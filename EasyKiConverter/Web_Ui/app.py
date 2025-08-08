@@ -83,9 +83,9 @@ def export_components():
                 'error': 'componentIds不能为空'
             }), 400
 
-        # 处理导出路径：如果为空则使用项目根目录上级目录的output文件夹
+        # 处理导出路径：如果为空则使用工作区根目录的output文件夹
         if not export_path or export_path.strip() == '':
-            export_dir = Path.cwd().parent / 'output'
+            export_dir = Path.cwd().parent.parent / 'output'
         else:
             export_dir = Path(export_path)
             if not export_dir.is_absolute():
