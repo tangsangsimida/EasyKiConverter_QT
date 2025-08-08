@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyKiConverter - 元器件库导出工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EasyKiConverter</h1>
+            <p>简单易用的元器件库导出工具</p>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <h2>元器件信息</h2>
+                <div class="form-group">
+                    <label for="componentIds">元器件编号 (支持多个，每行一个)</label>
+                    <textarea id="componentIds" placeholder="例如：
+C12345
+R67890
+Q123456" rows="5" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="filePrefix">文件名前缀 (可选)</label>
+                    <input type="text" id="filePrefix" placeholder="例如：my_project，留空默认为testlib">
+                </div>
+
+                <div class="form-group">
+                    <label for="exportPath">导出位置 (可选)</label>
+                    <input type="text" id="exportPath" placeholder="输入完整文件夹路径，留空则导出到项目根目录的output文件夹">
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        提示：请直接输入完整文件夹路径，如：C:\Users\用户名\Desktop\导出文件夹。留空将使用默认路径：项目上级目录\output
+                    </small>
+                </div>
+
+                <div class="export-options">
+                    <h3>导出内容</h3>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="exportSymbol" checked>
+                        <span>符号库</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="exportFootprint" checked>
+                        <span>封装库</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="export3DModel" checked>
+                        <span>3D模型库</span>
+                    </label>
+                </div>
+
+                <button type="button" id="exportBtn" class="primary-btn">
+                    <span class="btn-text">开始导出</span>
+                    <span class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+
+            <div class="progress-container" style="display: none;">
+                <h3>导出进度</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">准备中...</div>
+            </div>
+
+            <div class="results-container" style="display: none;">
+                <h3>导出结果</h3>
+                <div id="resultsList"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 EasyKiConverter - 让元器件库管理更简单</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
