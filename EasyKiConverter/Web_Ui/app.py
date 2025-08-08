@@ -28,6 +28,7 @@ from kicad.export_kicad_3d_model import Exporter3dModelKicad
 from kicad.export_kicad_footprint import ExporterFootprintKicad
 from kicad.export_kicad_symbol import ExporterSymbolKicad
 from kicad.parameters_kicad_symbol import KicadVersion
+from helpers import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 
 # 创建Flask应用
 app = Flask(__name__)
@@ -232,9 +233,20 @@ def export_component_real(lcsc_id: str, export_path: str, export_options: Dict[s
                     footprint_lib_name=lib_name
                 )
                 
-                # 直接写入符号库文件（简化版本，不处理已存在的情况）
-                with open(symbol_lib_path, 'a', encoding='utf-8') as f:
-                    f.write(kicad_symbol_str)
+                # 使用与main.py相同的逻辑添加符号
+                if not id_already_in_symbol_lib(
+                    lib_path=symbol_lib_path,
+                    component_name=symbol_data.info.name,
+                    kicad_version=kicad_version,
+                ):
+                    add_component_in_symbol_lib_file(
+                        lib_path=symbol_lib_path,
+                        component_content=kicad_symbol_str,
+                        kicad_version=kicad_version,
+                    )
+                    logger.info(f"Symbol for {symbol_data.info.name} added to {symbol_lib_path}")
+                else:
+                    logger.info(f"Symbol for {symbol_data.info.name} already exists in {symbol_lib_path}. Skipping.")
                 
                 files_created.append(os.path.abspath(symbol_lib_path))
                 logger.info(f"Symbol saved to {symbol_lib_path}")
