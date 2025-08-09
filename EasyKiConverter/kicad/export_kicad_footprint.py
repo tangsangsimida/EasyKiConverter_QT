@@ -73,7 +73,7 @@ def compute_arc(
         )
     sq = max(sq, 0)
     coef = sign * sqrt(sq)
-    cx1 = coef * ((radius_x * y1) / radius_y)
+    cx1 = coef * ((radius_x * y1) / radius_y) if radius_y != 0 else 0
     cy1 = coef * -((radius_y * x1) / radius_x) if radius_x != 0 else 0
 
     # Step 3 : Compute (cx, cy) from (cx1, cy1)
