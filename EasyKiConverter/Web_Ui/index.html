@@ -3,81 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyKiConverter - 元器件库导出工具</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>EasyKiConverter - 嘉立创EDA转KiCad工具</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>EasyKiConverter</h1>
-            <p>简单易用的元器件库导出工具</p>
+            <p>一个用于将嘉立创EDA的元器件导出为KiCad格式的便捷工具</p>
         </header>
 
         <main>
             <div class="form-container">
-                <h2>元器件信息</h2>
-                <div class="form-group">
-                    <label for="componentIds">元器件编号 (支持多个，每行一个)</label>
-                    <textarea id="componentIds" placeholder="例如：
+                <h2>输入嘉立创元器件编号</h2>
+                <form id="export-form">
+                    <div class="form-group">
+                        <label for="urls">元器件编号（每行一个）</label>
+                        <textarea id="urls" name="urls" rows="5" placeholder="例如：
 C12345
-R67890
-Q123456" rows="5" required></textarea>
-                </div>
+C67890
+C98765
+"></textarea>
+                    </div>
 
-                <div class="form-group">
-                    <label for="filePrefix">库名称 (可选)</label>
-                    <input type="text" id="filePrefix" placeholder="例如：my_lib，留空默认为easyeda_convertlib">
-                </div>
+                    <div class="form-group">
+                        <label for="output_folder_path">自定义库保存路径（可选）</label>
+                        <input type="text" id="output_folder_path" name="output_folder_path" placeholder="留空将默认保存到工作区根目录的output文件夹">
+                    </div>
 
-                <div class="form-group">
-                    <label for="exportPath">导出位置 (可选)</label>
-                    <input type="text" id="exportPath" placeholder="输入完整文件夹路径，留空则导出到工作区根目录的output文件夹">
-                    <small style="color: #666; margin-top: 5px; display: block;">
-                        提示：请直接输入完整文件夹路径，如：C:\Users\用户名\Desktop\导出文件夹。留空将使用默认路径：工作区根目录\output
-                    </small>
-                </div>
+                    <div class="form-group">
+                        <label for="output_lib_name">自定义库名称（可选）</label>
+                        <input type="text" id="output_lib_name" name="output_lib_name" placeholder="例如：my_project，留空默认为easyeda_convertlib">
+                    </div>
 
-                <div class="export-options">
-                    <h3>导出内容</h3>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="exportSymbol" checked>
-                        <span>符号库</span>
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="exportFootprint" checked>
-                        <span>封装库</span>
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="export3DModel" checked>
-                        <span>3D模型库</span>
-                    </label>
-                </div>
+                    <div class="export-options">
+                        <h3>导出选项</h3>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export_symbol" name="export_symbol" checked>
+                            <span class="checkbox-checkmark"></span>
+                            导出原理图符号 (.kicad_sym)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export_footprint" name="export_footprint" checked>
+                            <span class="checkbox-checkmark"></span>
+                            导出PCB封装 (.kicad_mod)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export_3d_model" name="export_3d_model" checked>
+                            <span class="checkbox-checkmark"></span>
+                            导出3D模型 (.step)
+                        </label>
+                    </div>
 
-                <button type="button" id="exportBtn" class="primary-btn">
-                    <span class="btn-text">开始导出</span>
-                    <span class="loading-spinner" style="display: none;"></span>
-                </button>
+                    <button type="submit" id="export-btn" class="primary-btn">
+                        <span class="btn-text">开始导出</span>
+                        <div class="loading-spinner"></div>
+                    </button>
+                </form>
             </div>
 
-            <div class="progress-container" style="display: none;">
-                <h3>导出进度</h3>
+            <div id="progress-container" class="progress-container" style="display: none;">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+                    <div id="progress-fill" class="progress-fill"></div>
                 </div>
-                <div class="progress-text" id="progressText">准备中...</div>
+                <div id="progress-text" class="progress-text"></div>
             </div>
 
-            <div class="results-container" style="display: none;">
+            <div id="results-container" class="results-container" style="display: none;">
                 <h3>导出结果</h3>
-                <div id="resultsList"></div>
+                <div id="results-list"></div>
             </div>
         </main>
 
         <footer>
-            <p>&copy; 2024 EasyKiConverter - 让元器件库管理更简单</p>
+            <p>&copy; 2024 EasyKiConverter. All Rights Reserved.</p>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

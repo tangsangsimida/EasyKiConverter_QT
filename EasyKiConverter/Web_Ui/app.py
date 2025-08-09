@@ -38,6 +38,34 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def extract_lcsc_id_from_url(url_or_id: str) -> str:
+    """从URL或直接输入中提取LCSC ID"""
+    import re
+    
+    # 如果已经是LCSC ID格式，直接返回
+    if re.match(r'^C\d+$', url_or_id.strip()):
+        return url_or_id.strip()
+    
+    # 从URL中提取LCSC ID
+    # 支持格式：https://item.szlcsc.com/12345.html 或 https://item.szlcsc.com/C12345.html
+    patterns = [
+        r'item\.szlcsc\.com/(C?\d+)\.html',  # 标准URL格式
+        r'item\.szlcsc\.com/(C\d+)',         # 不带.html的格式
+        r'/(C\d+)(?:\.html)?$',              # 任何以/C数字结尾的URL
+        r'\b(C\d+)\b'                        # 任何包含C+数字的文本
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, url_or_id)
+        if match:
+            lcsc_id = match.group(1)
+            # 确保以C开头
+            if not lcsc_id.startswith('C'):
+                lcsc_id = 'C' + lcsc_id
+            return lcsc_id
+    
+    return None
+
 # 主页路由
 @app.route('/')
 def index():
@@ -45,15 +73,20 @@ def index():
     return send_from_directory('.', 'index.html')
 
 # 静态文件路由
-@app.route('/styles.css')
-def styles():
+@app.route('/css/<path:filename>')
+def css_files(filename):
     """提供CSS文件"""
-    return send_from_directory('.', 'styles.css')
+    return send_from_directory('css', filename)
 
-@app.route('/script.js')
-def script():
+@app.route('/js/<path:filename>')
+def js_files(filename):
     """提供JS文件"""
-    return send_from_directory('.', 'script.js')
+    return send_from_directory('js', filename)
+
+@app.route('/imgs/<path:filename>')
+def img_files(filename):
+    """提供图片文件"""
+    return send_from_directory('imgs', filename)
 
 @app.route('/api/export', methods=['POST'])
 def export_components():
@@ -96,12 +129,14 @@ def export_components():
 
         # 使用真实导出逻辑
         all_results = []
-        for lcsc_id in component_ids:
-            if not lcsc_id.startswith('C'):
+        for component_input in component_ids:
+            # 从URL中提取LCSC ID
+            lcsc_id = extract_lcsc_id_from_url(component_input)
+            if not lcsc_id:
                 all_results.append({
-                    'componentId': lcsc_id,
+                    'componentId': component_input,
                     'success': False,
-                    'error': 'LCSC ID应以C开头'
+                    'error': '无法从URL中提取有效的LCSC ID'
                 })
                 continue
                 
