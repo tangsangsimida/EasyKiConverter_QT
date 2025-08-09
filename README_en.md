@@ -1,17 +1,29 @@
 # EasyKiConverter 🔄
 
-**English** | [中文](README_zh.md)
+**[English](README_en.md)** | [中文](README.md)
 
-A powerful Python tool for converting EasyEDA components to KiCad format with support for symbols, footprints, and 3D models.
+A powerful Python tool for converting LCSC and EasyEDA components to KiCad format, supporting complete conversion of symbols, footprints, and 3D models. Provides both command-line tools and modern Web UI interface.
 
 ## ✨ Features
 
-- **Symbol Conversion**: Convert EasyEDA symbols to KiCad symbol libraries
-- **Footprint Generation**: Create KiCad footprints from EasyEDA packages
-- **3D Model Support**: Download and convert 3D models (OBJ and STEP formats)
-- **Batch Processing**: Process multiple components in a single run
-- **Flexible Output**: Support for different KiCad versions and output formats
-- **API Integration**: Direct access to EasyEDA's component database
+### 🎯 Core Functions
+- **Symbol Conversion**: Convert EasyEDA symbols to KiCad symbol libraries (.kicad_sym)
+- **Footprint Generation**: Create KiCad footprints from EasyEDA packages (.kicad_mod)
+- **3D Model Support**: Automatically download and convert 3D models (multiple formats supported)
+- **Batch Processing**: Support simultaneous conversion of multiple components
+- **Version Compatibility**: Support KiCad 5.x and 6.x+ versions
+
+### 🌐 Web UI Interface
+- **Modern Interface**: Beautiful frosted glass effect design
+- **Real-time Progress**: Visual progress bar for conversion process
+- **Flexible Input**: Support LCSC part numbers or LCSC links
+- **Selective Export**: Choose to export symbols, footprints, or 3D models
+- **Instant Preview**: Real-time display of conversion results
+
+### 🛠️ Command Line Tools
+- **Script Automation**: Suitable for batch processing and CI/CD integration
+- **Rich Parameters**: Complete command-line parameter support
+- **Detailed Logging**: Detailed conversion process logs
 
 ## 🚀 Quick Start
 
@@ -22,93 +34,271 @@ A powerful Python tool for converting EasyEDA components to KiCad format with su
 git clone https://github.com/your-username/EasyKiConverter.git
 cd EasyKiConverter
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (choose based on usage)
+# Command-line tools only
+pip install -r EasyKiConverter/requirements.txt
+
+# Web UI (Recommended)
+pip install -r EasyKiConverter/Web_Ui/requirements.txt
 ```
 
-### Basic Usage
+### 🌐 Web UI Usage (Recommended)
 
 ```bash
-# Convert a single component
-python main.py -i LCSC_PART_NUMBER -v 6
+# Method 1: Use startup script (Windows)
+start_webui.bat
 
-# Convert multiple components
-python main.py -i LCSC_PART_NUMBER1 LCSC_PART_NUMBER2 -v 6
+# Method 2: Manual startup
+cd EasyKiConverter/Web_Ui
+python app.py
 
-# Specify output directory
-python main.py -i LCSC_PART_NUMBER -v 6 -o ./output
+# Then visit in browser: http://localhost:8000
+```
+
+**Web UI Usage Steps:**
+1. Enter LCSC part number (e.g., C13377) or LCSC link in the input box
+2. Select export content: symbols, footprints, 3D models
+3. Set output directory and library name
+4. Click "Start Export" button
+5. View real-time progress and conversion results
+
+### 🛠️ Command Line Usage
+
+```bash
+cd EasyKiConverter
+
+# Convert single component (export all content)
+python main.py --lcsc_id C13377 --symbol --footprint --model3d
+
+# Export symbols only
+python main.py --lcsc_id C13377 --symbol
+
+# Specify output directory and library name
+python main.py --lcsc_id C13377 --symbol --footprint --output_dir ./my_libs --lib_name MyLibrary
 ```
 
 ## 📁 Project Structure
 
 ```
 EasyKiConverter/
-├── main.py                 # Main entry point and CLI interface
-├── easyeda_api.py          # EasyEDA API client for component data
-├── export_kicad_symbol.py  # KiCad symbol generation engine
-├── export_kicad_footprint.py  # KiCad footprint generation engine
-├── helpers.py              # Utility functions and helpers
-├── requirements.txt        # Python dependencies
-├── README.md              # This file (English)
-├── README_zh.md           # Chinese documentation
-└── .gitignore            # Git ignore rules
+├── EasyKiConverter/                    # Core conversion engine
+│   ├── main.py                        # Command-line tool main entry
+│   ├── helpers.py                     # Utility functions and helpers
+│   ├── easyeda/                       # EasyEDA API and data processing
+│   │   ├── easyeda_api.py            # EasyEDA API client
+│   │   ├── easyeda_importer.py       # Data importers
+│   │   └── parameters_easyeda.py     # EasyEDA parameter definitions
+│   ├── kicad/                        # KiCad export engines
+│   │   ├── export_kicad_symbol.py    # Symbol exporter
+│   │   ├── export_kicad_footprint.py # Footprint exporter
+│   │   ├── export_kicad_3d_model.py  # 3D model exporter
+│   │   └── parameters_kicad_symbol.py # KiCad parameter definitions
+│   └── Web_Ui/                       # Web user interface
+│       ├── app.py                    # Flask web application
+│       ├── index.html                # Main page
+│       ├── css/styles.css            # Style files
+│       ├── js/script.js              # Frontend scripts
+│       ├── imgs/background.jpg       # Background images
+│       └── requirements.txt          # Web UI dependencies
+├── start_webui.bat                    # Windows startup script
+├── LICENSE                           # GPL-3.0 license
+├── README.md                         # Chinese documentation
+├── README_en.md                      # English documentation
+└── .gitignore                       # Git ignore rules
 ```
 
-## 📋 File Descriptions
+## 📋 Core Module Description
 
-| File | Description |
-|------|-------------|
-| **main.py** | Command-line interface that orchestrates the entire conversion process. Handles argument parsing, validation, and coordinates between API calls and export engines. |
-| **easyeda_api.py** | REST API client for EasyEDA's component database. Retrieves symbol data, footprint information, and 3D model URLs. |
-| **export_kicad_symbol.py** | Core engine for converting EasyEDA symbols to KiCad format. Handles pin mapping, graphical elements, and symbol properties. |
-| **export_kicad_footprint.py** | Engine for generating KiCad footprints from EasyEDA packages. Creates pads, silkscreen, and mechanical layers. |
-| **helpers.py** | Shared utilities including logging setup, file operations, coordinate transformations, and KiCad library management. |
-| **requirements.txt** | Lists all Python package dependencies needed to run the project. |
+### 🎯 Command Line Tools
+| File | Function Description |
+|------|----------------------|
+| **main.py** | Command-line interface main entry, handles parameter parsing, validation, and coordinates the entire conversion process |
+| **helpers.py** | Shared utility functions, including logging setup, file operations, KiCad library management, etc. |
+
+### 🌐 Web UI Interface
+| File | Function Description |
+|------|----------------------|
+| **app.py** | Flask web application main program, provides REST API and static file services |
+| **index.html** | Main page, modern user interface with drag-and-drop and real-time feedback |
+| **css/styles.css** | Style files, frosted glass effects and responsive design |
+| **js/script.js** | Frontend interaction scripts, handles form submission, progress display, and result presentation |
+
+### 🔧 Core Engine
+| Module | Function Description |
+|--------|----------------------|
+| **easyeda/** | EasyEDA API client and data processing modules |
+| **kicad/** | KiCad format export engines, supports symbols, footprints, and 3D models |
+
+### 📦 Data Processing Flow
+1. **API Retrieval**: Get component data from EasyEDA/LCSC
+2. **Data Parsing**: Parse symbol, footprint, and 3D model information
+3. **Format Conversion**: Convert to KiCad compatible format
+4. **File Generation**: Output .kicad_sym, .kicad_mod and other files
 
 ## 🔧 Command Line Options
 
 ```bash
-python main.py [OPTIONS]
+python main.py [options]
 
-Options:
-  -i, --id TEXT          LCSC part number(s) to convert  [required]
-  -v, --kicad_version    KiCad version (5 or 6)  [default: 6]
-  -o, --output_dir       Output directory path  [default: ./output]
+Required parameters:
+  --lcsc_id TEXT         LCSC part number to convert (e.g., C13377)
+
+Export options (at least one required):
+  --symbol               Export symbols (.kicad_sym)
+  --footprint            Export footprints (.kicad_mod)
+  --model3d              Export 3D models
+
+Optional parameters:
+  --output_dir PATH      Output directory path [default: ./output]
+  --lib_name TEXT        Library file name [default: EasyKiConverter]
+  --kicad_version INT    KiCad version (5 or 6) [default: 6]
   --overwrite            Overwrite existing files
-  --debug                Enable debug logging
-  --help                 Show help message
+  --debug                Enable detailed logging
+  --help                 Show help information
 ```
 
-## 🛠️ Development
+### 📝 Usage Examples
+
+```bash
+# Export all content to default directory
+python main.py --lcsc_id C13377 --symbol --footprint --model3d
+
+# Export symbols only to specified directory
+python main.py --lcsc_id C13377 --symbol --output_dir ./my_symbols
+
+# Export to custom library name
+python main.py --lcsc_id C13377 --symbol --footprint --lib_name MyComponents
+
+# Enable debug mode
+python main.py --lcsc_id C13377 --symbol --debug
+```
+
+## 🛠️ Development Guide
 
 ### Setting up Development Environment
 
 ```bash
+# Clone project
+git clone https://github.com/your-username/EasyKiConverter.git
+cd EasyKiConverter
+
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
 
-# Install development dependencies
-pip install -r requirements.txt
+# Install dependencies
+pip install -r EasyKiConverter/Web_Ui/requirements.txt
 ```
 
-### Running Tests
+### 🌐 Web UI Development
+
+```bash
+# Start development server
+cd EasyKiConverter/Web_Ui
+python app.py
+
+# Access development interface
+# http://localhost:8000
+```
+
+**Frontend Development:**
+- Modify `index.html` - Page structure
+- Modify `css/styles.css` - Styles and animations
+- Modify `js/script.js` - Interaction logic
+
+**Backend Development:**
+- Modify `app.py` - API interfaces and routing
+- Core conversion logic in `../` directory
+
+### 🛠️ Command Line Development
 
 ```bash
 # Run basic conversion test
-python main.py -i C13377 -v 6 --debug
+cd EasyKiConverter
+python main.py --lcsc_id C13377 --symbol --debug
+
+# Test different component types
+python main.py --lcsc_id C25804 --footprint --debug  # Test footprints
+python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
 ```
 
-## 📝 Requirements
+### 🔧 Code Structure
 
-- Python 3.7+
-- Internet connection (for EasyEDA API access)
-- KiCad (for using generated libraries)
+- **easyeda/** - EasyEDA API and data processing
+- **kicad/** - KiCad format export engines
+- **Web_Ui/** - Flask web application
+- **main.py** - Command-line entry point
+- **helpers.py** - Shared utility functions
 
-## 🤝 Contributing
+## 📝 System Requirements
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Basic Requirements
+- **Python 3.7+** (Recommended 3.8+)
+- **Internet Connection** (Access EasyEDA/LCSC API)
+- **KiCad 5.x or 6.x+** (Use generated library files)
+
+### Python Dependencies
+- **Flask 2.0+** (Web UI)
+- **Flask-CORS** (Cross-origin support)
+- **requests** (HTTP requests)
+- **Other dependencies** see requirements.txt
+
+### Supported Operating Systems
+- ✅ Windows 10/11
+- ✅ macOS 10.14+
+- ✅ Linux (Ubuntu 18.04+)
+
+## 🎯 Supported Component Types
+
+- 🔌 **Connectors** - Various plugs and terminals
+- 🔧 **Discrete Components** - Resistors, capacitors, inductors, diodes, etc.
+- 💾 **Integrated Circuits** - MCUs, memory, op-amps, etc.
+- ⚡ **Power Management** - Regulators, switching power supply chips, etc.
+- 📡 **RF Components** - Antennas, filters, etc.
+- 🔍 **Sensors** - Temperature, pressure, optical sensors, etc.
+
+## 🤝 Contributing Guide
+
+We welcome all forms of contributions!
+
+### 🐛 Report Issues
+- Use [GitHub Issues](https://github.com/your-username/EasyKiConverter/issues)
+- Provide detailed error information and reproduction steps
+- Include LCSC part numbers and system information
+
+### 💡 Feature Suggestions
+- Describe new feature requirements in Issues
+- Explain use cases and expected effects
+
+### 🔧 Code Contributions
+1. Fork the project
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Create Pull Request
 
 ## 📄 License
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0) - see the [LICENSE](../LICENSE) file in the project root directory for details.
+This project is licensed under **GNU General Public License v3.0 (GPL-3.0)**.
+
+- ✅ Commercial use
+- ✅ Modification
+- ✅ Distribution
+- ✅ Patent use
+- ❌ Liability
+- ❌ Warranty
+
+See [LICENSE](LICENSE) file for complete license terms.
+
+---
+
+## 🙏 Acknowledgments
+
+Thanks to [EasyEDA](https://easyeda.com/) and [LCSC](https://www.szlcsc.com/) for providing open APIs.
+
+Thanks to [KiCad](https://www.kicad.org/) open source circuit design software.
+
+---
+
+**⭐ If this project helps you, please give us a Star!**
