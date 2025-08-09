@@ -111,10 +111,26 @@ def compute_arc(
 # ---------------------------------------
 
 
-def fp_to_ki(dim: float) -> float:
-    if dim not in ["", None] and isnan(float(dim)) is False:
-        return round(float(dim) * 10 * 0.0254, 2)
-    return dim
+def fp_to_ki(dim) -> float:
+    # Handle both string and numeric inputs
+    if dim in ["", None]:
+        return 0.0
+    
+    try:
+        # Convert to float if it's a string
+        if isinstance(dim, str):
+            dim_float = float(dim)
+        else:
+            dim_float = float(dim)
+        
+        # Check for NaN
+        if isnan(dim_float):
+            return 0.0
+            
+        return round(dim_float * 10 * 0.0254, 2)
+    except (ValueError, TypeError):
+        # If conversion fails, return 0.0 as fallback
+        return 0.0
 
 
 # ---------------------------------------
@@ -293,20 +309,24 @@ class ExporterFootprintKicad:
             )
 
             # Generate line
-            point_list = [fp_to_ki(point) for point in ee_track.points.split(" ")]
-            for i in range(0, len(point_list) - 2, 2):
-                ki_track.points_start_x.append(
-                    round(point_list[i] - self.input.bbox.x, 2)
-                )
-                ki_track.points_start_y.append(
-                    round(point_list[i + 1] - self.input.bbox.y, 2)
-                )
-                ki_track.points_end_x.append(
-                    round(point_list[i + 2] - self.input.bbox.x, 2)
-                )
-                ki_track.points_end_y.append(
-                    round(point_list[i + 3] - self.input.bbox.y, 2)
-                )
+            point_list = [fp_to_ki(point) for point in ee_track.points.split(" ") if point.strip()]
+            # Ensure we have at least 4 points (2 coordinate pairs) to form a line
+            if len(point_list) >= 4:
+                for i in range(0, len(point_list) - 3, 2):
+                    ki_track.points_start_x.append(
+                        round(point_list[i] - self.input.bbox.x, 2)
+                    )
+                    ki_track.points_start_y.append(
+                        round(point_list[i + 1] - self.input.bbox.y, 2)
+                    )
+                    ki_track.points_end_x.append(
+                        round(point_list[i + 2] - self.input.bbox.x, 2)
+                    )
+                    ki_track.points_end_y.append(
+                        round(point_list[i + 3] - self.input.bbox.y, 2)
+                    )
+            else:
+                logging.warning(f"Track has insufficient points: {len(point_list)} points, need at least 4")
 
             self.output.tracks.append(ki_track)
 
