@@ -303,11 +303,11 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 
 感谢 [GitHub](https://github.com/) 平台以及所有为本项目提供贡献的贡献者。
 
+我们要向所有贡献者表示诚挚的感谢。
+
 <a href="https://github.com/your-username/EasyKiConverter/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=your-username/EasyKiConverter" />
 </a>
-
-*贡献者头像由 [contrib.rocks](https://contrib.rocks) 提供*
 
 感谢 [EasyEDA](https://easyeda.com/) 和 [嘉立创](https://www.szlcsc.com/) 提供的开放 API。
 

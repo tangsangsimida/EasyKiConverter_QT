@@ -303,11 +303,11 @@ This project is derived from **[uPesy/easyeda2kicad.py](https://github.com/uPesy
 
 Thanks to [GitHub](https://github.com/) platform and all contributors who have contributed to this project.
 
+We would like to express our sincere gratitude to all the contributors.
+
 <a href="https://github.com/your-username/EasyKiConverter/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=your-username/EasyKiConverter" />
 </a>
-
-*Contributor avatars provided by [contrib.rocks](https://contrib.rocks)*
 
 Thanks to [EasyEDA](https://easyeda.com/) and [LCSC](https://www.szlcsc.com/) for providing open APIs.
 
