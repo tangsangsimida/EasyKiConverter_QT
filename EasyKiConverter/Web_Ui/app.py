@@ -179,7 +179,7 @@ def export_component_real(lcsc_id: str, export_path: str, export_options: Dict[s
                 base_folder = os.path.abspath(base_folder)
 
         # 使用用户提供的文件名前缀，如果没有则使用默认名称
-        lib_name = file_prefix if file_prefix else "EasyKi_Library"
+        lib_name = file_prefix if file_prefix else "easyeda_convertlib"
 
         # 确保目录存在
         if not os.path.isdir(base_folder):
