@@ -1,0 +1,12 @@
+{
+  "output_folder_path": "",
+  "output_lib_name": "",
+  "export_options": {
+    "symbol": true,
+    "footprint": true,
+    "model3d": true
+  },
+  "last_component_ids": [
+    "C652779"
+  ]
+}
