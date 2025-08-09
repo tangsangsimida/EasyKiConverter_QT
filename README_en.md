@@ -295,6 +295,20 @@ See [LICENSE](LICENSE) file for complete license terms.
 
 ## 🙏 Acknowledgments
 
+### 🌟 Special Thanks
+
+This project is derived from **[uPesy/easyeda2kicad.py](https://github.com/uPesy/easyeda2kicad.py)**. We thank the original author for providing an excellent foundation framework and core conversion algorithms, which laid a solid foundation for the development of this project.
+
+### 🤝 Other Acknowledgments
+
+Thanks to [GitHub](https://github.com/) platform and all contributors who have contributed to this project.
+
+<a href="https://github.com/your-username/EasyKiConverter/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=your-username/EasyKiConverter" />
+</a>
+
+*Contributor avatars provided by [contrib.rocks](https://contrib.rocks)*
+
 Thanks to [EasyEDA](https://easyeda.com/) and [LCSC](https://www.szlcsc.com/) for providing open APIs.
 
 Thanks to [KiCad](https://www.kicad.org/) open source circuit design software.

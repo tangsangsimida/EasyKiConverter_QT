@@ -295,6 +295,20 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 
 ## 🙏 致谢
 
+### 🌟 特别感谢
+
+本项目基于 **[uPesy/easyeda2kicad.py](https://github.com/uPesy/easyeda2kicad.py)** 项目衍生而来。感谢原作者提供的优秀基础框架和核心转换算法，为本项目的开发奠定了坚实的基础。
+
+### 🤝 其他致谢
+
+感谢 [GitHub](https://github.com/) 平台以及所有为本项目提供贡献的贡献者。
+
+<a href="https://github.com/your-username/EasyKiConverter/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=your-username/EasyKiConverter" />
+</a>
+
+*贡献者头像由 [contrib.rocks](https://contrib.rocks) 提供*
+
 感谢 [EasyEDA](https://easyeda.com/) 和 [嘉立创](https://www.szlcsc.com/) 提供的开放 API。
 
 感谢 [KiCad](https://www.kicad.org/) 开源电路设计软件。
