@@ -2,7 +2,7 @@
 
 **[English](README_en.md)** | [中文](README.md)
 
-A powerful Python tool for converting LCSC and EasyEDA components to KiCad format, supporting complete conversion of symbols, footprints, and 3D models. Provides both command-line tools and modern Web UI interface.
+A powerful Python tool for converting LCSC and EasyEDA components to KiCad format, supporting complete conversion of symbols, footprints, and 3D models. Features a modern Web UI interface that makes component conversion simple and efficient.
 
 ## ✨ Features
 
@@ -11,71 +11,74 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 - **Footprint Generation**: Create KiCad footprints from EasyEDA packages (.kicad_mod)
 - **3D Model Support**: Automatically download and convert 3D models (multiple formats supported)
 - **Batch Processing**: Support simultaneous conversion of multiple components
+- **Multi-threading Optimization**: Parallel processing of multiple components for significantly improved efficiency
 - **Version Compatibility**: Support KiCad 5.x and 6.x+ versions
 
 ### 🌐 Web UI Interface
 - **Modern Interface**: Beautiful frosted glass effect design
-- **Real-time Progress**: Visual progress bar for conversion process
+- **Real-time Progress**: Visual progress bar for conversion process with parallel processing status
 - **Flexible Input**: Support LCSC part numbers or LCSC links
 - **Selective Export**: Choose to export symbols, footprints, or 3D models
-- **Instant Preview**: Real-time display of conversion results
+- **Instant Preview**: Real-time display of conversion results with processing time and file statistics
+- **Smart Configuration**: Auto-save export settings with clipboard quick input support
 
-### 🛠️ Command Line Tools
-- **Script Automation**: Suitable for batch processing and CI/CD integration
-- **Rich Parameters**: Complete command-line parameter support
-- **Detailed Logging**: Detailed conversion process logs
+### 🛠️ User-Friendly Design
+- **One-Click Launch**: Start Web UI with a simple double-click
+- **Zero Configuration**: Ready to use out of the box
+- **Cross-Platform**: Supports Windows, macOS, and Linux systems
 
 ## 🚀 Quick Start
 
-### Installation
+### 💻 Installation & Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/tangsangsimida/EasyKiConverter.git
 cd EasyKiConverter
-
-# Install dependencies (choose based on usage)
-# Command-line tools only
-pip install -r EasyKiConverter/requirements.txt
-
-# Web UI (Recommended)
-pip install -r EasyKiConverter/Web_Ui/requirements.txt
 ```
 
-### 🌐 Web UI Usage (Recommended)
+> 💡 **Tip**: The startup script will automatically check and install required dependencies
+
+### 🚀 Launch Web UI
 
 ```bash
-# Method 1: Use startup script (Windows)
+# Method 1: Use startup script (Recommended)
+# Windows users
 start_webui.bat
+
+# Linux/macOS users
+./start_webui.sh
 
 # Method 2: Manual startup
 cd EasyKiConverter/Web_Ui
 python app.py
-
-# Then visit in browser: http://localhost:8000
 ```
 
-**Web UI Usage Steps:**
-1. Enter LCSC part number (e.g., C13377) or LCSC link in the input box
-2. Select export content: symbols, footprints, 3D models
-3. Set output directory and library name
-4. Click "Start Export" button
-5. View real-time progress and conversion results
+After startup, visit in browser: **http://localhost:8000**
 
-### 🛠️ Command Line Usage
+### 🎯 Web UI User Guide
 
-```bash
-cd EasyKiConverter
+**Complete component conversion in four simple steps:**
 
-# Convert single component (export all content)
-python main.py --lcsc_id C13377 --symbol --footprint --model3d
+1. **📝 Input Component Information**
+   - Enter LCSC part number (e.g., C13377) in the input box
+   - Or paste LCSC product link directly
+   - Support batch input of multiple part numbers
 
-# Export symbols only
-python main.py --lcsc_id C13377 --symbol
+2. **⚙️ Select Export Options**
+   - ✅ Symbol library (.kicad_sym)
+   - ✅ Footprint library (.kicad_mod)
+   - ✅ 3D models (.step/.wrl)
 
-# Specify output directory and library name
-python main.py --lcsc_id C13377 --symbol --footprint --output_dir ./my_libs --lib_name MyLibrary
-```
+3. **📁 Configure Output Path**
+   - Choose output directory
+   - Set library file name prefix
+   - Settings auto-save for convenience
+
+4. **🚀 Start Conversion**
+   - Click "Start Export" button
+   - View real-time conversion progress
+   - Multi-component parallel processing for higher efficiency
 
 ## 📁 Project Structure
 
@@ -258,25 +261,104 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
 - 📡 **RF Components** - Antennas, filters, etc.
 - 🔍 **Sensors** - Temperature, pressure, optical sensors, etc.
 
-## 🤝 Contributing Guide
+## ⚡ Performance Optimization
 
-We welcome all forms of contributions!
+### 🚀 Multi-threading Parallel Processing
+- **Smart Thread Pool**: Automatically adjusts concurrent thread count based on CPU cores (maximum 8 threads)
+- **Parallel Conversion**: Multiple components processed simultaneously, significantly reducing batch conversion time
+- **Thread Safety**: File operations and symbol library writes use locking mechanisms to ensure data integrity
+- **Resource Optimization**: Single components processed directly to avoid unnecessary thread overhead
 
-### 🐛 Report Issues
+### 📊 Performance Improvement Effects
+- **Batch Processing**: Dramatically reduced conversion time for multiple components (improvement depends on component count and system configuration)
+- **CPU Utilization**: Full utilization of multi-core processor performance
+- **User Experience**: Real-time progress display with processing time and parallel status information
+- **Smart Scheduling**: Parallelized execution of network requests and file I/O operations
+
+### 🔧 Technical Features
+- **Thread Pool Management**: Implemented using `concurrent.futures.ThreadPoolExecutor`
+- **Locking Mechanism**: Independent locks assigned to each symbol library file to avoid write conflicts
+- **Error Isolation**: Single component processing failure does not affect other component conversions
+- **Memory Optimization**: Reasonable control of concurrency count, balancing performance and resource usage
+
+## 🤝 Contributing
+
+We welcome all forms of contributions! Please follow the standard GitHub collaboration workflow:
+
+### 🔄 Development Workflow
+
+1. **Fork the Project**
+   ```bash
+   # Fork the main repository to your GitHub account
+   # Then clone your fork
+   git clone https://github.com/your-username/EasyKiConverter.git
+   cd EasyKiConverter
+   ```
+
+2. **Switch to Development Branch**
+   ```bash
+   # Switch to dev branch (development branch)
+   git checkout dev
+   
+   # Create your feature branch
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Development**
+   - Develop on the `feature/your-feature-name` branch
+   - Follow existing code style and conventions
+   - Add necessary tests and documentation
+
+4. **Commit Changes**
+   ```bash
+   git add .
+   git commit -m "feat: add new feature description"
+   git push origin feature/your-feature-name
+   ```
+
+5. **Create Pull Request**
+   - Create PR on GitHub
+   - **Target Branch**: `dev` (Important: All PRs should be merged into dev branch)
+   - Provide clear PR description and change summary
+
+### 📋 Contribution Types
+
+- 🐛 **Bug Fixes**: Fix existing functionality issues
+- ✨ **New Features**: Add new functionality
+- 📚 **Documentation**: Improve documentation and instructions
+- 🎨 **UI/UX**: Improve user interface and experience
+- ⚡ **Performance**: Optimize performance and efficiency
+- 🧪 **Testing**: Add or improve tests
+
+### 🔍 Code Review
+
+- All PRs require code review
+- Maintainers will review your code and provide feedback
+- Please respond to review comments promptly and make necessary changes
+- After review approval, PR will be merged into `dev` branch
+
+### 🚀 Release Process
+
+- `dev` branch is used for daily development and feature integration
+- Release versions are created periodically from `dev` branch to `main` branch
+- All stable features will be released at appropriate times
+
+### 💡 Contribution Guidelines
+
+- Recommend creating an Issue for discussion before starting large feature development
+- Keep commit messages clear and meaningful
+- Follow project coding standards
+- Ensure your code is tested before submission
+
+### 🐛 Reporting Issues
 - Use [GitHub Issues](https://github.com/tangsangsimida/EasyKiConverter/issues)
 - Provide detailed error information and reproduction steps
-- Include LCSC part numbers and system information
+- Include LCSC component numbers and system information
 
 ### 💡 Feature Suggestions
 - Describe new feature requirements in Issues
 - Explain use cases and expected effects
-
-### 🔧 Code Contributions
-1. Fork the project
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Create Pull Request
+- Participate in community discussions and contributions
 
 ## 📄 License
 
