@@ -43,9 +43,15 @@ except ImportError as e:
     print(f"Python 路径: {sys.path}")
     raise
 
+# 导入配置管理器
+from config_manager import ConfigManager
+
 # 创建Flask应用
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# 初始化配置管理器
+config_manager = ConfigManager()
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -248,6 +254,18 @@ def export_components():
         end_time = time.time()
         processing_time = end_time - start_time
         logger.info(f"所有元器件处理完成，耗时: {processing_time:.2f} 秒")
+        
+        # 保存用户设置到配置文件
+        try:
+            config_manager.update_last_settings(
+                export_path=export_path,
+                file_prefix=file_prefix,
+                export_options=options,
+                component_ids=component_ids
+            )
+            logger.info("用户设置已保存")
+        except Exception as e:
+            logger.warning(f"保存用户设置失败: {str(e)}")
         
         return jsonify({
             'success': True,
@@ -607,6 +625,51 @@ def export_component_real(lcsc_id: str, export_path: str, export_options: Dict[s
             "files": [],
             "export_path": None
         }
+
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    """获取用户配置"""
+    try:
+        config = config_manager.get_last_settings()
+        return jsonify({
+            'success': True,
+            'config': config
+        })
+    except Exception as e:
+        logger.error(f"获取配置失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/config', methods=['POST'])
+def save_config():
+    """保存用户配置"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': '缺少配置数据'
+            }), 400
+        
+        success = config_manager.save_config(data)
+        if success:
+            return jsonify({
+                'success': True,
+                'message': '配置保存成功'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': '配置保存失败'
+            }), 500
+    except Exception as e:
+        logger.error(f"保存配置失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
