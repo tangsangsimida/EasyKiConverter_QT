@@ -5,7 +5,11 @@ EasyKiConverter Web UI - 集成真实EasyKiConverter工具链
 
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# 添加父目录到 Python 路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
 
 import json
 import tempfile
@@ -18,17 +22,23 @@ from flask_cors import CORS
 import logging
 
 # 导入EasyKiConverter的核心模块
-from easyeda.easyeda_api import EasyedaApi
-from easyeda.easyeda_importer import (
-    Easyeda3dModelImporter,
-    EasyedaFootprintImporter,
-    EasyedaSymbolImporter,
-)
-from kicad.export_kicad_3d_model import Exporter3dModelKicad
-from kicad.export_kicad_footprint import ExporterFootprintKicad
-from kicad.export_kicad_symbol import ExporterSymbolKicad
-from kicad.parameters_kicad_symbol import KicadVersion
-from helpers import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+try:
+    from easyeda.easyeda_api import EasyedaApi
+    from easyeda.easyeda_importer import (
+        Easyeda3dModelImporter,
+        EasyedaFootprintImporter,
+        EasyedaSymbolImporter,
+    )
+    from kicad.export_kicad_3d_model import Exporter3dModelKicad
+    from kicad.export_kicad_footprint import ExporterFootprintKicad
+    from kicad.export_kicad_symbol import ExporterSymbolKicad
+    from kicad.parameters_kicad_symbol import KicadVersion
+    from helpers import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+except ImportError as e:
+    print(f"导入错误: {e}")
+    print(f"当前工作目录: {os.getcwd()}")
+    print(f"Python 路径: {sys.path}")
+    raise
 
 # 创建Flask应用
 app = Flask(__name__)
