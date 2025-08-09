@@ -94,7 +94,9 @@ def compute_arc(
     p = ux * vx + uy * vy
     sign = -1 if (ux * vy - uy * vx) < 0 else 1
     if n != 0:
-        angle_extent = to_degrees(sign * acos(p / n)) if abs(p / n) < 1 else 360 + 359
+        # Clamp p/n to [-1, 1] to handle floating point precision errors
+        cosine_value = max(-1.0, min(1.0, p / n))
+        angle_extent = to_degrees(sign * acos(cosine_value))
     else:
         angle_extent = 360 + 359
     if not (sweep_flag) and angle_extent > 0:

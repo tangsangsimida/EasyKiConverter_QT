@@ -185,7 +185,9 @@ def get_arc_center(start_x, start_y, end_x, end_y, rotation_direction, radius):
 def get_arc_angle_end(
     center_x: float, end_x: float, radius: float, flag_large_arc: bool
 ):
-    theta = math.acos((end_x - center_x) / radius) * 180 / math.pi
+    # Clamp the cosine value to [-1, 1] to handle floating point precision errors
+    cosine_value = max(-1.0, min(1.0, (end_x - center_x) / radius))
+    theta = math.acos(cosine_value) * 180 / math.pi
     return 180 + theta if flag_large_arc else 180 + theta
 
 
