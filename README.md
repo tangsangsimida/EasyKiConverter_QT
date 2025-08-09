@@ -31,7 +31,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/EasyKiConverter.git
+git clone https://github.com/tangsangsimida/EasyKiConverter.git
 cd EasyKiConverter
 
 # 安装依赖（根据使用方式选择）
@@ -179,7 +179,7 @@ python main.py --lcsc_id C13377 --symbol --debug
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/EasyKiConverter.git
+git clone https://github.com/tangsangsimida/EasyKiConverter.git
 cd EasyKiConverter
 
 # 创建虚拟环境
@@ -263,7 +263,7 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 我们欢迎各种形式的贡献！
 
 ### 🐛 报告问题
-- 使用 [GitHub Issues](https://github.com/your-username/EasyKiConverter/issues)
+- 使用 [GitHub Issues](https://github.com/tangsangsimida/EasyKiConverter/issues)
 - 提供详细的错误信息和复现步骤
 - 包含 LCSC 元件编号和系统信息
 
@@ -305,8 +305,8 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 
 我们要向所有贡献者表示诚挚的感谢。
 
-<a href="https://github.com/your-username/EasyKiConverter/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=your-username/EasyKiConverter" />
+<a href="https://github.com/tangsangsimida/EasyKiConverter/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=tangsangsimida/EasyKiConverter" />
 </a>
 
 感谢 [EasyEDA](https://easyeda.com/) 和 [嘉立创](https://www.szlcsc.com/) 提供的开放 API。

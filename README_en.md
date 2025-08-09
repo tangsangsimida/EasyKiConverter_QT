@@ -31,7 +31,7 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/EasyKiConverter.git
+git clone https://github.com/tangsangsimida/EasyKiConverter.git
 cd EasyKiConverter
 
 # Install dependencies (choose based on usage)
@@ -179,7 +179,7 @@ python main.py --lcsc_id C13377 --symbol --debug
 
 ```bash
 # Clone project
-git clone https://github.com/your-username/EasyKiConverter.git
+git clone https://github.com/tangsangsimida/EasyKiConverter.git
 cd EasyKiConverter
 
 # Create virtual environment
@@ -263,7 +263,7 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
 We welcome all forms of contributions!
 
 ### 🐛 Report Issues
-- Use [GitHub Issues](https://github.com/your-username/EasyKiConverter/issues)
+- Use [GitHub Issues](https://github.com/tangsangsimida/EasyKiConverter/issues)
 - Provide detailed error information and reproduction steps
 - Include LCSC part numbers and system information
 
@@ -305,8 +305,8 @@ Thanks to [GitHub](https://github.com/) platform and all contributors who have c
 
 We would like to express our sincere gratitude to all the contributors.
 
-<a href="https://github.com/your-username/EasyKiConverter/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=your-username/EasyKiConverter" />
+<a href="https://github.com/tangsangsimida/EasyKiConverter/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=tangsangsimida/EasyKiConverter" />
 </a>
 
 Thanks to [EasyEDA](https://easyeda.com/) and [LCSC](https://www.szlcsc.com/) for providing open APIs.
