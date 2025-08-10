@@ -201,7 +201,8 @@ def export_components():
         if not component_ids:
             return jsonify({
                 'success': False,
-                'error': 'componentIds不能为空'
+                'error': '请输入至少一个元器件编号或上传BOM文件',
+                'error_type': 'empty_input'
             }), 400
 
         # 处理导出路径：如果为空则使用工作区根目录的output文件夹

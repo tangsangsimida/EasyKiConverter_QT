@@ -133,6 +133,32 @@ document.addEventListener('DOMContentLoaded', () => {
      form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const formData = new FormData(form);
+        const componentIds = formData.get('urls').split(/\s+/).filter(Boolean);
+        
+        // 检查是否输入了元器件编号
+        if (componentIds.length === 0) {
+            // 高亮显示输入框
+            const urlsTextarea = document.getElementById('urls');
+            urlsTextarea.style.borderColor = '#e74c3c';
+            urlsTextarea.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.3)';
+            
+            // 显示友好的错误提示
+            progressContainer.style.display = 'block';
+            progressText.textContent = '请输入至少一个元器件编号或上传BOM文件';
+            progressText.style.color = '#e74c3c';
+            
+            // 3秒后恢复样式
+            setTimeout(() => {
+                urlsTextarea.style.borderColor = '';
+                urlsTextarea.style.boxShadow = '';
+                progressContainer.style.display = 'none';
+                progressText.style.color = '';
+            }, 3000);
+            
+            return;
+        }
+
         // --- UI Setup for Loading --- 
         exportBtn.disabled = true;
         exportBtn.classList.add('loading');
@@ -141,10 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsList.innerHTML = '';
         progressFill.style.width = '0%';
         progressText.textContent = 'Starting...';
+        progressText.style.color = ''; // 重置颜色
 
-        const formData = new FormData(form);
         const data = {
-            componentIds: formData.get('urls').split(/\s+/).filter(Boolean),
+            componentIds: componentIds,
             options: {
                 symbol: formData.has('export_symbol'),
                 footprint: formData.has('export_footprint'),
@@ -175,7 +201,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // 尝试解析错误响应
+                try {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                } catch (parseError) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
             }
 
             const result = await response.json();
@@ -209,10 +241,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Export failed:', error);
-            progressText.textContent = 'An error occurred. Check console for details.';
+            
+            let errorMessage = 'An error occurred. Check console for details.';
+            
+            // 根据错误类型提供友好的错误信息
+            if (error.message.includes('HTTP error! status: 400')) {
+                errorMessage = '请检查输入的元器件编号格式是否正确';
+            } else if (error.message.includes('Failed to fetch')) {
+                errorMessage = '网络连接失败，请检查服务器是否正常运行';
+            } else if (error.message.includes('500')) {
+                errorMessage = '服务器内部错误，请稍后重试';
+            } else {
+                errorMessage = error.message || errorMessage;
+            }
+            
+            progressText.textContent = errorMessage;
+            progressText.style.color = '#e74c3c';
+            
             const errorItem = document.createElement('div');
             errorItem.className = 'result-item error';
-            errorItem.innerHTML = `<div class="result-details"><div class="result-name">Error</div><div class="result-path">${error.message}</div></div>`;
+            errorItem.innerHTML = `<div class="result-details"><div class="result-name">错误</div><div class="result-path">${errorMessage}</div></div>`;
             resultsList.appendChild(errorItem);
             resultsContainer.style.display = 'block';
         } finally {
