@@ -679,6 +679,11 @@ def health_check():
         'timestamp': datetime.now().isoformat()
     })
 
+@app.route('/@vite/client')
+def vite_client():
+    """处理 Vite 客户端请求，静默返回 404"""
+    return '', 404
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': '接口不存在'}), 404
