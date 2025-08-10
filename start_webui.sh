@@ -58,8 +58,12 @@ echo
 
 # Check if pip is available
 echo "Checking pip availability..."
+# Temporarily disable exit on error for this check
+set +e
 $PYTHON_CMD -m pip --version > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+PIP_CHECK_RESULT=$?
+set -e
+if [ $PIP_CHECK_RESULT -ne 0 ]; then
     echo "WARNING: pip is not available."
     echo "Attempting to install pip..."
     
@@ -99,8 +103,12 @@ if [ $? -ne 0 ]; then
     # Verify pip installation
     echo
     echo "Verifying pip installation..."
+    # Temporarily disable exit on error for this check
+    set +e
     $PYTHON_CMD -m pip --version > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
+    PIP_VERIFY_RESULT=$?
+    set -e
+    if [ $PIP_VERIFY_RESULT -ne 0 ]; then
         echo "ERROR: Failed to install or verify pip."
         echo "Please manually install pip and try again."
         exit 1
@@ -113,8 +121,14 @@ echo
 
 # Check if python3-venv module is available
 echo "Checking Python venv module availability..."
-$PYTHON_CMD -m venv --help > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+# Test by checking if ensurepip is available (required for venv)
+# Temporarily disable exit on error for this check
+set +e
+$PYTHON_CMD -c "import ensurepip" > /dev/null 2>&1
+VENV_TEST_RESULT=$?
+set -e
+
+if [ $VENV_TEST_RESULT -ne 0 ]; then
     echo "WARNING: Python venv module is not available."
     echo "This usually means the python3-venv package is not installed."
     echo
@@ -156,8 +170,14 @@ if [ $? -ne 0 ]; then
     # Verify installation
     echo
     echo "Verifying python3-venv installation..."
-    $PYTHON_CMD -m venv --help > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
+    # Test by checking if ensurepip is available (required for venv)
+    # Temporarily disable exit on error for this check
+    set +e
+    $PYTHON_CMD -c "import ensurepip" > /dev/null 2>&1
+    VENV_VERIFY_RESULT=$?
+    set -e
+    
+    if [ $VENV_VERIFY_RESULT -ne 0 ]; then
         echo "ERROR: Failed to install or verify python3-venv package."
         echo "Please manually install python3-venv and try again."
         exit 1
