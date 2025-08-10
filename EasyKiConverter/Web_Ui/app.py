@@ -23,6 +23,8 @@ import time
 from flask import Flask, request, jsonify, send_file, render_template_string, send_from_directory
 from flask_cors import CORS
 import logging
+import pandas as pd
+from werkzeug.utils import secure_filename
 
 # 导入EasyKiConverter的核心模块
 try:
@@ -669,6 +671,155 @@ def save_config():
         return jsonify({
             'success': False,
             'error': str(e)
+        }), 500
+
+@app.route('/api/parse-bom', methods=['POST'])
+def parse_bom():
+    """解析BOM文件，提取Supplier Part列中的元件编号"""
+    try:
+        logger.info(f"收到BOM解析请求，文件列表: {list(request.files.keys())}")
+        
+        # 检查是否有文件上传
+        if 'bom_file' not in request.files:
+            logger.error("未找到上传的文件")
+            return jsonify({
+                'success': False,
+                'error': '未找到上传的文件'
+            }), 400
+        
+        file = request.files['bom_file']
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': '未选择文件'
+            }), 400
+        
+        # 检查文件扩展名
+        filename = secure_filename(file.filename)
+        file_ext = filename.lower().split('.')[-1]
+        
+        if file_ext not in ['xlsx', 'xls', 'csv']:
+            return jsonify({
+                'success': False,
+                'error': '不支持的文件格式，请上传 .xlsx, .xls 或 .csv 文件'
+            }), 400
+        
+        # 读取文件内容
+        try:
+            if file_ext == 'csv':
+                # 尝试不同的编码读取CSV文件
+                try:
+                    df = pd.read_csv(file, encoding='utf-8')
+                except UnicodeDecodeError:
+                    file.seek(0)  # 重置文件指针
+                    try:
+                        df = pd.read_csv(file, encoding='gbk')
+                    except UnicodeDecodeError:
+                        file.seek(0)  # 重置文件指针
+                        df = pd.read_csv(file, encoding='latin-1')
+            else:
+                # Excel文件 - 首先尝试自动检测表头位置（检查前10行）
+                df_temp = pd.read_excel(file, header=None)
+                header_row = None
+                
+                # 查找包含元器件编号相关列名的行（检查前10行）
+                component_column_keywords = [
+                    'supplier part', 'supplier_part', 'lcsc', 'lcsc part', 'lcsc_part',
+                    'part number', 'part_number', 'component id', 'component_id',
+                    'mpn', 'manufacturer part', 'manufacturer_part', 'manufacturer part',
+                    'no.', 'quantity', 'comment', 'designator', 'footprint', 'value'
+                ]
+                
+                for i in range(min(10, len(df_temp))):
+                    row = df_temp.iloc[i]
+                    row_str = ' '.join([str(x) for x in row if pd.notna(x)]).lower()
+                    
+                    # 检查是否包含任何元器件编号相关的关键词
+                    for keyword in component_column_keywords:
+                        if keyword in row_str:
+                            header_row = i
+                            break
+                    
+                    if header_row is not None:
+                        break
+                
+                if header_row is not None:
+                    # 重新读取文件，使用找到的表头行
+                    file.seek(0)  # 重置文件指针
+                    df = pd.read_excel(file, header=header_row)
+                else:
+                    # 如果没找到，尝试默认方式读取
+                    file.seek(0)  # 重置文件指针
+                    df = pd.read_excel(file)
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': f'文件读取失败: {str(e)}'
+            }), 400
+        
+        # 查找元器件编号列（支持多种可能的列名）
+        component_column = None
+        component_column_keywords = [
+            'supplier part', 'supplier_part', 'lcsc', 'lcsc part', 'lcsc_part',
+            'part number', 'part_number', 'component id', 'component_id',
+            'mpn', 'manufacturer part', 'manufacturer_part'
+        ]
+        
+        # 优先查找 Supplier Part 列（嘉立创BOM标准格式）
+        for col in df.columns:
+            col_lower = str(col).lower().strip()
+            if 'supplier part' in col_lower:
+                component_column = col
+                break
+        
+        # 如果没找到 Supplier Part，再查找其他可能的列名
+        if component_column is None:
+            for col in df.columns:
+                col_lower = str(col).lower()
+                for keyword in component_column_keywords:
+                    if keyword in col_lower:
+                        component_column = col
+                        break
+                if component_column is not None:
+                    break
+        
+        if component_column is None:
+            return jsonify({
+                'success': False,
+                'error': f'未找到元器件编号列，请检查BOM表格式。\n支持的列名包括: Supplier Part, LCSC, Part Number, Component ID, MPN等\n可用列名: {", ".join([str(col) for col in df.columns])}'
+            }), 400
+        
+        # 提取元件编号
+        component_ids = []
+        for value in df[component_column].dropna():
+            # 转换为字符串并清理
+            component_id = str(value).strip()
+            if component_id and component_id.lower() != 'nan':
+                # 检查是否是有效的元件编号（通常以字母开头）
+                if component_id and len(component_id) > 1:
+                    component_ids.append(component_id)
+        
+        # 去重并保持顺序
+        unique_component_ids = []
+        seen = set()
+        for cid in component_ids:
+            if cid not in seen:
+                unique_component_ids.append(cid)
+                seen.add(cid)
+        
+        return jsonify({
+            'success': True,
+            'component_ids': unique_component_ids,
+            'total_count': len(unique_component_ids),
+            'column_name': component_column,
+            'message': f'从"{component_column}"列成功解析 {len(unique_component_ids)} 个唯一元件编号'
+        })
+        
+    except Exception as e:
+        logger.error(f"BOM解析错误: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'BOM解析失败: {str(e)}'
         }), 500
 
 @app.route('/api/health', methods=['GET'])

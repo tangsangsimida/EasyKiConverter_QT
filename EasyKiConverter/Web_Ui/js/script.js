@@ -221,4 +221,101 @@ document.addEventListener('DOMContentLoaded', () => {
             exportBtn.classList.remove('loading');
         }
     });
+
+    // BOM文件上传功能
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const bomFileInput = document.getElementById('bom-file');
+    const fileStatus = document.getElementById('file-status');
+    const urlsTextarea = document.getElementById('urls');
+
+    // 点击上传区域触发文件选择
+    fileUploadArea.addEventListener('click', () => {
+        bomFileInput.click();
+    });
+
+    // 拖拽上传功能
+    fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleBomFile(files[0]);
+        }
+    });
+
+    // 文件选择处理
+    bomFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleBomFile(e.target.files[0]);
+        }
+    });
+
+    // 处理BOM文件
+    async function handleBomFile(file) {
+        // 检查文件类型
+        const allowedTypes = ['.xlsx', '.xls', '.csv'];
+        const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+        
+        if (!allowedTypes.includes(fileExtension)) {
+            showFileStatus('error', '不支持的文件格式，请上传 .xlsx, .xls 或 .csv 文件');
+            return;
+        }
+
+        showFileStatus('processing', `正在处理文件: ${file.name}...`);
+
+        const formData = new FormData();
+        formData.append('bom_file', file);
+
+        try {
+            const response = await fetch('/api/parse-bom', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                const componentIds = result.component_ids;
+                if (componentIds.length > 0) {
+                    // 将解析出的元件编号添加到文本框中
+                    const currentText = urlsTextarea.value.trim();
+                    const newText = currentText ? currentText + '\n' + componentIds.join('\n') : componentIds.join('\n');
+                    urlsTextarea.value = newText;
+                    
+                    showFileStatus('success', `成功解析 ${componentIds.length} 个元件编号`);
+                } else {
+                    showFileStatus('error', '未找到任何元件编号，请检查BOM表中是否包含元器件编号列（如Supplier Part、LCSC、Part Number等）');
+                }
+            } else {
+                showFileStatus('error', result.error || '文件解析失败');
+            }
+        } catch (error) {
+            console.error('BOM文件处理失败:', error);
+            showFileStatus('error', '文件处理失败，请检查网络连接或文件格式');
+        }
+    }
+
+    // 显示文件状态
+    function showFileStatus(type, message) {
+        fileStatus.className = `file-status ${type}`;
+        fileStatus.textContent = message;
+        fileStatus.style.display = 'block';
+        
+        // 成功或错误状态5秒后自动隐藏
+        if (type === 'success' || type === 'error') {
+            setTimeout(() => {
+                fileStatus.style.display = 'none';
+            }, 5000);
+        }
+    }
 });
