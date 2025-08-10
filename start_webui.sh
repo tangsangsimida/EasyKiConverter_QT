@@ -56,6 +56,118 @@ else
 fi
 echo
 
+# Check if pip is available
+echo "Checking pip availability..."
+$PYTHON_CMD -m pip --version > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "WARNING: pip is not available."
+    echo "Attempting to install pip..."
+    
+    # Detect the system and install pip
+    if command -v apt &> /dev/null; then
+        # Debian/Ubuntu systems
+        echo "Detected Debian/Ubuntu system. Installing python3-pip..."
+        if command -v sudo &> /dev/null; then
+            sudo apt update && sudo apt install -y python3-pip
+        else
+            apt update && apt install -y python3-pip
+        fi
+    elif command -v yum &> /dev/null; then
+        # CentOS/RHEL systems
+        echo "Detected CentOS/RHEL system. Installing python3-pip..."
+        if command -v sudo &> /dev/null; then
+            sudo yum install -y python3-pip
+        else
+            yum install -y python3-pip
+        fi
+    elif command -v dnf &> /dev/null; then
+        # Fedora systems
+        echo "Detected Fedora system. Installing python3-pip..."
+        if command -v sudo &> /dev/null; then
+            sudo dnf install -y python3-pip
+        else
+            dnf install -y python3-pip
+        fi
+    else
+        echo "Could not detect package manager. Please manually install pip:"
+        echo "  - Ubuntu/Debian: apt install python3-pip"
+        echo "  - CentOS/RHEL: yum install python3-pip"
+        echo "  - Fedora: dnf install python3-pip"
+        exit 1
+    fi
+    
+    # Verify pip installation
+    echo
+    echo "Verifying pip installation..."
+    $PYTHON_CMD -m pip --version > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to install or verify pip."
+        echo "Please manually install pip and try again."
+        exit 1
+    fi
+    echo "pip is now available."
+else
+    echo "pip is available."
+fi
+echo
+
+# Check if python3-venv module is available
+echo "Checking Python venv module availability..."
+$PYTHON_CMD -m venv --help > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "WARNING: Python venv module is not available."
+    echo "This usually means the python3-venv package is not installed."
+    echo
+    echo "Attempting to install python3-venv package..."
+    
+    # Detect the system and install python3-venv
+    if command -v apt &> /dev/null; then
+        # Debian/Ubuntu systems
+        echo "Detected Debian/Ubuntu system. Installing python3-venv..."
+        if command -v sudo &> /dev/null; then
+            sudo apt update && sudo apt install -y python3-venv
+        else
+            apt update && apt install -y python3-venv
+        fi
+    elif command -v yum &> /dev/null; then
+        # CentOS/RHEL systems
+        echo "Detected CentOS/RHEL system. Installing python3-venv..."
+        if command -v sudo &> /dev/null; then
+            sudo yum install -y python3-venv
+        else
+            yum install -y python3-venv
+        fi
+    elif command -v dnf &> /dev/null; then
+        # Fedora systems
+        echo "Detected Fedora system. Installing python3-venv..."
+        if command -v sudo &> /dev/null; then
+            sudo dnf install -y python3-venv
+        else
+            dnf install -y python3-venv
+        fi
+    else
+        echo "Could not detect package manager. Please manually install python3-venv:"
+        echo "  - Ubuntu/Debian: apt install python3-venv"
+        echo "  - CentOS/RHEL: yum install python3-venv"
+        echo "  - Fedora: dnf install python3-venv"
+        exit 1
+    fi
+    
+    # Verify installation
+    echo
+    echo "Verifying python3-venv installation..."
+    $PYTHON_CMD -m venv --help > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to install or verify python3-venv package."
+        echo "Please manually install python3-venv and try again."
+        exit 1
+    fi
+    echo "Python venv module is now available."
+else
+    echo "Python venv module is available."
+fi
+echo
+
 echo "Checking for virtual environment..."
 
 # Check for existing virtual environments
@@ -74,8 +186,51 @@ else
     $PYTHON_CMD -m venv "$SCRIPT_DIR/venv"
     if [ $? -ne 0 ]; then
         echo "ERROR: Failed to create virtual environment."
-        echo "Please ensure you have the venv module installed."
-        exit 1
+        echo "This usually means the python3-venv package is not installed."
+        echo
+        echo "Attempting to install python3-venv package..."
+        
+        # Detect the system and install python3-venv
+        if command -v apt &> /dev/null; then
+            # Debian/Ubuntu systems
+            echo "Detected Debian/Ubuntu system. Installing python3-venv..."
+            if command -v sudo &> /dev/null; then
+                sudo apt update && sudo apt install -y python3-venv
+            else
+                apt update && apt install -y python3-venv
+            fi
+        elif command -v yum &> /dev/null; then
+            # CentOS/RHEL systems
+            echo "Detected CentOS/RHEL system. Installing python3-venv..."
+            if command -v sudo &> /dev/null; then
+                sudo yum install -y python3-venv
+            else
+                yum install -y python3-venv
+            fi
+        elif command -v dnf &> /dev/null; then
+            # Fedora systems
+            echo "Detected Fedora system. Installing python3-venv..."
+            if command -v sudo &> /dev/null; then
+                sudo dnf install -y python3-venv
+            else
+                dnf install -y python3-venv
+            fi
+        else
+            echo "Could not detect package manager. Please manually install python3-venv:"
+            echo "  - Ubuntu/Debian: apt install python3-venv"
+            echo "  - CentOS/RHEL: yum install python3-venv"
+            echo "  - Fedora: dnf install python3-venv"
+            exit 1
+        fi
+        
+        echo
+        echo "Retrying virtual environment creation..."
+        $PYTHON_CMD -m venv "$SCRIPT_DIR/venv"
+        if [ $? -ne 0 ]; then
+            echo "ERROR: Still failed to create virtual environment after installing python3-venv."
+            echo "Please check your Python installation and try again."
+            exit 1
+        fi
     fi
     VENV_PATH="$SCRIPT_DIR/venv"
     echo "Virtual environment created successfully: venv"
