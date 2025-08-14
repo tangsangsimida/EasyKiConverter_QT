@@ -315,7 +315,6 @@ python app.py
 
 <a href="https://github.com/tangsangsimida/EasyKiConverter/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=tangsangsimida/EasyKiConverter" />
-   <img src="https://contrib.rocks/image?repo=awan-deng/EasyKiConverter" />
 </a>
 
 感谢 [EasyEDA](https://easyeda.com/) 和 [嘉立创](https://www.szlcsc.com/) 提供的开放 API。
