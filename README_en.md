@@ -52,29 +52,7 @@ start_webui.bat
 
 After startup, visit in browser: **http://localhost:8000**
 
-### 🎯 Web UI User Guide
 
-**Complete component conversion in four simple steps:**
-
-1. **📝 Input Component Information**
-   - Enter LCSC part number (e.g., C13377) in the input box
-   - Or paste LCSC product link directly
-   - Support batch input of multiple part numbers
-
-2. **⚙️ Select Export Options**
-   - ✅ Symbol library (.kicad_sym)
-   - ✅ Footprint library (.kicad_mod)
-   - ✅ 3D models (.step/.wrl)
-
-3. **📁 Configure Output Path**
-   - Choose output directory
-   - Set library file name prefix
-   - Settings auto-save for convenience
-
-4. **🚀 Start Conversion**
-   - Click "Start Export" button
-   - View real-time conversion progress
-   - Multi-component parallel processing for higher efficiency
 
 ## 📚 Detailed Documentation
 
