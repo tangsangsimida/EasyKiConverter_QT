@@ -222,7 +222,7 @@ def main():
     debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
     print(f"启动 EasyKiConverter Web UI 服务器...")
-    print(f"访问 http://localhost:{port} 使用Web界面")
+    print(f"访问地址: http://localhost:{port} 使用Web界面")
     print(f"API文档: http://localhost:{port}/api/health")
     
     app.run(host='0.0.0.0', port=port, debug=debug)

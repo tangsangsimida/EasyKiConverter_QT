@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 EasyKiConverter Web UI - 集成真实EasyKiConverter工具链
 """
@@ -853,7 +854,7 @@ if __name__ == '__main__':
     print("=" * 50)
     print("  EasyKiConverter Web UI")
     print("=" * 50)
-    print(f"访问: http://localhost:{port}")
+    print(f"访问地址: http://localhost:{port}")
     print("=" * 50)
     
     app.run(host='0.0.0.0', port=port, debug=debug)
