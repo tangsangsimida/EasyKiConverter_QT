@@ -18,43 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // 添加当前活动状态
             item.classList.add('active');
             
-            // 切换页面内容
-            switchPage(page);
+            // 只处理元件转换页面
+            if (page === 'component') {
+                mainContent.style.display = 'block';
+                showComponentConversion();
+            }
         });
     });
-    
-    // 页面切换函数
-    function switchPage(page) {
-        if (page === 'component') {
-            mainContent.style.display = 'block';
-            // 恢复元件转换页面的原始内容
-            showComponentConversion();
-        } else if (page === 'project') {
-            mainContent.style.display = 'block';
-            // 显示工程转换页面
-            showProjectConversion();
-        }
-    }
     
     // 显示元件转换页面
     function showComponentConversion() {
         formContainer.innerHTML = originalComponentContent;
         // 重新绑定表单事件（因为DOM被重新创建）
         initializeComponentForm();
-    }
-    
-    // 显示工程转换页面（暂时显示提示信息）
-    function showProjectConversion() {
-        formContainer.innerHTML = `
-            <h2>工程转换</h2>
-            <div style="text-align: center; padding: 40px; color: #6B7280;">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom: 20px; opacity: 0.5;">
-                    <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
-                </svg>
-                <h3 style="margin-bottom: 10px; color: #374151;">工程转换功能</h3>
-                <p>此功能正在开发中，敬请期待...</p>
-            </div>
-        `;
     }
     
     // 初始化元件转换表单功能
