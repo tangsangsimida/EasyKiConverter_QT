@@ -13,7 +13,7 @@ from typing import List, Dict, Any
 from datetime import datetime
 
 try:
-    from flask import Flask, request, jsonify, send_file
+    from flask import Flask, request, jsonify, send_file, send_from_directory
     from flask_cors import CORS
 except ImportError:
     print("请安装依赖: pip install flask flask-cors")
@@ -27,6 +27,16 @@ CORS(app)
 
 # 全局变量存储导出任务状态
 export_tasks = {}
+
+@app.route('/')
+def index():
+    """提供主页"""
+    return send_file('index.html')
+
+@app.route('/<path:filename>')
+def static_files(filename):
+    """提供静态文件"""
+    return send_from_directory('.', filename)
 
 @app.route('/api/export', methods=['POST'])
 def export_components():
@@ -102,10 +112,10 @@ def process_export_task(
     results = []
     
     for component_id in component_ids:
-        component_results = process_single_component(
+        component_result = process_single_component(
             component_id, file_prefix, export_dir, options
         )
-        results.extend(component_results)
+        results.append(component_result)
     
     return results
 
@@ -114,12 +124,16 @@ def process_single_component(
     file_prefix: str, 
     export_dir: Path, 
     options: Dict[str, bool]
-) -> List[Dict[str, Any]]:
+) -> Dict[str, Any]:
     """处理单个元器件的导出"""
-    results = []
+    files = []
+    errors = []
+    success_count = 0
+    total_count = 0
     
     # 符号库导出
     if options.get('symbol', True):
+        total_count += 1
         try:
             symbol_file = export_dir / f"{file_prefix}_{component_id}_symbol.kicad_sym"
             
@@ -127,74 +141,70 @@ def process_single_component(
             # 暂时创建占位文件
             symbol_file.touch()
             
-            results.append({
-                'componentId': component_id,
+            files.append({
                 'type': 'symbol',
                 'fileName': symbol_file.name,
-                'filePath': str(symbol_file),
-                'success': True
+                'filePath': str(symbol_file)
             })
+            success_count += 1
         except Exception as e:
-            results.append({
-                'componentId': component_id,
-                'type': 'symbol',
-                'fileName': f"{file_prefix}_{component_id}_symbol.kicad_sym",
-                'filePath': str(export_dir),
-                'success': False,
-                'error': str(e)
-            })
+            errors.append(f"符号导出失败: {str(e)}")
     
     # 封装库导出
     if options.get('footprint', True):
+        total_count += 1
         try:
             footprint_dir = export_dir / f"{file_prefix}_{component_id}_footprints.pretty"
             footprint_dir.mkdir(exist_ok=True)
             footprint_file = footprint_dir / f"{component_id}.kicad_mod"
             footprint_file.touch()
             
-            results.append({
-                'componentId': component_id,
+            files.append({
                 'type': 'footprint',
                 'fileName': footprint_dir.name,
-                'filePath': str(footprint_dir),
-                'success': True
+                'filePath': str(footprint_dir)
             })
+            success_count += 1
         except Exception as e:
-            results.append({
-                'componentId': component_id,
-                'type': 'footprint',
-                'fileName': f"{file_prefix}_{component_id}_footprints.pretty",
-                'filePath': str(export_dir),
-                'success': False,
-                'error': str(e)
-            })
+            errors.append(f"封装导出失败: {str(e)}")
     
     # 3D模型导出
     if options.get('model3d', True):
+        total_count += 1
         try:
             model3d_dir = export_dir / f"{file_prefix}_{component_id}_3dmodels"
             model3d_dir.mkdir(exist_ok=True)
             model3d_file = model3d_dir / f"{component_id}.step"
             model3d_file.touch()
             
-            results.append({
-                'componentId': component_id,
+            files.append({
                 'type': '3dmodel',
                 'fileName': model3d_file.name,
-                'filePath': str(model3d_file),
-                'success': True
+                'filePath': str(model3d_file)
             })
+            success_count += 1
         except Exception as e:
-            results.append({
-                'componentId': component_id,
-                'type': '3dmodel',
-                'fileName': f"{component_id}.step",
-                'filePath': str(export_dir),
-                'success': False,
-                'error': str(e)
-            })
+            errors.append(f"3D模型导出失败: {str(e)}")
     
-    return results
+    # 构建结果
+    overall_success = success_count == total_count and len(errors) == 0
+    
+    if overall_success:
+        message = f"成功导出 {success_count} 个文件"
+    else:
+        message = f"部分成功: {success_count}/{total_count} 个文件导出成功"
+        if errors:
+            message += f". 错误: {'; '.join(errors)}"
+    
+    return {
+        'componentId': component_id,
+        'success': overall_success,
+        'files': files,
+        'message': message,
+        'successCount': success_count,
+        'totalCount': total_count,
+        'errors': errors
+    }
 
 @app.route('/api/download/<path:filename>')
 def download_file(filename):

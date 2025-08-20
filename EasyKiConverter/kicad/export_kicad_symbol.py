@@ -16,7 +16,7 @@ from easyeda.parameters_easyeda import (
     EeSymbolRectangle,
 )
 from easyeda.svg_path_parser import SvgPathEllipticalArc, SvgPathMoveTo
-from helpers import get_middle_arc_pos
+from geometry_utils import get_middle_arc_pos
 from kicad.export_kicad_footprint import compute_arc
 from kicad.parameters_kicad_symbol import *
 

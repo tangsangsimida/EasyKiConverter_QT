@@ -75,11 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
         loadLastSettings();
         
         // 重新绑定所有表单相关的事件监听器
-        bindFormEvents(form, exportBtn, btnText, loadingSpinner, progressContainer, progressFill, progressText, resultsContainer, resultsList);
+        bindFormEvents(form, exportBtn, btnText, loadingSpinner, progressContainer, progressFill, progressText, resultsContainer);
     }
     
     // 绑定表单事件的函数
-     function bindFormEvents(form, exportBtn, btnText, loadingSpinner, progressContainer, progressFill, progressText, resultsContainer, resultsList) {
+     function bindFormEvents(form, exportBtn, btnText, loadingSpinner, progressContainer, progressFill, progressText, resultsContainer) {
+         const resultsList = document.getElementById('results-list');
          // 表单提交事件
          form.addEventListener('submit', async (e) => {
              e.preventDefault();
@@ -359,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
      }
      
      function createResultsTable(results, stats, processingTime) {
+         const resultsList = document.getElementById('results-list');
          // 清空之前的结果
          resultsList.innerHTML = '';
          
