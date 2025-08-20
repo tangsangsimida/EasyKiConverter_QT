@@ -1,5 +1,5 @@
 {
-  "output_folder_path": "C:\\Users\\dennis-yoga\\Desktop\\testlib",
+  "output_folder_path": "C:\\Users\\dennis-yoga\\Desktop\\test",
   "output_lib_name": "",
   "export_options": {
     "symbol": true,
@@ -7,6 +7,6 @@
     "model3d": true
   },
   "last_component_ids": [
-    "C652779"
+    "C2040"
   ]
 }

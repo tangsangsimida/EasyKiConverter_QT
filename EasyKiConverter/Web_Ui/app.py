@@ -26,6 +26,8 @@ from flask_cors import CORS
 import logging
 import pandas as pd
 from werkzeug.utils import secure_filename
+from werkzeug.serving import WSGIRequestHandler
+import warnings
 
 # 导入EasyKiConverter的核心模块
 try:
@@ -39,7 +41,7 @@ try:
     from kicad.export_kicad_footprint import ExporterFootprintKicad
     from kicad.export_kicad_symbol import ExporterSymbolKicad
     from kicad.parameters_kicad_symbol import KicadVersion
-    from helpers import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+    from symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 except ImportError as e:
     print(f"导入错误: {e}")
     print(f"当前工作目录: {os.getcwd()}")
@@ -58,6 +60,42 @@ config_manager = ConfigManager()
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
+
+# 配置 werkzeug 日志 - 保留请求信息，但禁用开发服务器警告
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.INFO)
+
+# 创建更安全的自定义过滤器
+class StrictNoWarningFilter(logging.Filter):
+    def filter(self, record):
+        try:
+            # 尝试获取消息内容
+            message = ""
+            if hasattr(record, 'getMessage'):
+                try:
+                    message = record.getMessage()
+                except:
+                    pass
+            
+            # 检查各种可能包含警告的字段
+            msg = getattr(record, 'msg', '')
+            if isinstance(msg, str) and ("development server" in msg or "production deployment" in msg):
+                return False
+                
+            if isinstance(message, str) and ("development server" in message or "production deployment" in message):
+                return False
+                
+            return True
+        except:
+            # 如果过滤过程中出现任何错误，默认允许消息通过
+            return True
+
+# 应用过滤器到所有相关的日志记录器
+werkzeug_logger.addFilter(StrictNoWarningFilter())
+# 也应用到根日志记录器，以防警告通过其他渠道
+root_logger = logging.getLogger()
+root_logger.addFilter(StrictNoWarningFilter())
+
 logger = logging.getLogger(__name__)
 
 # 多线程配置
@@ -851,10 +889,22 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
     debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
+    # 完全禁用开发服务器警告
+    warnings.filterwarnings('ignore', '.*This is a development server.*')
+    warnings.filterwarnings('ignore', '.*Do not use it in a production deployment.*')
+    warnings.filterwarnings('ignore', '.*Use a production WSGI server instead.*')
+    
+    # 自定义请求处理器，只显示请求日志，不显示警告
+    class CustomRequestHandler(WSGIRequestHandler):
+        def log(self, type, message, *args):
+            # 跳过包含开发服务器警告的日志
+            if "development server" not in message and "production deployment" not in message:
+                return WSGIRequestHandler.log(self, type, message, *args)
+    
     print("=" * 50)
     print("  EasyKiConverter Web UI")
     print("=" * 50)
     print(f"访问地址: http://localhost:{port}")
     print("=" * 50)
     
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    app.run(host='0.0.0.0', port=port, debug=debug, request_handler=CustomRequestHandler)
