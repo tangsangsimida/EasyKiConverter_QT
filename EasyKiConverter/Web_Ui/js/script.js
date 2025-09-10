@@ -541,7 +541,12 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="remove-btn" data-component-id="${componentId}">-</button>
         `;
         
-        componentList.appendChild(listItem);
+        // 将新元素添加到列表顶部而不是底部
+        if (componentList.firstChild) {
+            componentList.insertBefore(listItem, componentList.firstChild);
+        } else {
+            componentList.appendChild(listItem);
+        }
         
         // 绑定删除事件
         const removeBtn = listItem.querySelector('.remove-btn');

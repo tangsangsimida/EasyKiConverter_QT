@@ -175,46 +175,39 @@ input[type="text"]:focus, textarea:focus {
     flex: 1;
 }
 
-.add-btn {
-    padding: 12px 20px;
-    background: linear-gradient(45deg, #4F46E5, #818CF8);
+.icon-btn {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.add-btn:hover {
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
 }
 
-.add-btn:active {
+.icon-btn:active {
     transform: translateY(0);
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.add-btn {
+    background: linear-gradient(45deg, #4F46E5, #818CF8);
 }
 
 .paste-btn {
-    padding: 12px 20px;
     background: linear-gradient(45deg, #10B981, #34D399);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.paste-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-}
-
-.paste-btn:active {
-    transform: translateY(0);
 }
 
 textarea {
@@ -676,24 +669,7 @@ footer {
 }
 
 .clear-all-btn {
-    padding: 6px 12px;
-    background: rgba(239, 68, 68, 0.2);
-    color: #EF4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.clear-all-btn:hover {
-    background: rgba(239, 68, 68, 0.3);
-    transform: translateY(-1px);
-}
-
-.clear-all-btn:active {
-    transform: translateY(0);
+    background: linear-gradient(45deg, #EF4444, #F87171);
 }
 
 .component-list-item {

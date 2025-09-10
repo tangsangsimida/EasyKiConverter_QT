@@ -44,14 +44,31 @@
                         <label for="component-id">添加元器件编号</label>
                         <div class="component-input-container">
                             <input type="text" id="component-id" name="component-id" placeholder="输入元器件编号，例如：C12345">
-                            <button type="button" id="add-component-btn" class="add-btn">添加</button>
-                            <button type="button" id="paste-component-btn" class="paste-btn">粘贴</button>
+                            <button type="button" id="add-component-btn" class="icon-btn" title="添加元件编号">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </button>
+                            <button type="button" id="paste-component-btn" class="icon-btn" title="从剪贴板粘贴元件编号">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                </svg>
+                            </button>
                         </div>
                         
                         <div class="component-list-container">
                             <div class="component-list-header">
                                 <h4>待转换列表</h4>
-                                <button type="button" id="clear-all-btn" class="clear-all-btn">清除所有</button>
+                                <button type="button" id="clear-all-btn" class="icon-btn clear-all-btn" title="清除所有元件">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
                             </div>
                             <ul id="component-list" class="component-list"></ul>
                             <div id="component-list-empty" class="component-list-empty">暂无待转换的元器件</div>
