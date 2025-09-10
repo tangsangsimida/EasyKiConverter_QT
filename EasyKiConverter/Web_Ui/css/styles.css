@@ -196,6 +196,27 @@ input[type="text"]:focus, textarea:focus {
     transform: translateY(0);
 }
 
+.paste-btn {
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #10B981, #34D399);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.paste-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.paste-btn:active {
+    transform: translateY(0);
+}
+
 textarea {
     resize: vertical;
     min-height: 120px;
@@ -691,6 +712,32 @@ footer {
     background: rgba(255, 255, 255, 0.15);
     transform: translateX(3px);
 }
+
+/* 不同批次添加的元件使用不同颜色 */
+.component-list-item[class*="component-batch-"] {
+    position: relative;
+}
+
+.component-list-item[class*="component-batch-"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 8px 0 0 8px;
+}
+
+.component-list-item.component-batch-0::before { background: #EF4444; } /* 红色 */
+.component-list-item.component-batch-1::before { background: #F59E0B; } /* 琥珀色 */
+.component-list-item.component-batch-2::before { background: #10B981; } /* 绿色 */
+.component-list-item.component-batch-3::before { background: #3B82F6; } /* 蓝色 */
+.component-list-item.component-batch-4::before { background: #8B5CF6; } /* 紫色 */
+.component-list-item.component-batch-5::before { background: #EC4899; } /* 粉色 */
+.component-list-item.component-batch-6::before { background: #06B6D4; } /* 青色 */
+.component-list-item.component-batch-7::before { background: #84CC16; } /* 酸橙绿 */
+.component-list-item.component-batch-8::before { background: #F97316; } /* 橙色 */
+.component-list-item.component-batch-9::before { background: #6366F1; } /* 靛蓝色 */
 
 .component-list-empty {
     text-align: center;

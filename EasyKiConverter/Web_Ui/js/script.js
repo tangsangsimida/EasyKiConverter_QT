@@ -418,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeComponentList() {
         const componentIdInput = document.getElementById('component-id');
         const addComponentBtn = document.getElementById('add-component-btn');
+        const pasteComponentBtn = document.getElementById('paste-component-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
         const componentList = document.getElementById('component-list');
         const emptyMessage = document.getElementById('component-list-empty');
@@ -447,6 +448,61 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
+        // 粘贴按钮点击事件
+        if (pasteComponentBtn) {
+            pasteComponentBtn.addEventListener('click', async () => {
+                try {
+                    // 从剪贴板读取文本
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        // 提取元件编号并添加到列表
+                        const componentIds = extractComponentIds(text);
+                        if (componentIds.length > 0) {
+                            // 为这次添加的元件使用特殊颜色标记
+                            const batchId = Date.now() % 10; // 使用0-9的数字作为批次ID
+                            componentIds.forEach(id => {
+                                addComponentToList(id, `component-batch-${batchId}`);
+                            });
+                            
+                            // 显示成功提示
+                            const fileStatus = document.getElementById('file-status');
+                            if (fileStatus) {
+                                fileStatus.className = 'file-status success';
+                                fileStatus.textContent = `成功添加 ${componentIds.length} 个元件编号`;
+                                fileStatus.style.display = 'block';
+                                setTimeout(() => {
+                                    fileStatus.style.display = 'none';
+                                }, 3000);
+                            }
+                        } else {
+                            // 没有找到有效的元件编号
+                            const fileStatus = document.getElementById('file-status');
+                            if (fileStatus) {
+                                fileStatus.className = 'file-status error';
+                                fileStatus.textContent = '未找到有效的元件编号';
+                                fileStatus.style.display = 'block';
+                                setTimeout(() => {
+                                    fileStatus.style.display = 'none';
+                                }, 3000);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('无法从剪贴板读取内容:', err);
+                    // 显示错误提示
+                    const fileStatus = document.getElementById('file-status');
+                    if (fileStatus) {
+                        fileStatus.className = 'file-status error';
+                        fileStatus.textContent = '无法读取剪贴板内容，请检查浏览器权限设置';
+                        fileStatus.style.display = 'block';
+                        setTimeout(() => {
+                            fileStatus.style.display = 'none';
+                        }, 3000);
+                    }
+                }
+            });
+        }
+        
         // 清除所有按钮点击事件
         if (clearAllBtn && componentList && emptyMessage) {
             clearAllBtn.addEventListener('click', () => {
@@ -457,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 添加元件到列表
-    function addComponentToList(componentId) {
+    function addComponentToList(componentId, batchClass = null) {
         const componentList = document.getElementById('component-list');
         const emptyMessage = document.getElementById('component-list-empty');
         
@@ -475,6 +531,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 创建列表项
         const listItem = document.createElement('li');
         listItem.className = 'component-list-item';
+        if (batchClass) {
+            listItem.classList.add(batchClass);
+        }
         listItem.dataset.componentId = componentId;
         
         listItem.innerHTML = `
@@ -493,6 +552,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 emptyMessage.style.display = 'block';
             }
         });
+    }
+    
+    // 从文本中提取元件编号
+    function extractComponentIds(text) {
+        // 常见的元件编号模式
+        // 例如: C12345, R123456, L12345, D12345, U12345, Q12345, Y12345, X12345, SW12345, LED12345 等
+        const patterns = [
+            // 标准元件编号模式 (字母+数字)
+            /\b([A-Z]{1,2}\d{3,8})\b/gi,
+            // 带连字符的元件编号
+            /\b([A-Z]{1,2}\d{3,8}-[A-Z0-9]+)\b/gi,
+            // 特殊元件编号模式
+            /\b([A-Z]{1,3}_\d{3,8})\b/gi
+        ];
+        
+        const componentIds = new Set(); // 使用Set避免重复
+        
+        for (const pattern of patterns) {
+            const matches = text.match(pattern);
+            if (matches) {
+                matches.forEach(match => {
+                    // 转换为大写并添加到集合中
+                    const componentId = match.toUpperCase();
+                    // 进一步验证元件编号格式
+                    if (isValidComponentId(componentId)) {
+                        componentIds.add(componentId);
+                    }
+                });
+            }
+        }
+        
+        return Array.from(componentIds);
+    }
+    
+    // 验证元件编号格式
+    function isValidComponentId(componentId) {
+        // 基本格式检查
+        if (!componentId || componentId.length < 4 || componentId.length > 20) {
+            return false;
+        }
+        
+        // 检查是否包含至少一个字母和一个数字
+        const hasLetter = /[A-Z]/.test(componentId);
+        const hasDigit = /\d/.test(componentId);
+        
+        if (!hasLetter || !hasDigit) {
+            return false;
+        }
+        
+        // 检查是否以字母开头
+        if (!/^[A-Z]/.test(componentId)) {
+            return false;
+        }
+        
+        // 检查是否只包含字母、数字和连字符/下划线
+        if (!/^[A-Z0-9\-_]+$/.test(componentId)) {
+            return false;
+        }
+        
+        return true;
     }
     
     // 从列表获取所有元件编号
