@@ -66,10 +66,3 @@ def parse_svg_path(svg_path: str) -> list:
 
     return parsed_path
 
-
-if __name__ == "__main__":
-    path_1 = "M 400.067 299.929 A 4 3.9 0 1 1 408.032 299.934 L 5 6 5 7 Z"
-    path_0 = "M 5 -6 L -5 0 L 5 6 Z"
-    path_2 = "M -5 3 L -2 0 L -5 -3"
-
-    print(parse_svg_path(svg_path=path_0))

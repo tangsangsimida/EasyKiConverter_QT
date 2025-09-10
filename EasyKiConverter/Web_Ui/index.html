@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyKiConverter - 嘉立创EDA转KiCad工具</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23007ACC'%3E%3Cpath d='M12 2L2 7v10l10 5 10-5V7l-10-5zM4 8.5l8-4 8 4v7l-8 4-8-4v-7z'/%3E%3Ccircle cx='12' cy='12' r='3' fill='white'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=1.1">
 </head>
 <body>
     <div class="container">
@@ -43,7 +43,7 @@
                     <div class="form-group">
                         <label for="component-id">添加元器件编号</label>
                         <div class="component-input-container">
-                            <input type="text" id="component-id" name="component-id" placeholder="输入元器件编号，例如：C12345">
+                            <input type="text" id="component-id" name="component-id" placeholder="输入元器件编号，例如：C2040">
                             <button type="button" id="add-component-btn" class="icon-btn" title="添加元件编号">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -61,7 +61,7 @@
                         <div class="component-list-container">
                             <div class="component-list-header">
                                 <h4>待转换列表</h4>
-                                <button type="button" id="clear-all-btn" class="icon-btn clear-all-btn" title="清除所有元件">
+                                <button type="button" class="remove-btn" title="清除所有元件">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="3 6 5 6 21 6"></polyline>
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

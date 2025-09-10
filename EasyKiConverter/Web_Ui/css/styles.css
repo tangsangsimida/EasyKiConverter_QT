@@ -668,10 +668,6 @@ footer {
     background: transparent; /* Chrome, Safari */
 }
 
-.clear-all-btn {
-    background: linear-gradient(45deg, #EF4444, #F87171);
-}
-
 .component-list-item {
     display: flex;
     justify-content: space-between;
@@ -723,22 +719,25 @@ footer {
 }
 
 .remove-btn {
-    width: 24px;
-    height: 24px;
-    background: rgba(239, 68, 68, 0.2);
-    color: #EF4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
     transition: all 0.3s ease;
+    font-size: 18px;
 }
 
 .remove-btn:hover {
     background: rgba(239, 68, 68, 0.3);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
     transform: scale(1.1);
 }
 
