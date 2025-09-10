@@ -164,6 +164,52 @@ input[type="text"]:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
+/* 元件输入容器 */
+.component-input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.component-input-container input[type="text"] {
+    flex: 1;
+}
+
+.icon-btn {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.icon-btn:active {
+    transform: translateY(0);
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.add-btn {
+    background: linear-gradient(45deg, #4F46E5, #818CF8);
+}
+
+.paste-btn {
+    background: linear-gradient(45deg, #10B981, #34D399);
+}
+
 textarea {
     resize: vertical;
     min-height: 120px;
@@ -584,6 +630,117 @@ footer {
 }
 
 /* BOM Upload Styles */
+.component-list-container {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.component-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.component-list-container h4 {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.component-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    /* 隐藏滚动条但保持滚动功能 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+.component-list::-webkit-scrollbar {
+    width: 0px; /* Chrome, Safari */
+    background: transparent; /* Chrome, Safari */
+}
+
+.component-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.component-list-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(3px);
+}
+
+/* 不同批次添加的元件使用不同颜色 */
+.component-list-item[class*="component-batch-"] {
+    position: relative;
+}
+
+.component-list-item[class*="component-batch-"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 8px 0 0 8px;
+}
+
+.component-list-item.component-batch-0::before { background: #EF4444; } /* 红色 */
+.component-list-item.component-batch-1::before { background: #F59E0B; } /* 琥珀色 */
+.component-list-item.component-batch-2::before { background: #10B981; } /* 绿色 */
+.component-list-item.component-batch-3::before { background: #3B82F6; } /* 蓝色 */
+.component-list-item.component-batch-4::before { background: #8B5CF6; } /* 紫色 */
+.component-list-item.component-batch-5::before { background: #EC4899; } /* 粉色 */
+.component-list-item.component-batch-6::before { background: #06B6D4; } /* 青色 */
+.component-list-item.component-batch-7::before { background: #84CC16; } /* 酸橙绿 */
+.component-list-item.component-batch-8::before { background: #F97316; } /* 橙色 */
+.component-list-item.component-batch-9::before { background: #6366F1; } /* 靛蓝色 */
+
+.component-list-empty {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.remove-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+
+.remove-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    transform: scale(1.1);
+}
+
 .bom-upload-section {
     margin-top: 20px;
     padding-top: 20px;

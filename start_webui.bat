@@ -9,25 +9,105 @@ echo.
 REM Set project root path
 set "project_root=%~dp0"
 set "base_path=%project_root%EasyKiConverter"
+set "python_dir=%project_root%python"
+set "python_exe=%python_dir%\python.exe"
 
-REM Check for Python installation
-echo Checking Python environment...
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo.
-    echo ERROR: Python is not installed or not found in PATH.
-    echo.
-    echo Please follow these steps:
-    echo 1. Download Python 3.7+ from https://www.python.org/downloads/
-    echo 2. During installation, make sure to check "Add Python to PATH"
-    echo 3. Restart your command prompt and try again
-    echo.
-    pause
-    exit /b 1
+REM Function to download portable Python
+:download_portable_python
+echo Downloading portable Python...
+REM Create python directory if it doesn't exist
+if not exist "%python_dir%" mkdir "%python_dir%"
+
+REM Check if we already have Python downloaded
+if exist "%python_exe%" (
+    echo Found existing portable Python installation
+    set "PYTHON_CMD=%python_exe%"
+    goto check_version
 )
 
-REM Get Python version and check if it meets requirements
-for /f "tokens=2" %%i in ('python --version 2^>^&1') do set python_version=%%i
+echo This may take a few minutes...
+
+REM Try to download Python using PowerShell with domestic mirror
+powershell -Command "& { $
+    $ProgressPreference = 'SilentlyContinue'; $
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $
+    try { $
+        Write-Host 'Trying domestic mirror...'; $
+        Invoke-WebRequest -Uri 'https://ghproxy.com/https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-x86_64-pc-windows-msvc-shared-install_only.tar.gz' -OutFile '%project_root%python.tar.gz'; $
+        Write-Host 'Download completed successfully'; $
+    } catch { $
+        Write-Host 'Domestic mirror failed, trying original URL...'; $
+        try { $
+            Invoke-WebRequest -Uri 'https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-x86_64-pc-windows-msvc-shared-install_only.tar.gz' -OutFile '%project_root%python.tar.gz'; $
+            Write-Host 'Download completed successfully'; $
+        } catch { $
+            Write-Host 'Failed to download Python. Please install Python manually.'; $
+            exit 1; $
+        } $
+    } $
+}"
+
+if exist "%project_root%python.tar.gz" (
+    echo Extracting Python...
+    REM Use PowerShell to extract tar.gz file
+    powershell -Command "tar -xzf '%project_root%python.tar.gz' -C '%python_dir%'"
+    del "%project_root%python.tar.gz"
+    
+    if exist "%python_exe%" (
+        echo Portable Python installed successfully
+        set "PYTHON_CMD=%python_exe%"
+        goto check_version
+    ) else (
+        echo Failed to extract Python properly
+        goto manual_install
+    )
+) else (
+    echo Failed to download Python
+    goto manual_install
+)
+
+:manual_install
+echo.
+echo =====================================
+echo   Manual Python Installation Required
+echo =====================================
+echo.
+echo Please install Python manually:
+echo 1. Download Python 3.7+ from https://www.python.org/downloads/
+echo 2. During installation, make sure to check "Add Python to PATH"
+echo 3. Restart your command prompt and try again
+echo.
+pause
+exit /b 1
+
+REM Check for Python installation in project directory first
+:check_project_python
+echo Checking for Python in project directory...
+if exist "%python_exe%" (
+    echo Found Python in project directory
+    set "PYTHON_CMD=%python_exe%"
+    goto check_version
+)
+
+REM Check for system Python installation
+:check_system_python
+echo Checking system Python environment...
+python --version >nul 2>&1
+if %errorlevel% equ 0 (
+    for /f "tokens=2" %%i in ('python --version 2^>^&1') do set python_version=%%i
+    echo Python %python_version% detected successfully
+    set "PYTHON_CMD=python"
+    goto check_version
+)
+
+REM No Python found, try to download portable Python
+echo.
+echo No Python installation found. Attempting to download portable Python...
+goto download_portable_python
+
+:check_version
+REM Get Python version
+for /f "tokens=2" %%i in ('%PYTHON_CMD% --version 2^>^&1') do set python_version=%%i
 echo Python %python_version% detected successfully
 
 REM Check Python version (basic check for 3.x)
@@ -38,7 +118,6 @@ if errorlevel 1 (
         echo.
         echo ERROR: Python version %python_version% is not supported.
         echo This project requires Python 3.7 or higher.
-        echo Please upgrade your Python installation.
         echo.
         pause
         exit /b 1
@@ -64,7 +143,7 @@ if exist "%project_root%venv\Scripts\activate.bat" (
     echo Found virtual environment: env
 ) else (
     echo No virtual environment found. Creating new virtual environment...
-    python -m venv "%project_root%venv"
+    %PYTHON_CMD% -m venv "%project_root%venv"
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment.
         echo Please ensure you have the venv module installed.
