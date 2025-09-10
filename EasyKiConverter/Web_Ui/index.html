@@ -41,12 +41,17 @@
                 <h2>输入嘉立创元器件编号</h2>
                 <form id="export-form">
                     <div class="form-group">
-                        <label for="urls">元器件编号（每行一个）</label>
-                        <textarea id="urls" name="urls" rows="5" placeholder="例如：
-C12345
-C67890
-C98765
-"></textarea>
+                        <label for="component-id">添加元器件编号</label>
+                        <div class="component-input-container">
+                            <input type="text" id="component-id" name="component-id" placeholder="输入元器件编号，例如：C12345">
+                            <button type="button" id="add-component-btn" class="add-btn">添加</button>
+                        </div>
+                        
+                        <div class="component-list-container">
+                            <h4>待转换列表</h4>
+                            <ul id="component-list" class="component-list"></ul>
+                            <div id="component-list-empty" class="component-list-empty">暂无待转换的元器件</div>
+                        </div>
                         
                         <div class="bom-upload-section">
                             <h4>或者上传BOM表批量导入</h4>

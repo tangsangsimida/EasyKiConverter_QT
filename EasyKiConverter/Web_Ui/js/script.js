@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!form || !exportBtn) return; // 如果元素不存在则退出
         
+        // 初始化待转换列表
+        initializeComponentList();
+        
         // 页面加载时恢复上次设置
         loadLastSettings();
         
@@ -62,24 +65,26 @@ document.addEventListener('DOMContentLoaded', () => {
              e.preventDefault();
 
              const formData = new FormData(form);
-             const componentIds = formData.get('urls').split(/\s+/).filter(Boolean);
+
+             // 获取待转换列表中的所有元件编号
+             const componentIds = getComponentIdsFromList();
              
              // 检查是否输入了元器件编号
              if (componentIds.length === 0) {
                  // 高亮显示输入框
-                 const urlsTextarea = document.getElementById('urls');
-                 urlsTextarea.style.borderColor = '#e74c3c';
-                 urlsTextarea.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.3)';
+                 const componentIdInput = document.getElementById('component-id');
+                 componentIdInput.style.borderColor = '#e74c3c';
+                 componentIdInput.style.boxShadow = '0 0 5px rgba(231, 76, 60, 0.3)';
                  
                  // 显示友好的错误提示
                  progressContainer.style.display = 'block';
-                 progressText.textContent = '请输入至少一个元器件编号或上传BOM文件';
+                 progressText.textContent = '请添加至少一个元器件编号或上传BOM文件';
                  progressText.style.color = '#e74c3c';
                  
                  // 3秒后恢复样式
                  setTimeout(() => {
-                     urlsTextarea.style.borderColor = '';
-                     urlsTextarea.style.boxShadow = '';
+                     componentIdInput.style.borderColor = '';
+                     componentIdInput.style.boxShadow = '';
                      progressContainer.style.display = 'none';
                      progressText.style.color = '';
                  }, 3000);
@@ -202,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
          const fileUploadArea = document.getElementById('file-upload-area');
          const bomFileInput = document.getElementById('bom-file');
          const fileStatus = document.getElementById('file-status');
-         const urlsTextarea = document.getElementById('urls');
 
          // 点击上传区域触发文件选择
           fileUploadArea.addEventListener('click', () => {
@@ -263,10 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
                   if (result.success) {
                       const componentIds = result.component_ids;
                       if (componentIds.length > 0) {
-                          // 将解析出的元件编号添加到文本框中
-                          const currentText = urlsTextarea.value.trim();
-                          const newText = currentText ? currentText + '\n' + componentIds.join('\n') : componentIds.join('\n');
-                          urlsTextarea.value = newText;
+                          // 将解析出的元件编号添加到待转换列表中
+                          componentIds.forEach(id => addComponentToList(id));
                           
                           showFileStatus('success', `成功解析 ${componentIds.length} 个元件编号`);
                       } else {
@@ -321,10 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // 可选：恢复上次的组件ID（作为提示）
                     if (config.last_component_ids && config.last_component_ids.length > 0) {
-                        const urlsTextarea = document.getElementById('urls');
-                        if (!urlsTextarea.value.trim()) {
-                            urlsTextarea.placeholder = `例如：\n${config.last_component_ids.slice(0, 3).join('\n')}\n...`;
-                        }
+                        // 不再需要恢复上次的组件ID到文本框，因为我们现在使用列表
                     }
                     
                     console.log('已恢复上次设置');
@@ -415,6 +414,83 @@ document.addEventListener('DOMContentLoaded', () => {
          resultsList.appendChild(table);
      }
  
+     // 初始化待转换列表功能
+    function initializeComponentList() {
+        const componentIdInput = document.getElementById('component-id');
+        const addComponentBtn = document.getElementById('add-component-btn');
+        
+        // 添加按钮点击事件
+        if (addComponentBtn) {
+            addComponentBtn.addEventListener('click', () => {
+                const componentId = componentIdInput.value.trim();
+                if (componentId) {
+                    addComponentToList(componentId);
+                    componentIdInput.value = '';
+                }
+            });
+        }
+        
+        // 回车键添加事件
+        if (componentIdInput) {
+            componentIdInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // 防止表单提交
+                    const componentId = componentIdInput.value.trim();
+                    if (componentId) {
+                        addComponentToList(componentId);
+                        componentIdInput.value = '';
+                    }
+                }
+            });
+        }
+    }
+    
+    // 添加元件到列表
+    function addComponentToList(componentId) {
+        const componentList = document.getElementById('component-list');
+        const emptyMessage = document.getElementById('component-list-empty');
+        
+        // 检查是否已存在
+        const existingItems = componentList.querySelectorAll('li');
+        for (let item of existingItems) {
+            if (item.dataset.componentId === componentId) {
+                return; // 已存在，不重复添加
+            }
+        }
+        
+        // 隐藏空列表提示
+        emptyMessage.style.display = 'none';
+        
+        // 创建列表项
+        const listItem = document.createElement('li');
+        listItem.className = 'component-list-item';
+        listItem.dataset.componentId = componentId;
+        
+        listItem.innerHTML = `
+            <span class="component-id">${componentId}</span>
+            <button class="remove-btn" data-component-id="${componentId}">-</button>
+        `;
+        
+        componentList.appendChild(listItem);
+        
+        // 绑定删除事件
+        const removeBtn = listItem.querySelector('.remove-btn');
+        removeBtn.addEventListener('click', () => {
+            listItem.remove();
+            // 如果列表为空，显示提示信息
+            if (componentList.children.length === 0) {
+                emptyMessage.style.display = 'block';
+            }
+        });
+    }
+    
+    // 从列表获取所有元件编号
+    function getComponentIdsFromList() {
+        const componentList = document.getElementById('component-list');
+        const items = componentList.querySelectorAll('.component-list-item');
+        return Array.from(items).map(item => item.dataset.componentId);
+    }
+    
      // 初始化元件转换表单
     initializeComponentForm();
 

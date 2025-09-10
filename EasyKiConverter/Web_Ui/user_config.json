@@ -1,12 +1,15 @@
 {
-  "output_folder_path": "C:\\Users\\dennis-yoga\\Desktop\\test",
-  "output_lib_name": "",
+  "output_folder_path": "/home/dennis/Desktop/test",
+  "output_lib_name": "test",
   "export_options": {
     "symbol": true,
     "footprint": true,
     "model3d": true
   },
   "last_component_ids": [
-    "C2040"
+    "C2040",
+    "C692974",
+    "C269268",
+    "C3038568"
   ]
 }

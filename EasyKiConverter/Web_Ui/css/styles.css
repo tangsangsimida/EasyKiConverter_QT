@@ -164,6 +164,38 @@ input[type="text"]:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
+/* 元件输入容器 */
+.component-input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.component-input-container input[type="text"] {
+    flex: 1;
+}
+
+.add-btn {
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #4F46E5, #818CF8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+}
+
+.add-btn:active {
+    transform: translateY(0);
+}
+
 textarea {
     resize: vertical;
     min-height: 120px;
@@ -584,6 +616,81 @@ footer {
 }
 
 /* BOM Upload Styles */
+.component-list-container {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.component-list-container h4 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.component-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    /* 隐藏滚动条但保持滚动功能 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+}
+
+.component-list::-webkit-scrollbar {
+    width: 0px; /* Chrome, Safari */
+    background: transparent; /* Chrome, Safari */
+}
+
+.component-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.component-list-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(3px);
+}
+
+.component-list-empty {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.remove-btn {
+    width: 24px;
+    height: 24px;
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: scale(1.1);
+}
+
 .bom-upload-section {
     margin-top: 20px;
     padding-top: 20px;

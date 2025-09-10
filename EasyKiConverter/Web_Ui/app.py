@@ -99,7 +99,7 @@ root_logger.addFilter(StrictNoWarningFilter())
 logger = logging.getLogger(__name__)
 
 # 多线程配置
-MAX_WORKERS = 8  # 最大并发线程数
+MAX_WORKERS = 15  # 最大并发线程数
 file_lock = threading.Lock()  # 文件操作锁
 symbol_lib_locks = {}  # 符号库文件锁字典
 symbol_lib_locks_lock = threading.Lock()  # 符号库锁字典的锁
@@ -255,20 +255,23 @@ def export_components():
         # 确保导出目录存在
         export_dir.mkdir(parents=True, exist_ok=True)
 
-        # 使用多线程并行处理
-        logger.info(f"开始并行处理 {len(component_ids)} 个元器件，使用 {MAX_WORKERS} 个线程")
+        # 根据元器件数量动态分配线程数，最多MAX_WORKERS个线程
+        num_components = len(component_ids)
+        num_workers = min(num_components, MAX_WORKERS)  # 线程数不超过元件数和最大线程数
+        
+        logger.info(f"开始并行处理 {num_components} 个元器件，使用 {num_workers} 个线程")
         start_time = time.time()
         
         all_results = []
         
         # 根据元器件数量决定是否使用多线程
-        if len(component_ids) == 1:
+        if num_components == 1:
             # 单个元器件直接处理，避免线程开销
             result = process_component_threaded(component_ids[0], str(export_dir), options, file_prefix)
             all_results.append(result)
         else:
-            # 多个元器件使用线程池并行处理
-            with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            # 多个元器件使用线程池并行处理，线程数根据元件数量动态分配
+            with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
                 # 提交所有任务
                 future_to_component = {
                     executor.submit(process_component_threaded, component_input, str(export_dir), options, file_prefix): component_input
