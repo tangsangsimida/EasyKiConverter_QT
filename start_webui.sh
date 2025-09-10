@@ -13,27 +13,139 @@ echo
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_PATH="$SCRIPT_DIR/EasyKiConverter"
+PYTHON_DIR="$SCRIPT_DIR/python"
+PYTHON_EXE="$PYTHON_DIR/bin/python3"
 
-# Check for Python installation
-echo "Checking Python environment..."
-if ! command -v python3 &> /dev/null; then
-    if ! command -v python &> /dev/null; then
-        echo
-        echo "ERROR: Python is not installed or not found in PATH."
-        echo
-        echo "Please follow these steps:"
-        echo "1. Install Python 3.7+ using your system package manager:"
-        echo "   - Ubuntu/Debian: sudo apt update && sudo apt install python3 python3-pip python3-venv"
-        echo "   - CentOS/RHEL: sudo yum install python3 python3-pip"
-        echo "   - macOS: brew install python3"
-        echo "2. Restart your terminal and try again"
-        echo
-        exit 1
-    else
-        PYTHON_CMD="python"
+# Function to download portable Python
+download_portable_python() {
+    echo "Downloading portable Python..."
+    
+    # Create python directory if it doesn't exist
+    if [ ! -d "$PYTHON_DIR" ]; then
+        mkdir -p "$PYTHON_DIR"
     fi
+    
+    # Determine OS and architecture
+    OS_TYPE="$(uname -s)"
+    ARCH_TYPE="$(uname -m)"
+    
+    echo "Detected OS: $OS_TYPE, Architecture: $ARCH_TYPE"
+    
+    # Set download URL based on OS and architecture
+    if [[ "$OS_TYPE" == "Linux" ]]; then
+        if [[ "$ARCH_TYPE" == "x86_64" ]]; then
+            # Use a portable Python distribution
+            PYTHON_URL="https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-x86_64-unknown-linux-gnu-install_only.tar.gz"
+            PYTHON_FILE="python.tar.gz"
+        else
+            echo "Unsupported architecture: $ARCH_TYPE"
+            return 1
+        fi
+    elif [[ "$OS_TYPE" == "Darwin" ]]; then
+        if [[ "$ARCH_TYPE" == "x86_64" ]]; then
+            PYTHON_URL="https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-x86_64-apple-darwin-install_only.tar.gz"
+            PYTHON_FILE="python.tar.gz"
+        elif [[ "$ARCH_TYPE" == "arm64" ]]; then
+            PYTHON_URL="https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-aarch64-apple-darwin-install_only.tar.gz"
+            PYTHON_FILE="python.tar.gz"
+        else
+            echo "Unsupported architecture: $ARCH_TYPE"
+            return 1
+        fi
+    else
+        echo "Unsupported OS: $OS_TYPE"
+        return 1
+    fi
+    
+    # Check if we already have Python downloaded
+    if [ -x "$PYTHON_EXE" ]; then
+        echo "Found existing portable Python installation"
+        return 0
+    fi
+    
+    # Download Python using a domestic mirror if possible
+    echo "Downloading Python from $PYTHON_URL..."
+    
+    # Try to use domestic mirrors first
+    MIRROR_URL=""
+    if [[ "$OS_TYPE" == "Linux" ]]; then
+        # Try Chinese mirrors
+        MIRROR_URL="https://ghproxy.com/$PYTHON_URL"
+    fi
+    
+    if [ -n "$MIRROR_URL" ]; then
+        echo "Trying domestic mirror: $MIRROR_URL"
+        if command -v wget &> /dev/null; then
+            wget -O "$SCRIPT_DIR/$PYTHON_FILE" "$MIRROR_URL" || true
+        elif command -v curl &> /dev/null; then
+            curl -L -o "$SCRIPT_DIR/$PYTHON_FILE" "$MIRROR_URL" || true
+        fi
+        
+        # Check if download was successful
+        if [ ! -f "$SCRIPT_DIR/$PYTHON_FILE" ]; then
+            echo "Domestic mirror failed, trying original URL..."
+            MIRROR_URL=""
+        fi
+    fi
+    
+    # If mirror failed or not available, try original URL
+    if [ -z "$MIRROR_URL" ] || [ ! -f "$SCRIPT_DIR/$PYTHON_FILE" ]; then
+        if command -v wget &> /dev/null; then
+            wget -O "$SCRIPT_DIR/$PYTHON_FILE" "$PYTHON_URL"
+        elif command -v curl &> /dev/null; then
+            curl -L -o "$SCRIPT_DIR/$PYTHON_FILE" "$PYTHON_URL"
+        else
+            echo "Neither wget nor curl is available. Please install one of them."
+            return 1
+        fi
+    fi
+    
+    # Extract Python
+    echo "Extracting Python..."
+    tar -xzf "$SCRIPT_DIR/$PYTHON_FILE" -C "$PYTHON_DIR" --strip-components=1
+    
+    # Clean up
+    rm -f "$SCRIPT_DIR/$PYTHON_FILE"
+    
+    if [ -x "$PYTHON_EXE" ]; then
+        echo "Portable Python installed successfully"
+        return 0
+    else
+        echo "Failed to install portable Python"
+        return 1
+    fi
+}
+
+# Check for Python installation in project directory first
+echo "Checking for Python in project directory..."
+if [ -x "$PYTHON_EXE" ]; then
+    echo "Found Python in project directory"
+    PYTHON_CMD="$PYTHON_EXE"
 else
-    PYTHON_CMD="python3"
+    # Check for system Python installation
+    echo "Checking system Python environment..."
+    if command -v python3 &> /dev/null; then
+        PYTHON_CMD="python3"
+    elif command -v python &> /dev/null; then
+        PYTHON_CMD="python"
+    else
+        echo "No system Python found. Attempting to download portable Python..."
+        if download_portable_python; then
+            PYTHON_CMD="$PYTHON_EXE"
+        else
+            echo
+            echo "ERROR: Python is not installed or not found in PATH."
+            echo
+            echo "Please follow these steps:"
+            echo "1. Install Python 3.7+ using your system package manager:"
+            echo "   - Ubuntu/Debian: sudo apt update && sudo apt install python3 python3-pip python3-venv"
+            echo "   - CentOS/RHEL: sudo yum install python3 python3-pip"
+            echo "   - macOS: brew install python3"
+            echo "2. Restart your terminal and try again"
+            echo
+            exit 1
+        fi
+    fi
 fi
 
 # Get Python version and check if it meets requirements
@@ -67,37 +179,43 @@ if [ $PIP_CHECK_RESULT -ne 0 ]; then
     echo "WARNING: pip is not available."
     echo "Attempting to install pip..."
     
-    # Detect the system and install pip
-    if command -v apt &> /dev/null; then
-        # Debian/Ubuntu systems
-        echo "Detected Debian/Ubuntu system. Installing python3-pip..."
-        if command -v sudo &> /dev/null; then
-            sudo apt update && sudo apt install -y python3-pip
-        else
-            apt update && apt install -y python3-pip
-        fi
-    elif command -v yum &> /dev/null; then
-        # CentOS/RHEL systems
-        echo "Detected CentOS/RHEL system. Installing python3-pip..."
-        if command -v sudo &> /dev/null; then
-            sudo yum install -y python3-pip
-        else
-            yum install -y python3-pip
-        fi
-    elif command -v dnf &> /dev/null; then
-        # Fedora systems
-        echo "Detected Fedora system. Installing python3-pip..."
-        if command -v sudo &> /dev/null; then
-            sudo dnf install -y python3-pip
-        else
-            dnf install -y python3-pip
-        fi
+    # For project directory Python, we need to ensure pip is available
+    if [[ "$PYTHON_CMD" == "$PYTHON_EXE" ]]; then
+        echo "Ensuring pip is available for project Python..."
+        $PYTHON_CMD -m ensurepip --upgrade > /dev/null 2>&1 || true
     else
-        echo "Could not detect package manager. Please manually install pip:"
-        echo "  - Ubuntu/Debian: apt install python3-pip"
-        echo "  - CentOS/RHEL: yum install python3-pip"
-        echo "  - Fedora: dnf install python3-pip"
-        exit 1
+        # Detect the system and install pip
+        if command -v apt &> /dev/null; then
+            # Debian/Ubuntu systems
+            echo "Detected Debian/Ubuntu system. Installing python3-pip..."
+            if command -v sudo &> /dev/null; then
+                sudo apt update && sudo apt install -y python3-pip
+            else
+                apt update && apt install -y python3-pip
+            fi
+        elif command -v yum &> /dev/null; then
+            # CentOS/RHEL systems
+            echo "Detected CentOS/RHEL system. Installing python3-pip..."
+            if command -v sudo &> /dev/null; then
+                sudo yum install -y python3-pip
+            else
+                yum install -y python3-pip
+            fi
+        elif command -v dnf &> /dev/null; then
+            # Fedora systems
+            echo "Detected Fedora system. Installing python3-pip..."
+            if command -v sudo &> /dev/null; then
+                sudo dnf install -y python3-pip
+            else
+                dnf install -y python3-pip
+            fi
+        else
+            echo "Could not detect package manager. Please manually install pip:"
+            echo "  - Ubuntu/Debian: apt install python3-pip"
+            echo "  - CentOS/RHEL: yum install python3-pip"
+            echo "  - Fedora: dnf install python3-pip"
+            exit 1
+        fi
     fi
     
     # Verify pip installation
@@ -119,93 +237,18 @@ else
 fi
 echo
 
-# Check if python3-venv module is available
-echo "Checking Python venv module availability..."
-# Test by checking if ensurepip is available (required for venv)
-# Temporarily disable exit on error for this check
-set +e
-$PYTHON_CMD -c "import ensurepip" > /dev/null 2>&1
-VENV_TEST_RESULT=$?
-set -e
-
-if [ $VENV_TEST_RESULT -ne 0 ]; then
-    echo "WARNING: Python venv module is not available."
-    echo "This usually means the python3-venv package is not installed."
-    echo
-    echo "Attempting to install python3-venv package..."
-    
-    # Detect the system and install python3-venv
-    if command -v apt &> /dev/null; then
-        # Debian/Ubuntu systems
-        echo "Detected Debian/Ubuntu system. Installing python3-venv..."
-        if command -v sudo &> /dev/null; then
-            sudo apt update && sudo apt install -y python3-venv
-        else
-            apt update && apt install -y python3-venv
-        fi
-    elif command -v yum &> /dev/null; then
-        # CentOS/RHEL systems
-        echo "Detected CentOS/RHEL system. Installing python3-venv..."
-        if command -v sudo &> /dev/null; then
-            sudo yum install -y python3-venv
-        else
-            yum install -y python3-venv
-        fi
-    elif command -v dnf &> /dev/null; then
-        # Fedora systems
-        echo "Detected Fedora system. Installing python3-venv..."
-        if command -v sudo &> /dev/null; then
-            sudo dnf install -y python3-venv
-        else
-            dnf install -y python3-venv
-        fi
-    else
-        echo "Could not detect package manager. Please manually install python3-venv:"
-        echo "  - Ubuntu/Debian: apt install python3-venv"
-        echo "  - CentOS/RHEL: yum install python3-venv"
-        echo "  - Fedora: dnf install python3-venv"
-        exit 1
-    fi
-    
-    # Verify installation
-    echo
-    echo "Verifying python3-venv installation..."
+# Check if python3-venv module is available (only for system Python)
+if [[ "$PYTHON_CMD" != "$PYTHON_EXE" ]]; then
+    echo "Checking Python venv module availability..."
     # Test by checking if ensurepip is available (required for venv)
     # Temporarily disable exit on error for this check
     set +e
     $PYTHON_CMD -c "import ensurepip" > /dev/null 2>&1
-    VENV_VERIFY_RESULT=$?
+    VENV_TEST_RESULT=$?
     set -e
-    
-    if [ $VENV_VERIFY_RESULT -ne 0 ]; then
-        echo "ERROR: Failed to install or verify python3-venv package."
-        echo "Please manually install python3-venv and try again."
-        exit 1
-    fi
-    echo "Python venv module is now available."
-else
-    echo "Python venv module is available."
-fi
-echo
 
-echo "Checking for virtual environment..."
-
-# Check for existing virtual environments
-VENV_PATH=""
-if [ -d "$SCRIPT_DIR/venv" ]; then
-    VENV_PATH="$SCRIPT_DIR/venv"
-    echo "Found virtual environment: venv"
-elif [ -d "$SCRIPT_DIR/.venv" ]; then
-    VENV_PATH="$SCRIPT_DIR/.venv"
-    echo "Found virtual environment: .venv"
-elif [ -d "$SCRIPT_DIR/env" ]; then
-    VENV_PATH="$SCRIPT_DIR/env"
-    echo "Found virtual environment: env"
-else
-    echo "No virtual environment found. Creating new virtual environment..."
-    $PYTHON_CMD -m venv "$SCRIPT_DIR/venv"
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Failed to create virtual environment."
+    if [ $VENV_TEST_RESULT -ne 0 ]; then
+        echo "WARNING: Python venv module is not available."
         echo "This usually means the python3-venv package is not installed."
         echo
         echo "Attempting to install python3-venv package..."
@@ -243,14 +286,50 @@ else
             exit 1
         fi
         
+        # Verify installation
         echo
-        echo "Retrying virtual environment creation..."
-        $PYTHON_CMD -m venv "$SCRIPT_DIR/venv"
-        if [ $? -ne 0 ]; then
-            echo "ERROR: Still failed to create virtual environment after installing python3-venv."
-            echo "Please check your Python installation and try again."
+        echo "Verifying python3-venv installation..."
+        # Test by checking if ensurepip is available (required for venv)
+        # Temporarily disable exit on error for this check
+        set +e
+        $PYTHON_CMD -c "import ensurepip" > /dev/null 2>&1
+        VENV_VERIFY_RESULT=$?
+        set -e
+        
+        if [ $VENV_VERIFY_RESULT -ne 0 ]; then
+            echo "ERROR: Failed to install or verify python3-venv package."
+            echo "Please manually install python3-venv and try again."
             exit 1
         fi
+        echo "Python venv module is now available."
+    else
+        echo "Python venv module is available."
+    fi
+else
+    echo "Using portable Python, venv should be available by default."
+fi
+echo
+
+echo "Checking for virtual environment..."
+
+# Check for existing virtual environments
+VENV_PATH=""
+if [ -d "$SCRIPT_DIR/venv" ]; then
+    VENV_PATH="$SCRIPT_DIR/venv"
+    echo "Found virtual environment: venv"
+elif [ -d "$SCRIPT_DIR/.venv" ]; then
+    VENV_PATH="$SCRIPT_DIR/.venv"
+    echo "Found virtual environment: .venv"
+elif [ -d "$SCRIPT_DIR/env" ]; then
+    VENV_PATH="$SCRIPT_DIR/env"
+    echo "Found virtual environment: env"
+else
+    echo "No virtual environment found. Creating new virtual environment..."
+    $PYTHON_CMD -m venv "$SCRIPT_DIR/venv"
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to create virtual environment."
+        echo "Please check your Python installation and try again."
+        exit 1
     fi
     VENV_PATH="$SCRIPT_DIR/venv"
     echo "Virtual environment created successfully: venv"
