@@ -418,6 +418,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeComponentList() {
         const componentIdInput = document.getElementById('component-id');
         const addComponentBtn = document.getElementById('add-component-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const componentList = document.getElementById('component-list');
+        const emptyMessage = document.getElementById('component-list-empty');
         
         // 添加按钮点击事件
         if (addComponentBtn) {
@@ -441,6 +444,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         componentIdInput.value = '';
                     }
                 }
+            });
+        }
+        
+        // 清除所有按钮点击事件
+        if (clearAllBtn && componentList && emptyMessage) {
+            clearAllBtn.addEventListener('click', () => {
+                componentList.innerHTML = '';
+                emptyMessage.style.display = 'block';
             });
         }
     }

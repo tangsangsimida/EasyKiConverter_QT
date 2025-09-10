@@ -624,11 +624,18 @@ footer {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.component-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .component-list-container h4 {
     color: white;
-    margin-bottom: 15px;
     font-size: 1.1rem;
     font-weight: 600;
+    margin: 0;
 }
 
 .component-list {
@@ -645,6 +652,27 @@ footer {
 .component-list::-webkit-scrollbar {
     width: 0px; /* Chrome, Safari */
     background: transparent; /* Chrome, Safari */
+}
+
+.clear-all-btn {
+    padding: 6px 12px;
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-all-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+.clear-all-btn:active {
+    transform: translateY(0);
 }
 
 .component-list-item {
