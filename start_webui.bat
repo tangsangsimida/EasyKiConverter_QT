@@ -9,103 +9,83 @@ echo.
 REM Set project root path
 set "project_root=%~dp0"
 set "base_path=%project_root%EasyKiConverter"
-set "python_dir=%project_root%python"
-set "python_exe=%python_dir%\python.exe"
 
-REM Check for Python installation in project directory first
-echo Checking for Python in project directory...
-if exist "%python_exe%" (
-    echo Found Python in project directory
-    set "PYTHON_CMD=%python_exe%"
-    goto check_version
-)
-
-REM Check for system Python installation
-echo Checking system Python environment...
+REM Check for Python installation
+echo Checking Python environment...
 python --version >nul 2>&1
-if %errorlevel% equ 0 (
-    for /f "tokens=2" %%i in ('python --version 2^>^&1') do set python_version=%%i
-    echo Python %python_version% detected successfully
-    set "PYTHON_CMD=python"
-    goto check_version
-)
-
-REM No Python found, try to download portable Python
-echo.
-echo No Python installation found. Attempting to download portable Python...
-goto download_portable_python
-
-REM Function to download portable Python
-:download_portable_python
-echo Downloading portable Python...
-REM Create python directory if it doesn't exist
-if not exist "%python_dir%" mkdir "%python_dir%"
-
-REM Check if we already have Python downloaded
-if exist "%python_exe%" (
-    echo Found existing portable Python installation
-    set "PYTHON_CMD=%python_exe%"
-    goto check_version
-)
-
-echo This may take a few minutes...
-
-REM Try to download Python using PowerShell with domestic mirror
-powershell -Command "& { $
-    $ProgressPreference = 'SilentlyContinue'; $
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $
-    try { $
-        Write-Host 'Trying domestic mirror...'; $
-        Invoke-WebRequest -Uri 'https://ghproxy.com/https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-x86_64-pc-windows-msvc-shared-install_only.tar.gz' -OutFile '%project_root%python.tar.gz'; $
-        Write-Host 'Download completed successfully'; $
-    } catch { $
-        Write-Host 'Domestic mirror failed, trying original URL...'; $
-        try { $
-            Invoke-WebRequest -Uri 'https://github.com/indygreg/python-build-standalone/releases/download/20230507/cpython-3.11.3+20230507-x86_64-pc-windows-msvc-shared-install_only.tar.gz' -OutFile '%project_root%python.tar.gz'; $
-            Write-Host 'Download completed successfully'; $
-        } catch { $
-            Write-Host 'Failed to download Python. Please install Python manually.'; $
-            exit 1; $
-        } $
-    } $
-}"
-
-if exist "%project_root%python.tar.gz" (
-    echo Extracting Python...
-    REM Use PowerShell to extract tar.gz file
-    powershell -Command "tar -xzf '%project_root%python.tar.gz' -C '%python_dir%'"
-    del "%project_root%python.tar.gz"
+if errorlevel 1 (
+    echo.
+    echo Python not found in system PATH. Checking for project-specific Python...
     
-    if exist "%python_exe%" (
-        echo Portable Python installed successfully
-        set "PYTHON_CMD=%python_exe%"
-        goto check_version
+    REM Check if project-specific Python exists
+    if exist "%project_root%python\python.exe" (
+        echo Project-specific Python found.
+        set "PYTHON_EXEC=%project_root%python\python.exe"
     ) else (
-        echo Failed to extract Python properly
-        goto manual_install
+        echo.
+        echo Project-specific Python not found. Downloading Python...
+        echo This Python will be used only for this project and will not affect your system Python.
+        echo.
+        
+        REM Create python directory if it doesn't exist
+        if not exist "%project_root%python" mkdir "%project_root%python"
+        
+        REM Try to download Python from the official source first
+        echo Downloading Python 3.13.7 from official source...
+        powershell -Command "try { Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.13.7/python-3.13.7-amd64.exe' -OutFile '%project_root%python\python-installer.exe' -ErrorAction Stop } catch { exit 1 }"
+        
+        if errorlevel 1 (
+            echo.
+            echo ERROR: Failed to download Python from official source.
+            echo Trying alternative download method...
+            echo.
+            
+            REM Alternative download method using bitsadmin
+            bitsadmin /transfer pythonDownloadJob /download /priority normal "https://www.python.org/ftp/python/3.13.7/python-3.13.7-amd64.exe" "%project_root%python\python-installer.exe"
+            
+            if errorlevel 1 (
+                echo.
+                echo ERROR: Failed to download Python using alternative method.
+                echo Please check your internet connection and try again.
+                echo.
+                pause
+                exit /b 1
+            )
+        )
+        
+        echo Installing Python...
+        "%project_root%python\python-installer.exe" /quiet InstallAllUsers=0 PrependPath=0 Include_test=0 TargetDir="%project_root%python"
+        
+        if errorlevel 1 (
+            echo.
+            echo ERROR: Failed to install Python.
+            echo.
+            pause
+            exit /b 1
+        )
+        
+        REM Clean up installer
+        del "%project_root%python\python-installer.exe"
+        
+        echo Python installed successfully in project directory!
+        set "PYTHON_EXEC=%project_root%python\python.exe"
+        
+        REM Verify Python installation
+        if not exist "%project_root%python\python.exe" (
+            echo.
+            echo ERROR: Python installation failed. python.exe not found.
+            echo.
+            pause
+            exit /b 1
+        )
     )
 ) else (
-    echo Failed to download Python
-    goto manual_install
+    echo System Python found.
+    set "PYTHON_EXEC=python"
 )
 
-:manual_install
-echo.
-echo =====================================
-echo   Manual Python Installation Required
-echo =====================================
-echo.
-echo Please install Python manually:
-echo 1. Download Python 3.7+ from https://www.python.org/downloads/
-echo 2. During installation, make sure to check "Add Python to PATH"
-echo 3. Restart your command prompt and try again
-echo.
-pause
-exit /b 1
-
-:check_version
-REM Get Python version
-for /f "tokens=2" %%i in ('%PYTHON_CMD% --version 2^>^&1') do set python_version=%%i
+REM Get Python version and check if it meets requirements
+for /f "tokens=2" %%i in ('%PYTHON_EXEC% --version 2^>^&1') do set python_version=%%i
 echo Python %python_version% detected successfully
 
 REM Check Python version (basic check for 3.x)
@@ -141,7 +121,7 @@ if exist "%project_root%venv\Scripts\activate.bat" (
     echo Found virtual environment: env
 ) else (
     echo No virtual environment found. Creating new virtual environment...
-    %PYTHON_CMD% -m venv "%project_root%venv"
+    %PYTHON_EXEC% -m venv "%project_root%venv"
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment.
         echo Please ensure you have the venv module installed.
@@ -171,10 +151,10 @@ set "PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn"
 
 REM Upgrade pip in virtual environment
 echo Upgrading pip using Tsinghua mirror...
-python -m pip install --upgrade pip -i %PIP_INDEX_URL% --trusted-host %PIP_TRUSTED_HOST% >nul 2>&1
+%PYTHON_EXEC% -m pip install --upgrade pip -i %PIP_INDEX_URL% --trusted-host %PIP_TRUSTED_HOST% >nul 2>&1
 if errorlevel 1 (
     echo Failed to upgrade pip using mirror, trying default source...
-    python -m pip install --upgrade pip >nul 2>&1
+    %PYTHON_EXEC% -m pip install --upgrade pip >nul 2>&1
 )
 
 echo Installing dependencies using domestic mirror for faster speed...
@@ -183,10 +163,10 @@ echo.
 REM Install main requirements if exists
 if exist "%base_path%\requirements.txt" (
     echo Installing main project dependencies...
-    pip install -r "%base_path%\requirements.txt" -i %PIP_INDEX_URL% --trusted-host %PIP_TRUSTED_HOST%
+    %PYTHON_EXEC% -m pip install -r "%base_path%\requirements.txt" -i %PIP_INDEX_URL% --trusted-host %PIP_TRUSTED_HOST%
     if errorlevel 1 (
         echo Some main dependencies failed with mirror, trying default source...
-        pip install -r "%base_path%\requirements.txt"
+        %PYTHON_EXEC% -m pip install -r "%base_path%\requirements.txt"
         if errorlevel 1 (
             echo WARNING: Some main dependencies failed to install.
         )
@@ -199,10 +179,10 @@ if exist "%base_path%\requirements.txt" (
 REM Install Web UI requirements
 echo.
 echo Installing Web UI dependencies...
-pip install -r "%base_path%\Web_Ui\requirements.txt" -i %PIP_INDEX_URL% --trusted-host %PIP_TRUSTED_HOST%
+%PYTHON_EXEC% -m pip install -r "%base_path%\Web_Ui\requirements.txt" -i %PIP_INDEX_URL% --trusted-host %PIP_TRUSTED_HOST%
 if errorlevel 1 (
     echo Failed with mirror, trying default source...
-    pip install -r "%base_path%\Web_Ui\requirements.txt"
+    %PYTHON_EXEC% -m pip install -r "%base_path%\Web_Ui\requirements.txt"
     if errorlevel 1 (
         echo ERROR: Failed to install Web UI dependencies.
         echo Please check your internet connection and try again.
