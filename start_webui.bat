@@ -12,6 +12,29 @@ set "base_path=%project_root%EasyKiConverter"
 set "python_dir=%project_root%python"
 set "python_exe=%python_dir%\python.exe"
 
+REM Check for Python installation in project directory first
+echo Checking for Python in project directory...
+if exist "%python_exe%" (
+    echo Found Python in project directory
+    set "PYTHON_CMD=%python_exe%"
+    goto check_version
+)
+
+REM Check for system Python installation
+echo Checking system Python environment...
+python --version >nul 2>&1
+if %errorlevel% equ 0 (
+    for /f "tokens=2" %%i in ('python --version 2^>^&1') do set python_version=%%i
+    echo Python %python_version% detected successfully
+    set "PYTHON_CMD=python"
+    goto check_version
+)
+
+REM No Python found, try to download portable Python
+echo.
+echo No Python installation found. Attempting to download portable Python...
+goto download_portable_python
+
 REM Function to download portable Python
 :download_portable_python
 echo Downloading portable Python...
@@ -79,31 +102,6 @@ echo 3. Restart your command prompt and try again
 echo.
 pause
 exit /b 1
-
-REM Check for Python installation in project directory first
-:check_project_python
-echo Checking for Python in project directory...
-if exist "%python_exe%" (
-    echo Found Python in project directory
-    set "PYTHON_CMD=%python_exe%"
-    goto check_version
-)
-
-REM Check for system Python installation
-:check_system_python
-echo Checking system Python environment...
-python --version >nul 2>&1
-if %errorlevel% equ 0 (
-    for /f "tokens=2" %%i in ('python --version 2^>^&1') do set python_version=%%i
-    echo Python %python_version% detected successfully
-    set "PYTHON_CMD=python"
-    goto check_version
-)
-
-REM No Python found, try to download portable Python
-echo.
-echo No Python installation found. Attempting to download portable Python...
-goto download_portable_python
 
 :check_version
 REM Get Python version
