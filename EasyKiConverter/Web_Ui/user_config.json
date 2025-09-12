@@ -1,5 +1,5 @@
 {
-  "output_folder_path": "/home/dennis/Desktop/test",
+  "output_folder_path": "",
   "output_lib_name": "test",
   "export_options": {
     "symbol": true,
@@ -7,8 +7,6 @@
     "model3d": true
   },
   "last_component_ids": [
-    "C269268",
-    "C22366987",
-    "C21104"
+    "C2040"
   ]
 }
