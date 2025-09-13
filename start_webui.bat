@@ -15,14 +15,23 @@ set "PYTHON_EXEC="
 if exist "%project_root%python\python.exe" (
     set "PYTHON_EXEC=%project_root%python\python.exe"
     set "PATH=%project_root%python;%PATH%"
-) else if exist "%project_root%python\python3.13t.exe" (
-    set "PYTHON_EXEC=%project_root%python\python3.13t.exe"
+) else if exist "%project_root%python\python3.13.exe" (
+    set "PYTHON_EXEC=%project_root%python\python3.13.exe"
+    set "PATH=%project_root%python;%PATH%"
+) else if exist "%project_root%python\python3.12.exe" (
+    set "PYTHON_EXEC=%project_root%python\python3.12.exe"
+    set "PATH=%project_root%python;%PATH%"
+) else if exist "%project_root%python\python3.11.exe" (
+    set "PYTHON_EXEC=%project_root%python\python3.11.exe"
+    set "PATH=%project_root%python;%PATH%"
+) else if exist "%project_root%python\python3.10.exe" (
+    set "PYTHON_EXEC=%project_root%python\python3.10.exe"
+    set "PATH=%project_root%python;%PATH%"
+) else if exist "%project_root%python\python3.9.exe" (
+    set "PYTHON_EXEC=%project_root%python\python3.9.exe"
     set "PATH=%project_root%python;%PATH%"
 ) else if exist "%project_root%python\python3.exe" (
     set "PYTHON_EXEC=%project_root%python\python3.exe"
-    set "PATH=%project_root%python;%PATH%"
-) else if exist "%project_root%python\python3.13.exe" (
-    set "PYTHON_EXEC=%project_root%python\python3.13.exe"
     set "PATH=%project_root%python;%PATH%"
 )
 
@@ -38,9 +47,28 @@ if errorlevel 1 (
     if exist "%project_root%python\python.exe" (
         echo Project-specific Python found.
         set "PYTHON_EXEC=%project_root%python\python.exe"
-    ) else if exist "%project_root%python\python3.13t.exe" (
-        echo Project-specific Python 3.13t found.
-        set "PYTHON_EXEC=%project_root%python\python3.13t.exe"
+    ) else if exist "%project_root%python\python3.13.exe" (
+        echo Project-specific Python 3.13 found.
+        set "PYTHON_EXEC=%project_root%python\python3.13.exe"
+    ) else if exist "%project_root%python\python3.12.exe" (
+        echo Project-specific Python 3.12 found.
+        set "PYTHON_EXEC=%project_root%python\python3.12.exe"
+    ) else if exist "%project_root%python\python3.11.exe" (
+        echo Project-specific Python 3.11 found.
+        set "PYTHON_EXEC=%project_root%python\python3.11.exe"
+    ) else if exist "%project_root%python\python3.10.exe" (
+        echo Project-specific Python 3.10 found.
+        set "PYTHON_EXEC=%project_root%python\python3.10.exe"
+    ) else if exist "%project_root%python\python3.9.exe" (
+        echo Project-specific Python 3.9 found.
+        set "PYTHON_EXEC=%project_root%python\python3.9.exe"
+    )
+    
+    if not defined PYTHON_EXEC (
+        echo.
+        echo No project-specific Python found.
+        echo This script will attempt to download and install Python automatically.
+        echo.
     )
     
     if defined PYTHON_EXEC (
@@ -139,11 +167,17 @@ if errorlevel 1 (
             set "PYTHON_FOUND="
             if exist "%project_root%python\python.exe" (
                 set "PYTHON_FOUND=1"
-            ) else if exist "%project_root%python\python3.13t.exe" (
+            ) else if exist "%project_root%python\python3.13.exe" (
+                set "PYTHON_FOUND=1"
+            ) else if exist "%project_root%python\python3.12.exe" (
+                set "PYTHON_FOUND=1"
+            ) else if exist "%project_root%python\python3.11.exe" (
+                set "PYTHON_FOUND=1"
+            ) else if exist "%project_root%python\python3.10.exe" (
+                set "PYTHON_FOUND=1"
+            ) else if exist "%project_root%python\python3.9.exe" (
                 set "PYTHON_FOUND=1"
             ) else if exist "%project_root%python\python3.exe" (
-                set "PYTHON_FOUND=1"
-            ) else if exist "%project_root%python\python3.13.exe" (
                 set "PYTHON_FOUND=1"
             )
             
@@ -251,6 +285,13 @@ if errorlevel 1 (
     set "PYTHON_EXEC=python"
 )
 
+REM If we are using system Python, make sure it is used for virtual environment creation
+if "%PYTHON_EXEC%"=="python" (
+    set "PYTHON_FOR_VENV=python"
+) else (
+    set "PYTHON_FOR_VENV=%PYTHON_EXEC%"
+)
+
 REM Get Python version and check if it meets requirements
 for /f "tokens=2" %%i in ('%PYTHON_EXEC% --version 2^>^&1') do set python_version=%%i
 echo Python %python_version% detected successfully
@@ -288,15 +329,17 @@ if exist "%project_root%venv\Scripts\activate.bat" (
     echo Found virtual environment: env
 ) else (
     echo No project virtual environment found. Creating new virtual environment...
-    "%project_root%python\python.exe" -m venv "%project_root%enve"
+    
+    REM Use the appropriate Python to create virtual environment
+    "%PYTHON_FOR_VENV%" -m venv "%project_root%venv"
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment.
         echo Please ensure you have the venv module installed.
         pause
         exit /b 1
     )
-    set "venv_path=%project_root%enve"
-    echo Project virtual environment created successfully: enve
+    set "venv_path=%project_root%venv"
+    echo Project virtual environment created successfully: venv
 )
 
 REM Activate virtual environment
