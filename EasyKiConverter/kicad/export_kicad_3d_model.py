@@ -47,7 +47,7 @@ def get_vertices(obj_data: str) -> list:
     matchs = re.findall(pattern=vertices_regex, string=obj_data, flags=re.DOTALL)
 
     return [
-        " ".join([str(round(float(coord) / 2.54, 4)) for coord in vertice.split(" ")])
+        " ".join([str(round(float(coord), 4)) for coord in vertice.split(" ")])
         for vertice in matchs
     ]
 
