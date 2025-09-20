@@ -47,7 +47,7 @@ def get_vertices(obj_data: str) -> list:
     matchs = re.findall(pattern=vertices_regex, string=obj_data, flags=re.DOTALL)
 
     return [
-        " ".join([str(round(float(coord), 4)) for coord in vertice.split(" ")])
+        " ".join([str(round(float(coord) / 2.54, 4)) for coord in vertice.split(" ")])
         for vertice in matchs
     ]
 
@@ -85,7 +85,7 @@ def generate_wrl_model(model_3d: Ee3dModel) -> Ki3dModel:
             f"""
             Shape{{
                 appearance Appearance {{
-                    material  Material 	{{
+                    material  Material {{
                         diffuseColor {' '.join(material['diffuse_color'])}
                         specularColor {' '.join(material['specular_color'])}
                         ambientIntensity 0.2
