@@ -85,7 +85,7 @@ def generate_wrl_model(model_3d: Ee3dModel) -> Ki3dModel:
             f"""
             Shape{{
                 appearance Appearance {{
-                    material  Material 	{{
+                    material  Material {{
                         diffuseColor {' '.join(material['diffuse_color'])}
                         specularColor {' '.join(material['specular_color'])}
                         ambientIntensity 0.2

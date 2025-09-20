@@ -453,7 +453,7 @@ def export_component_real_threadsafe(lcsc_id: str, export_path: str, export_opti
                     f"{footprint_data.info.name}.kicad_mod"
                 )
                 
-                model_3d_path = lib_name  # 与main.py一致
+                model_3d_path = output_base  # 使用完整的用户导出路径 + lib_name
                 footprint_exporter.export(
                     footprint_full_path=footprint_filename,
                     model_3d_path=model_3d_path
