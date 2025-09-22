@@ -395,7 +395,7 @@ def export_component_real_threadsafe(lcsc_id: str, export_path: str, export_opti
                     my_lib.write(
                         '''(kicad_symbol_lib
   (version 20211014)
-  (generator https://github.com/uPesy/easyeda2kicad.py)
+  (generator https://github.com/tangsangsimida/EasyKiConverter)
 )'''
                         if kicad_version == KicadVersion.v6
                         else "EESchema-LIBRARY Version 2.4\n#encoding utf-8\n"
@@ -566,7 +566,7 @@ def export_component_real(lcsc_id: str, export_path: str, export_options: Dict[s
                 my_lib.write(
                     '''(kicad_symbol_lib
   (version 20211014)
-  (generator https://github.com/uPesy/easyeda2kicad.py)
+  (generator https://github.com/tangsangsimida/EasyKiConverter)
 )'''
                     if kicad_version == KicadVersion.v6
                     else "EESchema-LIBRARY Version 2.4\n#encoding utf-8\n"
