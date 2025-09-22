@@ -40,7 +40,7 @@ def add_component_in_symbol_lib_file(
             lib_file.write(
                 new_lib_data.replace(
                     "(generator kicad_symbol_editor)",
-                    "(generator https://github.com/uPesy/easyeda2kicad.py)",
+                    "(generator https://github.com/tangsangsimida/EasyKiConverter)",
                 )
             )
 
@@ -68,7 +68,7 @@ def update_component_in_symbol_lib_file(
 
         new_lib = new_lib.replace(
             "(generator kicad_symbol_editor)",
-            "(generator https://github.com/uPesy/easyeda2kicad.py)",
+            "(generator https://github.com/tangsangsimida/EasyKiConverter)",
         )
 
     with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
