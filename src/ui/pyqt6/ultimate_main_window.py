@@ -44,38 +44,34 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.load_settings()
         
     def setup_window(self):
-        """设置窗口属性 - 优化默认尺寸，保留系统标题栏"""
-        self.setWindowTitle("EasyKiConverter")
-        self.setMinimumSize(1600, 1100)  # 进一步增加最小尺寸
-        self.resize(1800, 1200)  # 进一步增加默认尺寸
+        """设置窗口属性 - 使用系统默认标题栏"""
+        self.setWindowTitle("EasyKiConverter - 专业级EDA转换工具")
+        self.setMinimumSize(1600, 1100)  # 保持优化后的尺寸
+        self.resize(1800, 1200)  # 保持优化后的尺寸
         
-        # 设置窗口图标
-        # self.setWindowIcon(QIcon(":/icons/app_icon.png"))
-        
-        # 移除无边框设置，使用系统标题栏
-        # self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        # self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowSystemMenuHint)
+        # 使用系统默认标题栏，不移除任何窗口装饰
+        # 保持标准的窗口标志
+        self.setWindowFlags(Qt.WindowType.Window)  # 标准窗口
         
     def setup_ui(self):
-        """设置用户界面空间分配"""
+        """设置用户界面 - 使用系统标题栏，简化布局"""
         # 创建中央部件
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
-        # 主布局 - 垂直布局，专业级间距
+        # 主布局 - 垂直布局，直接使用系统标题栏
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)  # 主布局无间距，由子控件控制
+        main_layout.setSpacing(0)
         
-        # 1. 标题栏 - 固定高度，充足空间
-        self.title_bar = self.create_professional_title_bar()
-        main_layout.addWidget(self.title_bar)
+        # 直接使用系统标题栏，不需要自定义标题栏
+        # 系统会提供标准的标题栏、最小化/最大化/关闭按钮
         
-        # 2. 主内容区域 - 专业级分割布局
+        # 主内容区域 - 专业级分割布局
         content_area = self.create_professional_content_area()
         main_layout.addWidget(content_area, 1)  # 添加拉伸因子
         
-        # 3. 状态栏 - 固定高度
+        # 状态栏 - 固定高度
         self.status_bar = self.create_professional_status_bar()
         main_layout.addWidget(self.status_bar)
         
@@ -200,10 +196,6 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         title_bar.mouseMoveEvent = mouseMoveEvent
         
         return title_bar
-        
-    def show_help(self):
-        """显示帮助信息"""
-        QMessageBox.information(self, "帮助", "EasyKiConverter 使用帮助\n\n1. 输入元器件编号或上传BOM文件\n2. 选择导出选项\n3. 设置导出路径\n4. 点击开始导出")
         
     def create_professional_content_area(self) -> QWidget:
         """创建专业级内容区域 - 合理的空间分配"""
@@ -816,7 +808,9 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
     def setup_connections(self):
         """设置信号连接"""
-        self.theme_button.clicked.connect(self.toggle_theme)
+        # 主题切换功能暂时移除，后续可以添加到菜单栏或工具栏
+        # self.theme_button.clicked.connect(self.toggle_theme)
+        pass
         
     def switch_page(self, page_name: str):
         """切换页面"""
@@ -857,13 +851,12 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.theme_changed.emit(self.current_theme)
         
     def toggle_maximized(self):
-        """切换最大化状态"""
+        """切换最大化状态 - 使用系统默认行为"""
         if self.isMaximized():
             self.showNormal()
-            self.max_button.setText("□")
         else:
             self.showMaximized()
-            self.max_button.setText("❐")
+        # 移除对自定义max_button的引用，使用系统按钮
             
     def load_settings(self):
         """加载设置"""
@@ -884,7 +877,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.layout_manager.on_resize()
         
     def apply_responsive_layout(self, mode):
-        """应用响应式布局"""
+        """应用响应式布局 - 移除标题栏引用"""
         sizes = self.layout_manager.get_recommended_sizes(mode)
         
         # 根据模式调整布局
@@ -896,13 +889,13 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             # 平板端：调整尺寸
             self.sidebar.setFixedWidth(sizes['sidebar_width'])
             self.side_panel.setFixedWidth(sizes['side_panel_width'])
-            self.title_bar.setFixedHeight(sizes['title_height'])
+            # 移除标题栏引用，使用系统标题栏
             self.status_bar.setFixedHeight(sizes['status_height'])
         else:
             # 桌面端：标准尺寸
             self.sidebar.setFixedWidth(sizes['sidebar_width'])
             self.side_panel.setFixedWidth(sizes['side_panel_width'])
-            self.title_bar.setFixedHeight(sizes['title_height'])
+            # 移除标题栏引用，使用系统标题栏
             self.status_bar.setFixedHeight(sizes['status_height'])
             
     # 快速操作槽函数

@@ -6,7 +6,9 @@
     "footprint": true,
     "model3d": true
   },
-  "component_ids": [],
+  "component_ids": [
+    "C2040"
+  ],
   "theme": "light",
   "window_geometry": null,
   "window_state": null,
