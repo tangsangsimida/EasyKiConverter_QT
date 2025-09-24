@@ -17,9 +17,9 @@ class ResponsiveLayoutManager:
         self.parent_widget = parent_widget
         self.current_layout_mode = "desktop"  # desktop, tablet, mobile
         self.breakpoints = {
-            'mobile': 800,      # < 800px 移动端
-            'tablet': 1200,     # 800-1200px 平板端
-            'desktop': 1200     # > 1200px 桌面端
+            'mobile': 1200,     # < 1200px 移动端（调整为更大的值）
+            'tablet': 1600,     # 1200-1600px 平板端（调整为更大的值）
+            'desktop': 1600     # > 1600px 桌面端（调整为更大的值）
         }
         self.resize_timer = QTimer()
         self.resize_timer.setSingleShot(True)
@@ -54,31 +54,31 @@ class ResponsiveLayoutManager:
         """获取推荐尺寸"""
         sizes = {
             'desktop': {
-                'sidebar_width': 280,
-                'side_panel_width': 320,
-                'title_height': 70,
-                'status_height': 50,
-                'card_spacing': 30,
-                'button_height': 55,
-                'input_height': 50
+                'sidebar_width': 300,      # 增加侧边栏宽度
+                'side_panel_width': 350,   # 增加侧面板宽度
+                'title_height': 80,        # 增加标题栏高度
+                'status_height': 60,       # 增加状态栏高度
+                'card_spacing': 35,        # 增加卡片间距
+                'button_height': 65,       # 增加按钮高度
+                'input_height': 60         # 增加输入框高度
             },
             'tablet': {
-                'sidebar_width': 240,
-                'side_panel_width': 280,
-                'title_height': 60,
-                'status_height': 45,
-                'card_spacing': 25,
-                'button_height': 50,
-                'input_height': 45
+                'sidebar_width': 260,      # 调整平板侧边栏宽度
+                'side_panel_width': 300,   # 调整平板侧面板宽度
+                'title_height': 70,        # 调整平板标题栏高度
+                'status_height': 50,       # 调整平板状态栏高度
+                'card_spacing': 30,        # 调整平板卡片间距
+                'button_height': 55,       # 调整平板按钮高度
+                'input_height': 50         # 调整平板输入框高度
             },
             'mobile': {
-                'sidebar_width': 0,  # 隐藏侧边栏
-                'side_panel_width': 0,  # 隐藏侧面板
-                'title_height': 50,
-                'status_height': 40,
-                'card_spacing': 20,
-                'button_height': 45,
-                'input_height': 40
+                'sidebar_width': 0,        # 隐藏侧边栏
+                'side_panel_width': 0,     # 隐藏侧面板
+                'title_height': 60,        # 调整移动端标题栏高度
+                'status_height': 45,       # 调整移动端状态栏高度
+                'card_spacing': 25,        # 调整移动端卡片间距
+                'button_height': 50,       # 调整移动端按钮高度
+                'input_height': 45         # 调整移动端输入框高度
             }
         }
         return sizes.get(mode, sizes['desktop'])

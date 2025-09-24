@@ -23,9 +23,10 @@ from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
 from utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
 from utils.ui_effects import LoadingSpinner, ModernCard, SuccessAnimation, ModernProgressBar
+from utils.responsive_layout import AdaptiveWidget
 
 
-class OptimizedComponentInputWidget(QWidget):
+class OptimizedComponentInputWidget(QWidget, AdaptiveWidget):
     """优化版现代化组件输入界面"""
     
     # 信号定义
@@ -33,7 +34,8 @@ class OptimizedComponentInputWidget(QWidget):
     import_bom_requested = pyqtSignal(str)  # BOM文件路径
     
     def __init__(self, config_manager, parent=None):
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
+        AdaptiveWidget.__init__(self, parent)
         self.config_manager = config_manager
         self.component_validator = ComponentValidator()
         self.bom_parser = BOMParser()
@@ -72,16 +74,16 @@ class OptimizedComponentInputWidget(QWidget):
             }
         """)
         
-        # 左侧：组件输入和管理（占60%空间）
+        # 左侧：组件输入和管理（占65%空间）
         left_panel = self.create_left_panel()
         content_splitter.addWidget(left_panel)
         
-        # 右侧：导出选项和设置（占40%空间）
+        # 右侧：导出选项和设置（占35%空间）
         right_panel = self.create_right_panel()
         content_splitter.addWidget(right_panel)
         
-        # 设置合理的分割比例和最小尺寸
-        content_splitter.setSizes([700, 500])  # 左侧700px，右侧500px
+        # 设置合理的分割比例和最小尺寸 - 优化比例
+        content_splitter.setSizes([1000, 500])  # 左侧1000px，右侧500px
         content_splitter.setStretchFactor(0, 2)  # 左侧拉伸因子为2
         content_splitter.setStretchFactor(1, 1)  # 右侧拉伸因子为1
         
@@ -276,18 +278,20 @@ class OptimizedComponentInputWidget(QWidget):
         
         layout.addLayout(input_layout)
         
-        # 快捷操作 - 增大按钮
+        # 快捷操作 - 增大按钮和间距
         quick_actions = QHBoxLayout()
-        quick_actions.setSpacing(12)
+        quick_actions.setSpacing(15)  # 增加按钮间距
         
         paste_btn = QPushButton("📋 从剪贴板粘贴")
+        paste_btn.setMinimumHeight(42)  # 增加按钮高度
+        paste_btn.setFont(QFont("Segoe UI", 13))  # 增大字体
         paste_btn.setStyleSheet("""
             QPushButton {
                 background-color: #f1f5f9;
                 color: #64748b;
                 border: 1px solid #e2e8f0;
-                border-radius: 10px;
-                padding: 10px 18px;
+                border-radius: 12px;  /* 增大圆角 */
+                padding: 12px 20px;   /* 增加内边距 */
                 font-size: 14px;
                 font-weight: 500;
             }
@@ -300,13 +304,15 @@ class OptimizedComponentInputWidget(QWidget):
         quick_actions.addWidget(paste_btn)
         
         clear_btn = QPushButton("🗑️ 清空")
+        clear_btn.setMinimumHeight(42)  # 增加按钮高度
+        clear_btn.setFont(QFont("Segoe UI", 13))  # 增大字体
         clear_btn.setStyleSheet("""
             QPushButton {
                 background-color: #f1f5f9;
                 color: #64748b;
                 border: 1px solid #e2e8f0;
-                border-radius: 10px;
-                padding: 10px 18px;
+                border-radius: 12px;  /* 增大圆角 */
+                padding: 12px 20px;   /* 增加内边距 */
                 font-size: 14px;
                 font-weight: 500;
             }
@@ -334,16 +340,17 @@ class OptimizedComponentInputWidget(QWidget):
         return card
         
     def create_list_card(self) -> QFrame:
-        """创建列表卡片 - 优化列表显示区域"""
+        """创建列表卡片 - 优化列表显示区域，增加空间"""
         card = QFrame()
         card.setObjectName("listCard")
         card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        card.setMinimumHeight(450)  # 大幅增加最小高度
         card.setStyleSheet("""
             QFrame#listCard {
                 background-color: white;
                 border: 2px solid #e2e8f0;
                 border-radius: 20px;
-                padding: 30px;
+                padding: 35px;  /* 增加内边距 */
             }
             QFrame#listCard:hover {
                 border-color: #cbd5e1;
@@ -395,24 +402,25 @@ class OptimizedComponentInputWidget(QWidget):
         
         layout.addLayout(header_layout)
         
-        # 组件列表 - 优化样式和尺寸
+        # 组件列表 - 优化样式和尺寸，增加间距
         self.component_list = QListWidget()
         self.component_list.setStyleSheet("""
             QListWidget {
                 background-color: #f8fafc;
                 border: 1px solid #e2e8f0;
                 border-radius: 15px;
-                padding: 15px;
-                font-size: 15px;  /* 增大字体 */
+                padding: 20px;  /* 增加内边距 */
+                font-size: 16px;  /* 进一步增大字体 */
             }
             QListWidget::item {
                 background-color: white;
                 border: 1px solid #e2e8f0;
-                border-radius: 10px;
-                padding: 15px;  /* 增加内边距 */
-                margin: 6px 0;  /* 增加间距 */
+                border-radius: 12px;  /* 增大圆角 */
+                padding: 18px;  /* 大幅增加内边距 */
+                margin: 8px 0;  /* 大幅增加间距 */
                 color: #1e293b;
-                font-size: 14px;  /* 增大字体 */
+                font-size: 15px;  /* 进一步增大字体 */
+                min-height: 50px;  /* 设置最小高度 */
             }
             QListWidget::item:hover {
                 background-color: #f1f5f9;
@@ -424,17 +432,17 @@ class OptimizedComponentInputWidget(QWidget):
                 color: #1e40af;
             }
         """)
-        self.component_list.setMinimumHeight(250)  # 设置最小高度
+        self.component_list.setMinimumHeight(350)  # 增加最小高度
         layout.addWidget(self.component_list, 1)  # 添加拉伸因子
         
-        # 列表底部操作 - 增大按钮
+        # 列表底部操作 - 增大按钮和字体
         bottom_layout = QHBoxLayout()
-        bottom_layout.setSpacing(12)
+        bottom_layout.setSpacing(15)  # 增加按钮间距
         
         self.component_count_label = QLabel("共 0 个组件")
         self.component_count_label.setStyleSheet("""
             color: #64748b;
-            font-size: 14px;  /* 增大字体 */
+            font-size: 16px;  /* 进一步增大字体 */
             font-weight: 500;
         """)
         bottom_layout.addWidget(self.component_count_label)
@@ -442,14 +450,16 @@ class OptimizedComponentInputWidget(QWidget):
         bottom_layout.addStretch()
         
         remove_btn = QPushButton("🗑️ 删除选中")
+        remove_btn.setMinimumHeight(45)  # 增加按钮高度
+        remove_btn.setFont(QFont("Segoe UI", 13))  # 增大字体
         remove_btn.setStyleSheet("""
             QPushButton {
                 background-color: #fee2e2;
                 color: #dc2626;
                 border: 1px solid #fecaca;
-                border-radius: 10px;
-                padding: 8px 16px;
-                font-size: 13px;
+                border-radius: 12px;  /* 增大圆角 */
+                padding: 10px 18px;   /* 增加内边距 */
+                font-size: 14px;
                 font-weight: 500;
             }
             QPushButton:hover {
@@ -493,16 +503,17 @@ class OptimizedComponentInputWidget(QWidget):
         return panel
         
     def create_options_card(self) -> QFrame:
-        """创建选项卡片 - 优化布局和尺寸"""
+        """创建选项卡片 - 优化布局和尺寸，增加空间"""
         card = QFrame()
         card.setObjectName("optionsCard")
         card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        card.setMinimumHeight(350)  # 设置最小高度
         card.setStyleSheet("""
             QFrame#optionsCard {
                 background-color: white;
                 border: 2px solid #e2e8f0;
                 border-radius: 20px;
-                padding: 30px;
+                padding: 35px;  /* 增加内边距 */
             }
             QFrame#optionsCard:hover {
                 border-color: #cbd5e1;
@@ -534,19 +545,20 @@ class OptimizedComponentInputWidget(QWidget):
         
         layout.addLayout(title_layout)
         
-        # 选项 - 增大复选框和字体
+        # 选项 - 大幅增加复选框间距和尺寸
         self.symbol_check = QCheckBox("📋 符号库 (.kicad_sym)")
         self.symbol_check.setChecked(True)
         self.symbol_check.setStyleSheet("""
             QCheckBox {
-                font-size: 15px;  /* 增大字体 */
+                font-size: 16px;  /* 进一步增大字体 */
                 color: #374151;
-                spacing: 10px;    /* 增加间距 */
-                padding: 10px;    /* 增加内边距 */
+                spacing: 12px;    /* 增加间距 */
+                padding: 12px;    /* 增加内边距 */
+                min-height: 40px; /* 设置最小高度 */
             }
             QCheckBox::indicator {
-                width: 22px;      /* 增大指示器 */
-                height: 22px;
+                width: 24px;      /* 进一步增大指示器 */
+                height: 24px;
                 border-radius: 6px;
             }
         """)
@@ -556,14 +568,15 @@ class OptimizedComponentInputWidget(QWidget):
         self.footprint_check.setChecked(True)
         self.footprint_check.setStyleSheet("""
             QCheckBox {
-                font-size: 15px;
+                font-size: 16px;
                 color: #374151;
-                spacing: 10px;
-                padding: 10px;
+                spacing: 12px;
+                padding: 12px;
+                min-height: 40px;
             }
             QCheckBox::indicator {
-                width: 22px;
-                height: 22px;
+                width: 24px;
+                height: 24px;
                 border-radius: 6px;
             }
         """)
@@ -573,14 +586,15 @@ class OptimizedComponentInputWidget(QWidget):
         self.model3d_check.setChecked(True)
         self.model3d_check.setStyleSheet("""
             QCheckBox {
-                font-size: 15px;
+                font-size: 16px;
                 color: #374151;
-                spacing: 10px;
-                padding: 10px;
+                spacing: 12px;
+                padding: 12px;
+                min-height: 40px;
             }
             QCheckBox::indicator {
-                width: 22px;
-                height: 22px;
+                width: 24px;
+                height: 24px;
                 border-radius: 6px;
             }
         """)
@@ -1011,3 +1025,20 @@ class OptimizedComponentInputWidget(QWidget):
             'model3d': self.model3d_check.isChecked()
         }
         self.config_manager.save_config(config)
+    
+    def apply_responsive_layout(self, mode):
+        """应用响应式布局"""
+        if mode == "mobile":
+            # 移动端：简化布局，增大控件尺寸
+            self.setMinimumWidth(600)
+            # 增大字体和间距
+            self.component_input.setFont(QFont("Segoe UI", 14))
+            self.component_list.setStyleSheet(self.component_list.styleSheet().replace("font-size: 16px", "font-size: 18px"))
+        elif mode == "tablet":
+            # 平板端：中等尺寸
+            self.setMinimumWidth(800)
+            self.component_input.setFont(QFont("Segoe UI", 13))
+        else:
+            # 桌面端：标准尺寸（已优化）
+            self.setMinimumWidth(1000)
+            self.component_input.setFont(QFont("Segoe UI", 13))
