@@ -22,7 +22,7 @@ from PyQt6.QtGui import QIcon, QFont, QPalette, QColor, QLinearGradient, QPainte
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
 from utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
-from utils.ui_effects import LoadingSpinner, ModernCard, SuccessAnimation
+from utils.ui_effects import LoadingSpinner, ModernCard, SuccessAnimation, ModernProgressBar
 
 
 class OptimizedComponentInputWidget(QWidget):
@@ -109,7 +109,7 @@ class OptimizedComponentInputWidget(QWidget):
         """)
         
         # 添加阴影效果
-        from utils.ui_effects import ModernStyle
+        from utils.modern_style import ModernStyle
         ModernStyle.add_shadow_effect(container, blur_radius=25, offset=(0, 6))
         
         layout = QHBoxLayout(container)
