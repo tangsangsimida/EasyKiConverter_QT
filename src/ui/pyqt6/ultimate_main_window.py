@@ -44,13 +44,19 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.load_settings()
         
     def setup_window(self):
-        """设置窗口属性 - 使用系统默认标题栏"""
+        """设置窗口属性 - 优化最大化兼容性"""
         self.setWindowTitle("EasyKiConverter - 专业级EDA转换工具")
-        self.setMinimumSize(1600, 1100)  # 保持优化后的尺寸
-        self.resize(1800, 1200)  # 保持优化后的尺寸
+        
+        # 问题：最小尺寸限制会干扰最大化功能
+        # 解决方案：使用更合理的尺寸策略
+        # 设置推荐尺寸而不是强制最小尺寸
+        self.resize(1800, 1200)  # 默认尺寸
+        
+        # 设置一个合理的最小尺寸，但不要过大
+        # 避免设置超过常见屏幕尺寸的最小值
+        self.setMinimumSize(1200, 800)  # 减小最小尺寸要求
         
         # 使用系统默认标题栏，不移除任何窗口装饰
-        # 保持标准的窗口标志
         self.setWindowFlags(Qt.WindowType.Window)  # 标准窗口
         
     def setup_ui(self):
