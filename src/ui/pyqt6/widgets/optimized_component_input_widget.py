@@ -51,49 +51,416 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         self.load_settings()
         
     def init_ui(self):
-        """初始化用户界面 - 优化布局结构"""
-        # 主布局 - 垂直布局，合理的间距
+        """初始化用户界面 - 从上至下的简洁布局"""
+        # 主布局 - 垂直布局，简洁的间距
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(30, 30, 30, 30)
-        main_layout.setSpacing(30)  # 增加组件间距
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(20)  # 合理的间距
         
-        # 1. 标题区域 - 增加高度和间距
-        title_section = self.create_title_section()
-        main_layout.addWidget(title_section)
+        # 1. 简洁的使用提示区域（替代原来的卡片标题）
+        tips_section = self.create_tips_section()
+        main_layout.addWidget(tips_section)
         
-        # 2. 主要内容区域 - 使用分割器，合理分配空间
-        content_splitter = QSplitter(Qt.Orientation.Horizontal)
-        content_splitter.setHandleWidth(3)  # 增加分割条宽度
-        content_splitter.setStyleSheet("""
-            QSplitter::handle {
-                background-color: #e2e8f0;
-                margin: 5px 0;
-            }
-            QSplitter::handle:hover {
-                background-color: #cbd5e1;
-            }
-        """)
+        # 2. 组件输入区域（从上至下布局）
+        input_section = self.create_input_section()
+        main_layout.addWidget(input_section)
         
-        # 左侧：组件输入和管理（占65%空间）
-        left_panel = self.create_left_panel()
-        content_splitter.addWidget(left_panel)
+        # 3. 组件列表区域
+        list_section = self.create_list_section()
+        main_layout.addWidget(list_section, 1)  # 添加拉伸因子
         
-        # 右侧：导出选项和设置（占35%空间）
-        right_panel = self.create_right_panel()
-        content_splitter.addWidget(right_panel)
+        # 4. 导出选项区域
+        export_section = self.create_export_section()
+        main_layout.addWidget(export_section)
         
-        # 设置合理的分割比例和最小尺寸 - 优化比例
-        content_splitter.setSizes([1000, 500])  # 左侧1000px，右侧500px
-        content_splitter.setStretchFactor(0, 2)  # 左侧拉伸因子为2
-        content_splitter.setStretchFactor(1, 1)  # 右侧拉伸因子为1
-        
-        main_layout.addWidget(content_splitter, 1)  # 添加拉伸因子
-        
-        # 3. 底部操作区域 - 固定高度，不拉伸
+        # 5. 底部操作区域
         bottom_section = self.create_bottom_section()
         main_layout.addWidget(bottom_section)
         
-    def create_title_section(self) -> QWidget:
+    def create_tips_section(self) -> QWidget:
+        """创建简洁的使用提示区域（替代原来的卡片标题）"""
+        container = QWidget()
+        container.setObjectName("tipsSection")
+        container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        container.setStyleSheet("""
+            QWidget#tipsSection {
+                background-color: transparent;
+                padding: 10px 0;
+            }
+        """)
+        
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(10)
+        
+        # 简洁的使用提示
+        tips_label = QLabel("💡 支持LCSC编号：C2040、C123456  |  支持元件型号：ESP32、STM32F103  |  可批量导入BOM文件")
+        tips_label.setStyleSheet("""
+            font-size: 14px;
+            color: #64748b;
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            padding: 12px 20px;
+        """)
+        tips_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(tips_label)
+        
+        return container
+        
+    def import_bom(self):
+        """导入BOM文件 - 简化版本"""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "选择BOM文件", "",
+            "Excel文件 (*.xlsx *.xls);;CSV文件 (*.csv);;所有文件 (*.*)"
+        )
+        
+        if file_path:
+            self.import_bom_file(file_path)
+    
+    def import_bom_file(self, file_path: str):
+        """导入BOM文件 - 保持原有逻辑"""
+        try:
+            # 解析BOM文件
+            result = self.bom_parser.parse_bom_file(file_path)
+            
+            if not result['success']:
+                QMessageBox.warning(self, "BOM解析失败", result['error'])
+                return
+                
+            component_ids = result['component_ids']
+            
+            if not component_ids:
+                QMessageBox.information(self, "提示", "BOM文件中没有找到有效的元件编号")
+                return
+                
+            # 添加解析到的组件
+            added_count = 0
+            duplicate_count = 0
+            
+            for component_id in component_ids:
+                if component_id not in self.components:
+                    self.components.append(component_id)
+                    added_count += 1
+                else:
+                    duplicate_count += 1
+            
+            # 更新界面
+            self.update_component_list()
+            
+            # 显示结果
+            message = f"从BOM文件导入 {added_count} 个新组件"
+            if duplicate_count > 0:
+                message += f"（跳过 {duplicate_count} 个重复组件）"
+            
+            self.status_label.setText(f"✅ {message}")
+            
+            # 发送BOM导入信号
+            self.import_bom_requested.emit(file_path)
+            
+        except Exception as e:
+            QMessageBox.critical(self, "BOM导入错误", f"导入BOM文件时发生错误：\n{str(e)}")
+            self.status_label.setText("❌ BOM导入失败")
+    
+    def browse_output_path(self):
+        """浏览输出目录"""
+        path = QFileDialog.getExistingDirectory(self, "选择输出目录")
+        if path:
+            self.path_input.setText(path)
+            self.save_settings()
+    
+    def clear_components(self):
+        """清空组件列表"""
+        if not self.components:
+            return
+            
+        reply = QMessageBox.question(
+            self, "确认清空", 
+            "确定要清空所有组件吗？",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            self.components.clear()
+            self.update_component_list()
+            self.status_label.setText("✅ 组件列表已清空")
+        
+    def create_export_section(self) -> QWidget:
+        """创建导出选项区域 - 从上至下布局"""
+        container = QWidget()
+        container.setObjectName("exportSection")
+        container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        container.setStyleSheet("""
+            QWidget#exportSection {
+                background-color: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 20px;
+            }
+        """)
+        
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(15)
+        
+        # 导出选项标题
+        title_label = QLabel("⚙️ 导出选项")
+        title_label.setStyleSheet("""
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        """)
+        layout.addWidget(title_label)
+        
+        # 导出类型选择（从上至下）
+        export_types_layout = QVBoxLayout()
+        export_types_layout.setSpacing(10)
+        
+        # 符号导出
+        self.symbol_check = QCheckBox("📋 导出符号 (Symbol)")
+        self.symbol_check.setChecked(True)
+        self.symbol_check.setStyleSheet("""
+            QCheckBox {
+                font-size: 14px;
+                color: #475569;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+            }
+        """)
+        export_types_layout.addWidget(self.symbol_check)
+        
+        # 封装导出
+        self.footprint_check = QCheckBox("📦 导出封装 (Footprint)")
+        self.footprint_check.setChecked(True)
+        self.footprint_check.setStyleSheet("""
+            QCheckBox {
+                font-size: 14px;
+                color: #475569;
+                spacing: 8px;
+            }
+        """)
+        export_types_layout.addWidget(self.footprint_check)
+        
+        # 3D模型导出
+        self.model3d_check = QCheckBox("🎨 导出3D模型")
+        self.model3d_check.setChecked(True)
+        self.model3d_check.setStyleSheet("""
+            QCheckBox {
+                font-size: 14px;
+                color: #475569;
+                spacing: 8px;
+            }
+        """)
+        export_types_layout.addWidget(self.model3d_check)
+        
+        layout.addLayout(export_types_layout)
+        
+        # 输出路径设置
+        path_layout = QVBoxLayout()
+        path_layout.setSpacing(8)
+        
+        path_label = QLabel("输出目录：")
+        path_label.setStyleSheet("""
+            font-size: 14px;
+            color: #475569;
+            font-weight: 500;
+        """)
+        path_layout.addWidget(path_label)
+        
+        path_row = QHBoxLayout()
+        path_row.setSpacing(10)
+        
+        self.path_input = ModernLineEdit()
+        self.path_input.setPlaceholderText("选择输出目录...")
+        self.path_input.setMinimumHeight(40)
+        path_row.addWidget(self.path_input)
+        
+        browse_btn = ModernButton("📁 浏览")
+        browse_btn.setMinimumHeight(40)
+        browse_btn.setMinimumWidth(80)
+        browse_btn.clicked.connect(self.browse_output_path)
+        path_row.addWidget(browse_btn)
+        
+        path_layout.addLayout(path_row)
+        layout.addLayout(path_layout)
+        
+        # 文件前缀
+        prefix_layout = QVBoxLayout()
+        prefix_layout.setSpacing(8)
+        
+        prefix_label = QLabel("文件前缀（可选）：")
+        prefix_label.setStyleSheet("""
+            font-size: 14px;
+            color: #475569;
+            font-weight: 500;
+        """)
+        prefix_layout.addWidget(prefix_label)
+        
+        self.prefix_input = ModernLineEdit()
+        self.prefix_input.setPlaceholderText("例如：MyProject_")
+        self.prefix_input.setMinimumHeight(40)
+        prefix_layout.addWidget(self.prefix_input)
+        
+        layout.addLayout(prefix_layout)
+        
+        return container
+        
+    def create_list_section(self) -> QWidget:
+        """创建组件列表区域 - 从上至下布局"""
+        container = QWidget()
+        container.setObjectName("listSection")
+        container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        container.setStyleSheet("""
+            QWidget#listSection {
+                background-color: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 20px;
+            }
+        """)
+        
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(15)
+        
+        # 列表标题和统计
+        header_layout = QHBoxLayout()
+        title_label = QLabel("📋 组件列表")
+        title_label.setStyleSheet("""
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        """)
+        header_layout.addWidget(title_label)
+        header_layout.addStretch()
+        
+        # 组件数量统计
+        self.component_count_label = QLabel("共 0 个组件")
+        self.component_count_label.setStyleSheet("""
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        """)
+        header_layout.addWidget(self.component_count_label)
+        layout.addLayout(header_layout)
+        
+        # 组件列表
+        self.component_list = QListWidget()
+        self.component_list.setMinimumHeight(200)
+        self.component_list.setStyleSheet("""
+            QListWidget {
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                background-color: #f8fafc;
+                font-size: 14px;
+            }
+            QListWidget::item {
+                padding: 8px;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            QListWidget::item:selected {
+                background-color: #dbeafe;
+                color: #1e40af;
+            }
+        """)
+        layout.addWidget(self.component_list)
+        
+        return container
+        
+    def create_input_section(self) -> QWidget:
+        """创建组件输入区域 - 从上至下布局"""
+        container = QWidget()
+        container.setObjectName("inputSection")
+        container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        container.setStyleSheet("""
+            QWidget#inputSection {
+                background-color: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 20px;
+            }
+        """)
+        
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(15)
+        
+        # 输入区域标题
+        title_layout = QHBoxLayout()
+        title_label = QLabel("🔍 组件输入")
+        title_label.setStyleSheet("""
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        """)
+        title_layout.addWidget(title_label)
+        title_layout.addStretch()
+        layout.addLayout(title_layout)
+        
+        # 组件ID输入（从上至下）
+        input_layout = QVBoxLayout()
+        input_layout.setSpacing(10)
+        
+        # 输入框标签
+        input_label = QLabel("请输入组件ID或型号：")
+        input_label.setStyleSheet("""
+            font-size: 14px;
+            color: #475569;
+            font-weight: 500;
+        """)
+        input_layout.addWidget(input_label)
+        
+        # 输入框和按钮的水平布局
+        input_row = QHBoxLayout()
+        input_row.setSpacing(10)
+        
+        self.component_input = ModernLineEdit()
+        self.component_input.setPlaceholderText("例如：C2040、ESP32、STM32F103...")
+        self.component_input.setMinimumHeight(45)
+        self.component_input.setStyleSheet("""
+            QLineEdit {
+                font-size: 14px;
+                padding: 12px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                background-color: #f8fafc;
+            }
+            QLineEdit:focus {
+                border-color: #2563eb;
+                background-color: white;
+            }
+        """)
+        input_row.addWidget(self.component_input)
+        
+        # 添加按钮
+        add_btn = ModernButton("添加组件")
+        add_btn.setMinimumHeight(45)
+        add_btn.setMinimumWidth(100)
+        add_btn.clicked.connect(self.add_component)
+        input_row.addWidget(add_btn)
+        
+        input_layout.addLayout(input_row)
+        layout.addLayout(input_layout)
+        
+        # 批量操作按钮（从上至下）
+        batch_layout = QHBoxLayout()
+        batch_layout.setSpacing(10)
+        
+        bom_btn = ModernButton("📋 导入BOM文件")
+        bom_btn.setMinimumHeight(40)
+        bom_btn.clicked.connect(self.import_bom)
+        batch_layout.addWidget(bom_btn)
+        
+        clear_btn = ModernButton("🗑️ 清空列表")
+        clear_btn.setMinimumHeight(40)
+        clear_btn.clicked.connect(self.clear_components)
+        batch_layout.addWidget(clear_btn)
+        
+        layout.addLayout(batch_layout)
+        
+        return container
         """创建标题区域 - 增加高度和视觉层次"""
         container = QWidget()
         container.setObjectName("titleSection")
@@ -193,26 +560,7 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         
         return container
         
-    def create_left_panel(self) -> QWidget:
-        """创建左侧面板 - 优化尺寸和间距"""
-        panel = QWidget()
-        panel.setMinimumWidth(500)  # 设置最小宽度
-        panel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        
-        panel_layout = QVBoxLayout(panel)
-        panel_layout.setContentsMargins(0, 0, 0, 0)
-        panel_layout.setSpacing(25)  # 增加面板内间距
-        
-        # 组件输入卡片 - 增加内边距
-        input_card = self.create_input_card()
-        panel_layout.addWidget(input_card)
-        
-        # 组件列表卡片 - 设置最小高度
-        list_card = self.create_list_card()
-        list_card.setMinimumHeight(350)  # 设置最小高度
-        panel_layout.addWidget(list_card, 1)  # 添加拉伸因子
-        
-        return panel
+    # 移除了 create_left_panel 方法 - 改用从上至下布局
         
     def create_input_card(self) -> QFrame:
         """创建输入卡片 - 优化尺寸和布局，增加空间"""
@@ -473,34 +821,7 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         
         return card
         
-    def create_right_panel(self) -> QWidget:
-        """创建右侧面板 - 优化尺寸和布局"""
-        panel = QWidget()
-        panel.setMinimumWidth(400)  # 设置最小宽度
-        panel.setMaximumWidth(500)  # 设置最大宽度
-        panel.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        
-        panel_layout = QVBoxLayout(panel)
-        panel_layout.setContentsMargins(0, 0, 0, 0)
-        panel_layout.setSpacing(25)  # 增加面板间距
-        
-        # 导出选项卡片 - 增加高度
-        options_card = self.create_options_card()
-        options_card.setMinimumHeight(280)  # 设置最小高度
-        panel_layout.addWidget(options_card)
-        
-        # 路径设置卡片 - 增加高度
-        path_card = self.create_path_card()
-        path_card.setMinimumHeight(250)  # 设置最小高度
-        panel_layout.addWidget(path_card)
-        
-        # 帮助信息卡片
-        help_card = self.create_help_card()
-        panel_layout.addWidget(help_card)
-        
-        panel_layout.addStretch()
-        
-        return panel
+    # 移除了 create_right_panel 方法 - 改用从上至下布局
         
     def create_options_card(self) -> QFrame:
         """创建选项卡片 - 优化布局和尺寸，增加空间"""
@@ -772,68 +1093,48 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         return card
         
     def create_bottom_section(self) -> QWidget:
-        """创建底部操作区域 - 优化布局和尺寸"""
+        """创建底部操作区域 - 简洁设计"""
         container = QWidget()
         container.setObjectName("bottomSection")
-        container.setMinimumHeight(80)  # 增加最小高度
         container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         container.setStyleSheet("""
             QWidget#bottomSection {
-                background-color: white;
-                border: 2px solid #e2e8f0;
-                border-radius: 20px;
-                padding: 25px;
-                margin-top: 10px;
+                background-color: transparent;
+                padding: 20px 0;
             }
         """)
         
-        ModernStyle.add_shadow_effect(container, blur_radius=20, offset=(0, 5))
-        
         layout = QHBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(20)  # 增加间距
+        layout.setSpacing(15)
         
-        # 左侧：进度显示 - 增大字体
-        progress_container = QWidget()
-        progress_container.setMinimumWidth(250)  # 设置最小宽度
-        progress_layout = QVBoxLayout(progress_container)
-        progress_layout.setContentsMargins(0, 0, 0, 0)
-        progress_layout.setSpacing(8)
-        
+        # 左侧：状态显示
         self.status_label = QLabel("准备就绪")
         self.status_label.setStyleSheet("""
-            font-size: 15px;  /* 增大字体 */
+            font-size: 14px;
             color: #64748b;
             font-weight: 500;
         """)
-        progress_layout.addWidget(self.status_label)
+        layout.addWidget(self.status_label)
         
-        # 使用自定义进度条
-        from utils.ui_effects import ModernProgressBar
-        self.progress_bar = ModernProgressBar()
-        self.progress_bar.setVisible(False)
-        self.progress_bar.setFixedWidth(250)  # 增加宽度
-        progress_layout.addWidget(self.progress_bar)
-        
-        layout.addWidget(progress_container)
         layout.addStretch()
         
-        # 右侧：操作按钮 - 增大按钮尺寸
+        # 右侧：操作按钮
         button_layout = QHBoxLayout()
-        button_layout.setSpacing(15)  # 增加按钮间距
+        button_layout.setSpacing(10)
         
-        # 预览按钮 - 增大尺寸
+        # 预览按钮
         preview_btn = QPushButton("👁️ 预览")
         preview_btn.setStyleSheet("""
             QPushButton {
                 background-color: #f1f5f9;
                 color: #64748b;
                 border: 1px solid #e2e8f0;
-                border-radius: 12px;
-                padding: 14px 24px;  /* 增加内边距 */
-                font-size: 15px;     /* 增大字体 */
+                border-radius: 8px;
+                padding: 10px 20px;
+                font-size: 14px;
                 font-weight: 500;
-                min-width: 100px;    /* 设置最小宽度 */
+                min-width: 80px;
             }
             QPushButton:hover {
                 background-color: #e2e8f0;
@@ -842,11 +1143,27 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         """)
         button_layout.addWidget(preview_btn)
         
-        # 导出按钮 - 增大尺寸
+        # 导出按钮
         export_btn = ModernButton("🚀 开始转换")
-        export_btn.setMinimumWidth(160)  # 增加宽度
-        export_btn.setMinimumHeight(55)  # 增加高度
-        export_btn.setFont(QFont("Segoe UI", 14, QFont.Weight.Medium))  # 增大字体
+        export_btn.setMinimumWidth(140)
+        export_btn.setMinimumHeight(45)
+        export_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 12px 24px;
+                font-size: 16px;
+                font-weight: 600;
+            }
+            QPushButton:hover {
+                background-color: #1d4ed8;
+            }
+            QPushButton:pressed {
+                background-color: #1e40af;
+            }
+        """)
         export_btn.clicked.connect(self.start_export)
         button_layout.addWidget(export_btn)
         
@@ -913,7 +1230,7 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
             self.component_list.addItem(item)
             
         # 更新计数
-        self.component_count_label.setText(str(len(self.components)))
+        self.component_count_label.setText(f"共 {len(self.components)} 个组件")
         
     def remove_selected_components(self):
         """删除选中的组件 - 保持原有逻辑"""

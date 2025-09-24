@@ -281,76 +281,10 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
         return workspace
         
-    def create_simplified_welcome_page(self) -> QWidget:
-        """创建简化的欢迎页面 - 无导航栏版本"""
-        page = QWidget()
-        page.setObjectName("simplifiedWelcomePage")
-        
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(60, 60, 60, 60)
-        layout.setSpacing(40)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        # 主标题
-        title = QLabel("EasyKiConverter")
-        title.setStyleSheet("""
-            font-size: 48px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 20px;
-        """)
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
-        
-        # 副标题
-        subtitle = QLabel("嘉立创EDA转KiCad转换工具")
-        subtitle.setStyleSheet("""
-            font-size: 20px;
-            color: #64748b;
-            margin-bottom: 40px;
-        """)
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(subtitle)
-        
-        # 功能介绍
-        features = QLabel("✨ 完整转换 • 🚀 批量处理 • 🎯 精准识别")
-        features.setStyleSheet("""
-            font-size: 16px;
-            color: #475569;
-            margin-bottom: 50px;
-        """)
-        features.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(features)
-        
-        # 开始按钮
-        start_btn = QPushButton("🚀 开始转换")
-        start_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #2563eb;
-                color: white;
-                border: none;
-                border-radius: 12px;
-                padding: 16px 40px;
-                font-size: 18px;
-                font-weight: 600;
-                min-width: 200px;
-            }
-            QPushButton:hover {
-                background-color: #1d4ed8;
-            }
-            QPushButton:pressed {
-                background-color: #1e40af;
-            }
-        """)
-        start_btn.clicked.connect(lambda: self.switch_page("component"))
-        layout.addWidget(start_btn)
-        
-        layout.addStretch()
-        
-        return page
+    # 移除了 create_simplified_welcome_page 方法 - 不再需要欢迎页
         
     def create_professional_main_content(self) -> QWidget:
-        """创建主内容区域 - 简化版核心功能"""
+        """创建主内容区域 - 直接显示转换界面"""
         content = QWidget()
         content.setObjectName("professionalMainContent")
         content.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -364,11 +298,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.content_stack = QStackedWidget()
         self.content_stack.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
-        # 创建欢迎页面 - 作为默认页面
-        welcome_page = self.create_simplified_welcome_page()
-        self.content_stack.addWidget(welcome_page)
-        
-        # 创建组件输入界面
+        # 直接创建组件输入界面作为默认页面
         self.component_widget = OptimizedComponentInputWidget(self.config_manager)
         self.content_stack.addWidget(self.component_widget)
         
@@ -383,7 +313,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             
         layout.addWidget(self.content_stack)
         
-        # 默认显示欢迎页面
+        # 默认直接显示转换界面
         self.content_stack.setCurrentIndex(0)
         
         return content
@@ -485,10 +415,6 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         help_menu = menu_bar.addMenu("帮助")
         help_menu.addAction("使用指南", self.show_help)
         help_menu.addAction("关于", lambda: self.switch_page("about"))
-        
-        # 添加返回欢迎页菜单
-        help_menu.addSeparator()
-        help_menu.addAction("返回主页", lambda: self.switch_page("welcome"))
         
         return menu_bar
         
@@ -606,14 +532,13 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             self.component_widget.conversion_completed.connect(self.on_conversion_completed)
         
     def switch_page(self, page_name: str):
-        """切换页面 - 更新页面映射"""
-        # 页面映射（更新为新的索引）
+        """切换页面 - 更新页面映射（移除欢迎页）"""
+        # 页面映射（转换界面为索引0）
         page_map = {
-            "welcome": 0,
-            "component": 1,
-            "history": 2,
-            "settings": 3,
-            "about": 4
+            "component": 0,
+            "history": 1,
+            "settings": 2,
+            "about": 3
         }
         
         if page_name in page_map:
@@ -669,27 +594,33 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
     def open_bom(self):
         """打开BOM文件"""
-        self.status_label.setText("📁 选择BOM文件...")
+        # 状态显示已移除，直接调用组件界面的方法
+        if hasattr(self, 'component_widget'):
+            self.component_widget.import_bom()
         
     def save_project(self):
         """保存项目"""
-        self.status_label.setText("💾 项目保存成功")
+        # 状态显示已移除，可添加实际保存逻辑
+        pass
         
     def batch_process(self):
         """批量处理"""
-        # 移除状态栏引用，改为显示统计信息
+        # 状态显示已移除，可添加批量处理逻辑
         self.show_conversion_stats("批量处理模式", "0", "0", "0s")
         
     def open_bom_parser(self):
         """打开BOM解析器"""
+        # 状态显示已移除，可添加BOM解析器逻辑
         self.show_conversion_stats("BOM解析器", "0", "0", "0s")
         
     def open_component_validator(self):
         """打开元件验证器"""
+        # 状态显示已移除，可添加元件验证器逻辑
         self.show_conversion_stats("元件验证", "0", "0", "0s")
         
     def show_help(self):
         """显示帮助"""
+        # 状态显示已移除，可添加帮助逻辑
         self.show_conversion_stats("使用指南", "0", "0", "0s")
         
     def on_conversion_completed(self, total, success, failed, avg_time):
