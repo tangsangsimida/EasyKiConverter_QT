@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from pathlib import Path
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QFrame, QStackedWidget,
-                           QSplitter, QScrollArea, QSizePolicy)
+                           QSplitter, QScrollArea, QSizePolicy, QMenuBar, QMenu)
 from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal
 from utils.config_manager import ConfigManager
 from utils.modern_style import ModernStyle
@@ -60,26 +60,23 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.setWindowFlags(Qt.WindowType.Window)  # 标准窗口
         
     def setup_ui(self):
-        """设置用户界面 - 使用系统标题栏，简化布局"""
+        """设置用户界面 - Web风格，无状态栏"""
         # 创建中央部件
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
-        # 主布局 - 垂直布局，直接使用系统标题栏
+        # 主布局 - 垂直布局
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         
-        # 直接使用系统标题栏，不需要自定义标题栏
-        # 系统会提供标准的标题栏、最小化/最大化/关闭按钮
-        
-        # 主内容区域 - 分割布局
+        # 主内容区域 - Web风格布局
         content_area = self.create_professional_content_area()
         main_layout.addWidget(content_area, 1)  # 添加拉伸因子
         
-        # 状态栏 - 固定高度
-        self.status_bar = self.create_professional_status_bar()
-        main_layout.addWidget(self.status_bar)
+        # 移除状态栏 - 统计信息将在转换后显示
+        # self.status_bar = self.create_professional_status_bar()
+        # main_layout.addWidget(self.status_bar)
         
         # 应用样式
         self.apply_professional_style()
@@ -204,208 +201,29 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return title_bar
         
     def create_professional_content_area(self) -> QWidget:
-        """创建内容区域 - 合理的空间分配"""
+        """创建内容区域 - 纯Web风格布局（无导航栏）"""
         content_area = QWidget()
         content_area.setObjectName("professionalContentArea")
         content_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
-        layout = QHBoxLayout(content_area)
+        layout = QVBoxLayout(content_area)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         
-        # 使用分割器创建三栏布局
-        main_splitter = QSplitter(Qt.Orientation.Horizontal)
-        main_splitter.setHandleWidth(2)  # 细分割条
-        main_splitter.setStyleSheet("""
-            QSplitter::handle {
-                background-color: #f1f5f9;
-                margin: 0;
-            }
-            QSplitter::handle:hover {
-                background-color: #e2e8f0;
-            }
-        """)
+        # 顶部菜单栏 - Web风格
+        self.top_menu_bar = self.create_web_style_menu_bar()
+        layout.addWidget(self.top_menu_bar)
         
-        # 左侧导航栏 - 固定宽度，设计
-        self.sidebar = self.create_professional_sidebar()
-        main_splitter.addWidget(self.sidebar)
-        
-        # 中间主工作区 - 主要空间
+        # 主内容区域 - 单栏布局（仅中央工作区）
         self.main_workspace = self.create_professional_main_workspace()
-        main_splitter.addWidget(self.main_workspace)
-        
-        # 右侧辅助面板 - 固定宽度
-        self.side_panel = self.create_professional_side_panel()
-        main_splitter.addWidget(self.side_panel)
-        
-        # 设置合理的分割比例和最小尺寸
-        main_splitter.setSizes([280, 1200, 320])  # 优化比例：导航栏更小，主工作区更大
-        main_splitter.setStretchFactor(0, 0)  # 导航栏不拉伸
-        main_splitter.setStretchFactor(1, 1)  # 主工作区拉伸
-        main_splitter.setStretchFactor(2, 0)  # 辅助面板不拉伸
-        
-        # 设置最小尺寸防止过度压缩
-        self.sidebar.setMinimumWidth(280)
-        self.sidebar.setMaximumWidth(350)
-        self.side_panel.setMinimumWidth(380)
-        self.side_panel.setMaximumWidth(450)
-        
-        layout.addWidget(main_splitter)
+        layout.addWidget(self.main_workspace, 1)  # 添加拉伸因子
         
         return content_area
         
-    def create_professional_sidebar(self) -> QWidget:
-        """创建侧边栏 - 充足的空间和层次"""
-        sidebar = QWidget()
-        sidebar.setObjectName("professionalSidebar")
-        sidebar.setMinimumWidth(300)  # 增加最小宽度
-        sidebar.setMaximumWidth(380)  # 增加最大宽度
-        sidebar.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        sidebar.setStyleSheet("""
-            QWidget#professionalSidebar {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                                          stop:0 #1e293b, 
-                                          stop:1 #334155);
-                border-right: none;
-            }
-        """)
-        
-        layout = QVBoxLayout(sidebar)
-        layout.setContentsMargins(0, 30, 0, 30)  # 增加上下边距
-        layout.setSpacing(25)  # 增加组件间距
-        
-        # Logo区域 - 更大的视觉元素
-        logo_container = QWidget()
-        logo_layout = QVBoxLayout(logo_container)
-        logo_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        # 更大的Logo
-        logo_label = QLabel("⚡")
-        logo_label.setStyleSheet("""
-            color: white;
-            font-size: 56px;
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 28px;
-            padding: 20px;
-            margin: 20px;
-            min-width: 56px;
-            min-height: 56px;
-            qproperty-alignment: AlignCenter;
-        """)
-        logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        logo_layout.addWidget(logo_label)
-        
-        # 更大的应用名称
-        app_name = QLabel("EasyKi\nConverter")
-        app_name.setStyleSheet("""
-            color: white;
-            font-size: 24px;
-            font-weight: 600;
-            text-align: center;
-            background: transparent;
-            padding: 15px;
-        """)
-        app_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        logo_layout.addWidget(app_name)
-        
-        layout.addWidget(logo_container)
-        
-        # 导航菜单 - 更大的按钮和间距
-        nav_container = QWidget()
-        nav_layout = QVBoxLayout(nav_container)
-        nav_layout.setSpacing(10)  # 增加按钮间距
-        
-        nav_items = [
-            ("🏠", "元件转换", "component"),
-            ("📊", "转换历史", "history"), 
-            ("⚙️", "设置", "settings"),
-            ("ℹ️", "关于", "about")
-        ]
-        
-        self.nav_buttons = {}
-        for icon, text, name in nav_items:
-            btn = QPushButton(f"{icon}  {text}")
-            btn.setObjectName(f"professionalNav_{name}")
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: transparent;
-                    color: #cbd5e1;
-                    border: none;
-                    border-radius: 16px;
-                    padding: 20px 25px;
-                    font-size: 16px;
-                    font-weight: 500;
-                    text-align: left;
-                    margin: 4px 20px;
-                }
-                QPushButton:hover {
-                    background-color: rgba(255, 255, 255, 0.1);
-                    color: white;
-                }
-                QPushButton:pressed {
-                    background-color: rgba(255, 255, 255, 0.2);
-                }
-                QPushButton:checked {
-                    background-color: #2563eb;
-                    color: white;
-                }
-            """)
-            btn.setCheckable(True)
-            btn.clicked.connect(lambda checked, n=name: self.switch_page(n))
-            nav_layout.addWidget(btn)
-            self.nav_buttons[name] = btn
-            
-        nav_layout.addStretch()
-        layout.addWidget(nav_container)
-        
-        # 用户信息区域 - 更大的用户区域
-        user_container = QWidget()
-        user_layout = QHBoxLayout(user_container)
-        user_layout.setContentsMargins(25, 20, 25, 20)  # 增加边距
-        
-        user_avatar = QLabel("👤")
-        user_avatar.setStyleSheet("""
-            color: white;
-            font-size: 24px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 12px;
-            min-width: 40px;
-            min-height: 40px;
-            qproperty-alignment: AlignCenter;
-        """)
-        user_layout.addWidget(user_avatar)
-        
-        user_info = QWidget()
-        user_info_layout = QVBoxLayout(user_info)
-        user_info_layout.setContentsMargins(0, 0, 0, 0)
-        user_info_layout.setSpacing(4)  # 增加行间距
-        
-        user_name = QLabel("用户")
-        user_name.setStyleSheet("""
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-        """)
-        user_info_layout.addWidget(user_name)
-        
-        user_status = QLabel("在线")
-        user_status.setStyleSheet("""
-            color: #10b981;
-            font-size: 14px;
-        """)
-        user_info_layout.addWidget(user_status)
-        
-        user_layout.addWidget(user_info)
-        user_layout.addStretch()
-        
-        layout.addWidget(user_container)
-        
-        return sidebar
+    # 移除了 create_professional_sidebar 方法 - 不再需要导航栏
         
     def create_professional_main_workspace(self) -> QWidget:
-        """创建主工作区 - 核心功能区域"""
+        """创建主工作区 - 简化Web风格核心功能区域"""
         workspace = QWidget()
         workspace.setObjectName("professionalMainWorkspace")
         workspace.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -447,106 +265,92 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         # 创建滚动内容
         scroll_content = QWidget()
         scroll_layout = QVBoxLayout(scroll_content)
-        scroll_layout.setContentsMargins(40, 40, 40, 40)  # 充足的内边距
-        scroll_layout.setSpacing(35)  # 组件间距
+        scroll_layout.setContentsMargins(40, 40, 40, 40)
+        scroll_layout.setSpacing(35)
         
-        # 欢迎区域 - 更大的视觉冲击力
-        welcome_area = self.create_professional_welcome_area()
-        scroll_layout.addWidget(welcome_area)
-        
-        # 主要内容区域 - 合理的空间分配
+        # 主要内容区域（包含欢迎页面和转换界面）
         main_content = self.create_professional_main_content()
-        scroll_layout.addWidget(main_content, 1)  # 添加拉伸因子
+        scroll_layout.addWidget(main_content, 1)
+        
+        # 转换统计信息 - 初始隐藏，转换后显示
+        self.conversion_stats_widget = self.create_conversion_stats_widget()
+        scroll_layout.addWidget(self.conversion_stats_widget)
         
         scroll_area.setWidget(scroll_content)
         layout.addWidget(scroll_area)
         
         return workspace
         
-    def create_professional_welcome_area(self) -> QWidget:
-        """创建欢迎区域 - 强烈的视觉层次"""
-        welcome = QWidget()
-        welcome.setObjectName("professionalWelcomeArea")
-        welcome.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+    def create_simplified_welcome_page(self) -> QWidget:
+        """创建简化的欢迎页面 - 无导航栏版本"""
+        page = QWidget()
+        page.setObjectName("simplifiedWelcomePage")
         
-        # 使用卡片式设计
-        card = QFrame()
-        card.setObjectName("welcomeCard")
-        card.setStyleSheet("""
-            QFrame#welcomeCard {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                                          stop:0 #2563eb, 
-                                          stop:1 #3b82f6);
-                border-radius: 24px;
-                padding: 40px;
-            }
-        """)
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(60, 60, 60, 60)
+        layout.setSpacing(40)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        # 添加阴影效果
-        from utils.modern_style import ModernStyle
-        ModernStyle.add_shadow_effect(card, blur_radius=40, offset=(0, 12))
-        
-        layout = QHBoxLayout(card)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(40)  # 充足的间距
-        
-        # 左侧文字区域 - 更大的字体和间距
-        text_container = QWidget()
-        text_layout = QVBoxLayout(text_container)
-        text_layout.setContentsMargins(0, 0, 0, 0)
-        text_layout.setSpacing(20)  # 增加行间距
-        
-        # 主标题 - 更大字体
-        main_title = QLabel("欢迎使用 EasyKiConverter")
-        main_title.setStyleSheet("""
-            font-size: 32px;
+        # 主标题
+        title = QLabel("EasyKiConverter")
+        title.setStyleSheet("""
+            font-size: 48px;
             font-weight: 700;
-            color: white;
-            margin-bottom: 12px;
-        """)
-        text_layout.addWidget(main_title)
-        
-        # 副标题 - 更大字体
-        subtitle = QLabel("嘉立创EDA转KiCad转换工具")
-        subtitle.setStyleSheet("""
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 20px;
         """)
-        text_layout.addWidget(subtitle)
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title)
         
-        # 功能特点 - 更大字体
-        features = QLabel("✨ 完整转换 • 🚀 批量处理 • 🎯 精准识别 • 🎨 现代化界面")
+        # 副标题
+        subtitle = QLabel("嘉立创EDA转KiCad转换工具")
+        subtitle.setStyleSheet("""
+            font-size: 20px;
+            color: #64748b;
+            margin-bottom: 40px;
+        """)
+        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(subtitle)
+        
+        # 功能介绍
+        features = QLabel("✨ 完整转换 • 🚀 批量处理 • 🎯 精准识别")
         features.setStyleSheet("""
             font-size: 16px;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 28px;
+            color: #475569;
+            margin-bottom: 50px;
         """)
-        text_layout.addWidget(features)
+        features.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(features)
         
-        layout.addWidget(text_container)
+        # 开始按钮
+        start_btn = QPushButton("🚀 开始转换")
+        start_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 12px;
+                padding: 16px 40px;
+                font-size: 18px;
+                font-weight: 600;
+                min-width: 200px;
+            }
+            QPushButton:hover {
+                background-color: #1d4ed8;
+            }
+            QPushButton:pressed {
+                background-color: #1e40af;
+            }
+        """)
+        start_btn.clicked.connect(lambda: self.switch_page("component"))
+        layout.addWidget(start_btn)
+        
         layout.addStretch()
         
-        # 右侧装饰图标 - 更大尺寸
-        icon_label = QLabel("⚡")
-        icon_label.setStyleSheet("""
-            font-size: 80px;
-            color: rgba(255, 255, 255, 0.2);
-            background: transparent;
-        """)
-        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(icon_label)
-        
-        # 外层容器用于添加外边距
-        outer_container = QWidget()
-        outer_layout = QVBoxLayout(outer_container)
-        outer_layout.setContentsMargins(0, 0, 0, 0)
-        outer_layout.addWidget(card)
-        
-        return outer_container
+        return page
         
     def create_professional_main_content(self) -> QWidget:
-        """创建主内容区域 - 核心功能"""
+        """创建主内容区域 - 简化版核心功能"""
         content = QWidget()
         content.setObjectName("professionalMainContent")
         content.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -560,11 +364,15 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.content_stack = QStackedWidget()
         self.content_stack.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
+        # 创建欢迎页面 - 作为默认页面
+        welcome_page = self.create_simplified_welcome_page()
+        self.content_stack.addWidget(welcome_page)
+        
         # 创建组件输入界面
         self.component_widget = OptimizedComponentInputWidget(self.config_manager)
         self.content_stack.addWidget(self.component_widget)
         
-        # 添加其他页面的占位符 - 更美观的设计
+        # 添加其他页面的占位符
         for i, (title, description, icon) in enumerate([
             ("转换历史", "查看和管理您的转换记录", "📊"),
             ("设置", "配置应用程序选项", "⚙️"),
@@ -574,6 +382,9 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             self.content_stack.addWidget(placeholder)
             
         layout.addWidget(self.content_stack)
+        
+        # 默认显示欢迎页面
+        self.content_stack.setCurrentIndex(0)
         
         return content
         
@@ -623,151 +434,122 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
         return page
         
-    def create_professional_side_panel(self) -> QWidget:
-        """创建侧面板 - 辅助功能区域"""
-        panel = QWidget()
-        panel.setObjectName("professionalSidePanel")
-        panel.setMinimumWidth(420)  # 增加最小宽度
-        panel.setMaximumWidth(500)  # 增加最大宽度
-        panel.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        panel.setStyleSheet("""
-            QWidget#professionalSidePanel {
+    def create_web_style_menu_bar(self) -> QMenuBar:
+        """创建Web风格的顶部菜单栏"""
+        menu_bar = QMenuBar()
+        menu_bar.setObjectName("webStyleMenuBar")
+        menu_bar.setStyleSheet("""
+            QMenuBar#webStyleMenuBar {
                 background-color: #ffffff;
-                border-left: 1px solid #f1f5f9;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 8px 20px;
+                font-size: 14px;
+                font-weight: 500;
+            }
+            QMenuBar::item {
+                background-color: transparent;
+                color: #475569;
+                padding: 8px 16px;
+                margin: 0 4px;
+                border-radius: 6px;
+            }
+            QMenuBar::item:selected {
+                background-color: #f1f5f9;
+                color: #1e293b;
+            }
+            QMenuBar::item:pressed {
+                background-color: #e2e8f0;
             }
         """)
         
-        layout = QVBoxLayout(panel)
-        layout.setContentsMargins(30, 40, 30, 30)  # 增加内边距
-        layout.setSpacing(10)  # 间距
+        # 文件菜单
+        file_menu = menu_bar.addMenu("文件")
+        file_menu.addAction("新建转换", lambda: self.switch_page("component"))
+        file_menu.addAction("打开BOM", self.open_bom)
+        file_menu.addAction("保存项目", self.save_project)
+        file_menu.addSeparator()
+        file_menu.addAction("退出", self.close)
         
-        # 快速操作区域 - 更大的卡片
-        quick_actions = self.create_professional_quick_actions()
-        layout.addWidget(quick_actions)
+        # 转换菜单
+        convert_menu = menu_bar.addMenu("转换")
+        convert_menu.addAction("单个转换", lambda: self.switch_page("component"))
+        convert_menu.addAction("批量处理", self.batch_process)
+        convert_menu.addAction("转换历史", lambda: self.switch_page("history"))
         
-        # 统计信息区域 - 更大的卡片
-        stats_area = self.create_professional_stats_area()
-        layout.addWidget(stats_area)
+        # 工具菜单
+        tools_menu = menu_bar.addMenu("工具")
+        tools_menu.addAction("BOM解析器", self.open_bom_parser)
+        tools_menu.addAction("元件验证", self.open_component_validator)
         
-        # 帮助信息区域 - 更大的卡片
-        help_area = self.create_professional_help_area()
-        layout.addWidget(help_area)
+        # 帮助菜单
+        help_menu = menu_bar.addMenu("帮助")
+        help_menu.addAction("使用指南", self.show_help)
+        help_menu.addAction("关于", lambda: self.switch_page("about"))
         
-        layout.addStretch()
+        # 添加返回欢迎页菜单
+        help_menu.addSeparator()
+        help_menu.addAction("返回主页", lambda: self.switch_page("welcome"))
         
-        return panel
+        return menu_bar
         
-    def create_professional_quick_actions(self) -> QWidget:
-        """创建快速操作区域"""
-        card = ModernCard(
-            title="快速操作",
-            icon="⚡",
-            description="常用功能的快捷入口"
-        )
-
-        # 增加卡片内边距和元素间距
-        card_layout = card.layout()
-        card_layout.setContentsMargins(0, 0, 0, 0)  # 增加卡片内边距
-        card_layout.setSpacing(2)  # 增加卡片内元素间距
+    # 移除右侧面板相关方法，改为统计信息显示在转换后
+    def create_conversion_stats_widget(self) -> QWidget:
+        """创建转换统计信息组件 - 在转换后显示"""
+        stats_widget = QWidget()
+        stats_widget.setObjectName("conversionStatsWidget")
+        stats_widget.setVisible(False)  # 初始隐藏
+        stats_widget.setStyleSheet("""
+            QWidget#conversionStatsWidget {
+                background-color: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 20px;
+                margin: 20px 40px;
+            }
+        """)
         
-        # 添加更大的操作按钮
-        actions_layout = QVBoxLayout()
-        actions_layout.setSpacing(2)  # 增加按钮间距
+        layout = QHBoxLayout(stats_widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(30)
         
-        actions = [
-            ("📋 新建转换", self.new_conversion),
-            ("📁 打开BOM", self.open_bom),
-            ("💾 保存项目", self.save_project),
-            ("🔄 批量处理", self.batch_process)
-        ]
-        
-        for text, callback in actions:
-            btn = QPushButton(text)
-            btn.setMinimumHeight(10)  # 增加按钮高度
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #f8fafc;
-                    color: #475569;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 12px;
-                    padding: 12px 18px;
-                    font-size: 14px;
-                    font-weight: 500;
-                    text-align: left;
-                }
-                QPushButton:hover {
-                    background-color: #f1f5f9;
-                    color: #1e293b;
-                    border-color: #cbd5e1;
-                }
-            """)
-            btn.clicked.connect(callback)
-            actions_layout.addWidget(btn)
-        card.setMinimumHeight(370)  # 增加卡片最小高度
-        card.layout().addLayout(actions_layout)
-        return card
-        
-    def create_professional_stats_area(self) -> QWidget:
-        """创建统计信息区域"""
-        card = ModernCard(
-            title="统计信息",
-            icon="📊",
-            description="转换数据统计"
-        )
-        
-        # 添加更大的统计信息
-        stats_layout = QVBoxLayout()
-        stats_layout.setSpacing(12)  # 增加间距
-        
+        # 统计信息
         stats = [
-            ("总转换次数", "0"),
-            ("成功次数", "0"),
-            ("失败次数", "0"),
-            ("平均用时", "0s")
+            ("总转换次数", "0", "#2563eb"),
+            ("成功次数", "0", "#10b981"),
+            ("失败次数", "0", "#ef4444"),
+            ("平均用时", "0s", "#f59e0b")
         ]
         
-        for label, value in stats:
-            stat_layout = QHBoxLayout()
-            stat_label = QLabel(label)
-            stat_label.setStyleSheet("color: #64748b; font-size: 14px; font-weight: 500;")
+        self.stats_labels = {}
+        for label, value, color in stats:
+            stat_container = QWidget()
+            stat_layout = QVBoxLayout(stat_container)
+            stat_layout.setContentsMargins(0, 0, 0, 0)
+            stat_layout.setSpacing(5)
+            
             stat_value = QLabel(value)
-            stat_value.setStyleSheet("color: #1e293b; font-size: 14px; font-weight: 600;")
+            stat_value.setStyleSheet(f"""
+                color: {color};
+                font-size: 24px;
+                font-weight: 700;
+            """)
+            stat_value.setAlignment(Qt.AlignmentFlag.AlignCenter)
             
-            stat_layout.addWidget(stat_label)
-            stat_layout.addStretch()
+            stat_label = QLabel(label)
+            stat_label.setStyleSheet("""
+                color: #64748b;
+                font-size: 14px;
+                font-weight: 500;
+            """)
+            stat_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
             stat_layout.addWidget(stat_value)
-            stats_layout.addLayout(stat_layout)
+            stat_layout.addWidget(stat_label)
             
-        card.layout().addLayout(stats_layout)
-        return card
-        
-    def create_professional_help_area(self) -> QWidget:
-        """创建帮助信息区域"""
-        card = ModernCard(
-            title="使用帮助",
-            icon="💡",
-            description="快速入门指南"
-        )
-        
-        # 添加更大的帮助信息
-        help_layout = QVBoxLayout()
-        help_layout.setSpacing(10)  # 增加间距
-        
-        help_items = [
-            "📝 支持LCSC编号：C2040、C123456",
-            "🔧 支持元件型号：ESP32、STM32F103",
-            "📋 可批量导入BOM文件",
-            "🎯 支持符号、封装、3D模型导出"
-        ]
-        
-        for item in help_items:
-            help_label = QLabel(item)
-            help_label.setStyleSheet("color: #0c4a6e; font-size: 13px; font-weight: 500;")
-            help_label.setWordWrap(True)
-            help_layout.addWidget(help_label)
+            layout.addWidget(stat_container)
+            self.stats_labels[label] = stat_value
             
-        card.layout().addLayout(help_layout)
-        return card
+        return stats_widget
         
     def create_professional_status_bar(self) -> QWidget:
         """创建状态栏 - 充足的信息展示空间"""
@@ -819,36 +601,24 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
     def setup_connections(self):
         """设置信号连接"""
-        # 主题切换功能暂时移除，后续可以添加到菜单栏或工具栏
-        # self.theme_button.clicked.connect(self.toggle_theme)
-        pass
+        # 连接组件转换信号以显示统计信息
+        if hasattr(self, 'component_widget'):
+            self.component_widget.conversion_completed.connect(self.on_conversion_completed)
         
     def switch_page(self, page_name: str):
-        """切换页面"""
-        # 更新导航按钮状态
-        for name, btn in self.nav_buttons.items():
-            btn.setChecked(name == page_name)
-        
-        # 页面映射
+        """切换页面 - 更新页面映射"""
+        # 页面映射（更新为新的索引）
         page_map = {
-            "component": 0,
-            "history": 1,
-            "settings": 2,
-            "about": 3
+            "welcome": 0,
+            "component": 1,
+            "history": 2,
+            "settings": 3,
+            "about": 4
         }
         
         if page_name in page_map:
             index = page_map[page_name]
             self.content_stack.setCurrentIndex(index)
-            
-            # 更新状态栏
-            page_titles = {
-                "component": "元件转换 - 添加和管理元器件",
-                "history": "转换历史 - 查看转换记录",
-                "settings": "设置 - 配置应用程序选项",
-                "about": "关于 - 了解应用程序信息"
-            }
-            self.status_label.setText(page_titles.get(page_name, "就绪"))
             
     def toggle_theme(self):
         """切换主题"""
@@ -888,32 +658,14 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.layout_manager.on_resize()
         
     def apply_responsive_layout(self, mode):
-        """应用响应式布局 - 移除标题栏引用"""
-        sizes = self.layout_manager.get_recommended_sizes(mode)
-        
-        # 根据模式调整布局
-        if mode == "mobile":
-            # 移动端：隐藏侧边栏，简化布局
-            self.sidebar.setVisible(False)
-            self.side_panel.setVisible(False)
-        elif mode == "tablet":
-            # 平板端：调整尺寸
-            self.sidebar.setFixedWidth(sizes['sidebar_width'])
-            self.side_panel.setFixedWidth(sizes['side_panel_width'])
-            # 移除标题栏引用，使用系统标题栏
-            self.status_bar.setFixedHeight(sizes['status_height'])
-        else:
-            # 桌面端：标准尺寸
-            self.sidebar.setFixedWidth(sizes['sidebar_width'])
-            self.side_panel.setFixedWidth(sizes['side_panel_width'])
-            # 移除标题栏引用，使用系统标题栏
-            self.status_bar.setFixedHeight(sizes['status_height'])
+        """应用响应式布局 - 简化版本"""
+        # 简化响应式布局，不再处理侧边栏和右侧面板
+        pass
             
     # 快速操作槽函数
     def new_conversion(self):
         """新建转换"""
         self.switch_page("component")
-        self.status_label.setText("🆕 新建转换任务")
         
     def open_bom(self):
         """打开BOM文件"""
@@ -925,7 +677,34 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
     def batch_process(self):
         """批量处理"""
-        self.status_label.setText("🔄 批量处理模式")
+        # 移除状态栏引用，改为显示统计信息
+        self.show_conversion_stats("批量处理模式", "0", "0", "0s")
+        
+    def open_bom_parser(self):
+        """打开BOM解析器"""
+        self.show_conversion_stats("BOM解析器", "0", "0", "0s")
+        
+    def open_component_validator(self):
+        """打开元件验证器"""
+        self.show_conversion_stats("元件验证", "0", "0", "0s")
+        
+    def show_help(self):
+        """显示帮助"""
+        self.show_conversion_stats("使用指南", "0", "0", "0s")
+        
+    def on_conversion_completed(self, total, success, failed, avg_time):
+        """转换完成回调 - 显示统计信息"""
+        self.show_conversion_stats(total, success, failed, avg_time)
+        
+    def show_conversion_stats(self, total="0", success="0", failed="0", avg_time="0s"):
+        """显示转换统计信息"""
+        if hasattr(self, 'conversion_stats_widget'):
+            self.conversion_stats_widget.setVisible(True)
+            if hasattr(self, 'stats_labels'):
+                self.stats_labels["总转换次数"].setText(total)
+                self.stats_labels["成功次数"].setText(success)
+                self.stats_labels["失败次数"].setText(failed)
+                self.stats_labels["平均用时"].setText(avg_time)
         
     def mousePressEvent(self, event):
         """鼠标按下事件（用于窗口拖动）"""
