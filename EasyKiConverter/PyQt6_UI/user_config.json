@@ -1,5 +1,5 @@
 {
-  "export_path": "/home/dennis/Desktop",
+  "export_path": "",
   "file_prefix": "",
   "export_options": {
     "symbol": true,
@@ -10,4 +10,17 @@
     "C2040"
   ],
   "theme": "light",
-  "window_geometry": 
+  "window_geometry": null,
+  "window_state": null,
+  "language": "zh_CN",
+  "auto_save": true,
+  "max_recent_components": 100,
+  "parallel_workers": 15,
+  "debug_mode": false,
+  "log_level": "INFO",
+  "check_updates": true,
+  "confirm_delete": true,
+  "show_tips": true,
+  "last_used_path": "",
+  "file_dialog_path": ""
+}
