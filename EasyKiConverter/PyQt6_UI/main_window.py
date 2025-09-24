@@ -37,8 +37,8 @@ class MainWindow(QMainWindow):
         self.current_theme = "light"
         
         self.init_ui()
-        self.init_menu()
         self.init_status_bar()
+        self.init_menu()
         self.init_connections()
         self.load_settings()
         
@@ -398,10 +398,11 @@ class MainWindow(QMainWindow):
         self.current_theme = theme
         self.style_manager.apply_theme(self, theme)
         
-        # 更新主题按钮图标
-        theme_button = self.status_bar.findChild(QLabel, "themeButton")
-        if theme_button:
-            theme_button.setText("🌙" if theme == "light" else "☀️")
+        # 更新主题按钮图标（如果status_bar已初始化）
+        if hasattr(self, 'status_bar'):
+            theme_button = self.status_bar.findChild(QLabel, "themeButton")
+            if theme_button:
+                theme_button.setText("🌙" if theme == "light" else "☀️")
             
     def switch_page(self, page_name: str):
         """切换页面"""

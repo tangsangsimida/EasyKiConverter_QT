@@ -1,0 +1,13 @@
+{
+  "export_path": "/home/dennis/Desktop",
+  "file_prefix": "",
+  "export_options": {
+    "symbol": true,
+    "footprint": true,
+    "model3d": true
+  },
+  "component_ids": [
+    "C2040"
+  ],
+  "theme": "light",
+  "window_geometry": 

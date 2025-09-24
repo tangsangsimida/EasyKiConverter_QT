@@ -446,11 +446,16 @@ class ComponentInputWidget(QWidget):
         if not input_text:
             return
             
-        # 验证元件编号
+        # 首先尝试提取LCSC ID
         component_id = self.component_validator.extract_lcsc_id(input_text)
+        
+        # 如果不是LCSC格式，尝试通用元件编号验证
         if not component_id:
-            QMessageBox.warning(self, "警告", f"无法识别的元件编号格式：{input_text}")
-            return
+            if self.component_validator.validate_component_format(input_text):
+                component_id = input_text
+            else:
+                QMessageBox.warning(self, "警告", f"无法识别的元件编号格式：{input_text}\n\n支持的格式：\n• LCSC编号：C123456\n• 元件型号：CC2040、ESP32等")
+                return
             
         # 检查是否已存在
         if component_id in self.components:
