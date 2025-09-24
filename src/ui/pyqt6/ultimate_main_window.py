@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 现代化主窗口 - 彻底解决布局拥挤和覆盖问题
-采用专业级的空间分配和视觉层次设计
+采用的空间分配和视觉层次设计
 """
 
 import sys
@@ -45,7 +45,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
     def setup_window(self):
         """设置窗口属性 - 优化最大化兼容性"""
-        self.setWindowTitle("EasyKiConverter - 专业级EDA转换工具")
+        self.setWindowTitle("EasyKiConverter - EDA转换工具")
         
         # 问题：最小尺寸限制会干扰最大化功能
         # 解决方案：使用更合理的尺寸策略
@@ -73,7 +73,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         # 直接使用系统标题栏，不需要自定义标题栏
         # 系统会提供标准的标题栏、最小化/最大化/关闭按钮
         
-        # 主内容区域 - 专业级分割布局
+        # 主内容区域 - 分割布局
         content_area = self.create_professional_content_area()
         main_layout.addWidget(content_area, 1)  # 添加拉伸因子
         
@@ -137,7 +137,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         """)
         text_layout.addWidget(app_title)
         
-        app_subtitle = QLabel("专业级EDA转换工具")
+        app_subtitle = QLabel("EDA转换工具")
         app_subtitle.setStyleSheet("""
             font-size: 11px;
             color: #64748b;
@@ -204,7 +204,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return title_bar
         
     def create_professional_content_area(self) -> QWidget:
-        """创建专业级内容区域 - 合理的空间分配"""
+        """创建内容区域 - 合理的空间分配"""
         content_area = QWidget()
         content_area.setObjectName("professionalContentArea")
         content_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -226,7 +226,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             }
         """)
         
-        # 左侧导航栏 - 固定宽度，专业级设计
+        # 左侧导航栏 - 固定宽度，设计
         self.sidebar = self.create_professional_sidebar()
         main_splitter.addWidget(self.sidebar)
         
@@ -255,7 +255,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return content_area
         
     def create_professional_sidebar(self) -> QWidget:
-        """创建专业级侧边栏 - 充足的空间和层次"""
+        """创建侧边栏 - 充足的空间和层次"""
         sidebar = QWidget()
         sidebar.setObjectName("professionalSidebar")
         sidebar.setMinimumWidth(300)  # 增加最小宽度
@@ -405,7 +405,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return sidebar
         
     def create_professional_main_workspace(self) -> QWidget:
-        """创建专业级主工作区 - 核心功能区域"""
+        """创建主工作区 - 核心功能区域"""
         workspace = QWidget()
         workspace.setObjectName("professionalMainWorkspace")
         workspace.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -448,7 +448,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         scroll_content = QWidget()
         scroll_layout = QVBoxLayout(scroll_content)
         scroll_layout.setContentsMargins(40, 40, 40, 40)  # 充足的内边距
-        scroll_layout.setSpacing(35)  # 专业级组件间距
+        scroll_layout.setSpacing(35)  # 组件间距
         
         # 欢迎区域 - 更大的视觉冲击力
         welcome_area = self.create_professional_welcome_area()
@@ -464,7 +464,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return workspace
         
     def create_professional_welcome_area(self) -> QWidget:
-        """创建专业级欢迎区域 - 强烈的视觉层次"""
+        """创建欢迎区域 - 强烈的视觉层次"""
         welcome = QWidget()
         welcome.setObjectName("professionalWelcomeArea")
         welcome.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -482,7 +482,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             }
         """)
         
-        # 添加专业级阴影效果
+        # 添加阴影效果
         from utils.modern_style import ModernStyle
         ModernStyle.add_shadow_effect(card, blur_radius=40, offset=(0, 12))
         
@@ -507,7 +507,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         text_layout.addWidget(main_title)
         
         # 副标题 - 更大字体
-        subtitle = QLabel("专业级嘉立创EDA转KiCad转换工具")
+        subtitle = QLabel("嘉立创EDA转KiCad转换工具")
         subtitle.setStyleSheet("""
             font-size: 18px;
             color: rgba(255, 255, 255, 0.9);
@@ -546,7 +546,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return outer_container
         
     def create_professional_main_content(self) -> QWidget:
-        """创建专业级主内容区域 - 核心功能"""
+        """创建主内容区域 - 核心功能"""
         content = QWidget()
         content.setObjectName("professionalMainContent")
         content.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -554,13 +554,13 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         # 使用更合理的布局结构
         layout = QVBoxLayout(content)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(30)  # 专业级间距
+        layout.setSpacing(30)  # 间距
         
         # 创建堆栈式内容区域
         self.content_stack = QStackedWidget()
         self.content_stack.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
-        # 创建专业级组件输入界面
+        # 创建组件输入界面
         self.component_widget = OptimizedComponentInputWidget(self.config_manager)
         self.content_stack.addWidget(self.component_widget)
         
@@ -578,7 +578,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return content
         
     def create_professional_placeholder_page(self, title: str, description: str, icon: str) -> QWidget:
-        """创建专业级占位符页面 - 美观的提示"""
+        """创建占位符页面 - 美观的提示"""
         page = QWidget()
         page.setObjectName("professionalPlaceholderPage")
         
@@ -624,7 +624,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return page
         
     def create_professional_side_panel(self) -> QWidget:
-        """创建专业级侧面板 - 辅助功能区域"""
+        """创建侧面板 - 辅助功能区域"""
         panel = QWidget()
         panel.setObjectName("professionalSidePanel")
         panel.setMinimumWidth(420)  # 增加最小宽度
@@ -639,7 +639,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(30, 40, 30, 30)  # 增加内边距
-        layout.setSpacing(30)  # 专业级间距
+        layout.setSpacing(10)  # 间距
         
         # 快速操作区域 - 更大的卡片
         quick_actions = self.create_professional_quick_actions()
@@ -658,16 +658,21 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return panel
         
     def create_professional_quick_actions(self) -> QWidget:
-        """创建专业级快速操作区域"""
+        """创建快速操作区域"""
         card = ModernCard(
             title="快速操作",
             icon="⚡",
             description="常用功能的快捷入口"
         )
+
+        # 增加卡片内边距和元素间距
+        card_layout = card.layout()
+        card_layout.setContentsMargins(0, 0, 0, 0)  # 增加卡片内边距
+        card_layout.setSpacing(2)  # 增加卡片内元素间距
         
         # 添加更大的操作按钮
         actions_layout = QVBoxLayout()
-        actions_layout.setSpacing(12)  # 增加按钮间距
+        actions_layout.setSpacing(2)  # 增加按钮间距
         
         actions = [
             ("📋 新建转换", self.new_conversion),
@@ -678,14 +683,14 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
         for text, callback in actions:
             btn = QPushButton(text)
-            btn.setMinimumHeight(48)  # 增加按钮高度
+            btn.setMinimumHeight(10)  # 增加按钮高度
             btn.setStyleSheet("""
                 QPushButton {
                     background-color: #f8fafc;
                     color: #475569;
                     border: 1px solid #e2e8f0;
                     border-radius: 12px;
-                    padding: 14px 18px;
+                    padding: 12px 18px;
                     font-size: 14px;
                     font-weight: 500;
                     text-align: left;
@@ -698,12 +703,12 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             """)
             btn.clicked.connect(callback)
             actions_layout.addWidget(btn)
-            
+        card.setMinimumHeight(370)  # 增加卡片最小高度
         card.layout().addLayout(actions_layout)
         return card
         
     def create_professional_stats_area(self) -> QWidget:
-        """创建专业级统计信息区域"""
+        """创建统计信息区域"""
         card = ModernCard(
             title="统计信息",
             icon="📊",
@@ -737,7 +742,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return card
         
     def create_professional_help_area(self) -> QWidget:
-        """创建专业级帮助信息区域"""
+        """创建帮助信息区域"""
         card = ModernCard(
             title="使用帮助",
             icon="💡",
@@ -765,7 +770,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return card
         
     def create_professional_status_bar(self) -> QWidget:
-        """创建专业级状态栏 - 充足的信息展示空间"""
+        """创建状态栏 - 充足的信息展示空间"""
         status_bar = QWidget()
         status_bar.setFixedHeight(60)  # 增加高度
         status_bar.setObjectName("professionalStatusBar")
@@ -802,7 +807,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         return status_bar
         
     def apply_professional_style(self):
-        """应用专业级样式"""
+        """应用样式"""
         self.setStyleSheet(ModernStyle.get_main_stylesheet(self.current_theme))
         
     def setup_animations(self):
