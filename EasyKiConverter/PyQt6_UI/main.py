@@ -24,6 +24,7 @@ except ImportError as e:
     sys.exit(1)
 
 from main_window import MainWindow
+from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 
 
@@ -48,8 +49,8 @@ def main():
         # 初始化配置管理器
         config_manager = ConfigManager()
         
-        # 创建并显示主窗口
-        main_window = MainWindow(config_manager)
+        # 创建并显示主窗口（使用现代化界面）
+        main_window = ModernMainWindow(config_manager)
         main_window.show()
         
         # 运行应用程序事件循环
