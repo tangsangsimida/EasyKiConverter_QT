@@ -46,8 +46,8 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
     def setup_window(self):
         """设置窗口属性 - 优化默认尺寸"""
         self.setWindowTitle("EasyKiConverter - 专业级EDA转换工具")
-        self.setMinimumSize(1400, 900)  # 增加最小尺寸
-        self.resize(1600, 1000)  # 增加默认尺寸
+        self.setMinimumSize(1600, 1100)  # 进一步增加最小尺寸
+        self.resize(1800, 1200)  # 进一步增加默认尺寸
         
         # 设置窗口图标
         # self.setWindowIcon(QIcon(":/icons/app_icon.png"))
@@ -83,11 +83,14 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.apply_professional_style()
         
     def create_professional_title_bar(self) -> QWidget:
-        """创建专业级标题栏 - 充足的空间和层次"""
+        """创建专业级标题栏 - 充足的空间和层次，支持拖动"""
         title_bar = QWidget()
         title_bar.setFixedHeight(80)  # 增加高度到80px
         title_bar.setObjectName("professionalTitleBar")
         title_bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        
+        # 启用鼠标跟踪，支持拖动
+        title_bar.setMouseTracking(True)
         
         layout = QHBoxLayout(title_bar)
         layout.setContentsMargins(30, 0, 30, 0)  # 增加左右边距
@@ -230,6 +233,20 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             }
         """)
         
+        # 添加标题栏鼠标事件处理，支持拖动窗口
+        def title_bar_mouse_press(event):
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+                event.accept()
+        
+        def title_bar_mouse_move(event):
+            if event.buttons() == Qt.MouseButton.LeftButton and hasattr(self, 'drag_position'):
+                self.move(event.globalPosition().toPoint() - self.drag_position)
+                event.accept()
+        
+        title_bar.mousePressEvent = title_bar_mouse_press
+        title_bar.mouseMoveEvent = title_bar_mouse_move
+        
         return title_bar
         
     def create_professional_content_area(self) -> QWidget:
@@ -268,7 +285,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         main_splitter.addWidget(self.side_panel)
         
         # 设置合理的分割比例和最小尺寸
-        main_splitter.setSizes([300, 900, 400])  # 更合理的比例分配
+        main_splitter.setSizes([280, 1200, 320])  # 优化比例：导航栏更小，主工作区更大
         main_splitter.setStretchFactor(0, 0)  # 导航栏不拉伸
         main_splitter.setStretchFactor(1, 1)  # 主工作区拉伸
         main_splitter.setStretchFactor(2, 0)  # 辅助面板不拉伸

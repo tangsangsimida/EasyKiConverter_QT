@@ -213,17 +213,17 @@ class OptimizedComponentInputWidget(QWidget):
         return panel
         
     def create_input_card(self) -> QFrame:
-        """创建输入卡片 - 优化尺寸和布局"""
+        """创建输入卡片 - 优化尺寸和布局，增加空间"""
         card = QFrame()
         card.setObjectName("inputCard")
-        card.setMinimumHeight(220)  # 增加最小高度
+        card.setMinimumHeight(280)  # 进一步增加最小高度
         card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         card.setStyleSheet("""
             QFrame#inputCard {
                 background-color: white;
                 border: 2px solid #e2e8f0;
                 border-radius: 20px;
-                padding: 30px;
+                padding: 35px;  /* 增加内边距 */
             }
             QFrame#inputCard:hover {
                 border-color: #cbd5e1;
@@ -256,21 +256,21 @@ class OptimizedComponentInputWidget(QWidget):
         
         layout.addLayout(title_layout)
         
-        # 输入区域 - 增加高度
+        # 输入区域 - 增加高度和间距
         input_layout = QHBoxLayout()
-        input_layout.setSpacing(15)  # 增加间距
+        input_layout.setSpacing(20)  # 进一步增加间距
         
         self.component_input = ModernLineEdit()
         self.component_input.setPlaceholderText("输入元器件编号，如 C2040、ESP32、STM32F103...")
-        self.component_input.setMinimumHeight(55)  # 增加高度
-        self.component_input.setFont(QFont("Segoe UI", 12))  # 增大字体
+        self.component_input.setMinimumHeight(65)  # 保持高度
+        self.component_input.setFont(QFont("Segoe UI", 13))  # 增大字体
         self.component_input.returnPressed.connect(self.add_component)
         input_layout.addWidget(self.component_input)
         
         add_btn = ModernButton("添加")
-        add_btn.setMinimumWidth(120)  # 增加按钮宽度
-        add_btn.setMinimumHeight(55)  # 增加按钮高度
-        add_btn.setFont(QFont("Segoe UI", 12, QFont.Weight.Medium))
+        add_btn.setMinimumWidth(140)  # 进一步增加按钮宽度
+        add_btn.setMinimumHeight(65)  # 保持按钮高度
+        add_btn.setFont(QFont("Segoe UI", 13, QFont.Weight.Medium))
         add_btn.clicked.connect(self.add_component)
         input_layout.addWidget(add_btn)
         
