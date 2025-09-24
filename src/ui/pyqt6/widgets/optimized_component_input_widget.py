@@ -26,7 +26,7 @@ from utils.ui_effects import LoadingSpinner, ModernCard, SuccessAnimation, Moder
 from utils.responsive_layout import AdaptiveWidget
 
 
-class OptimizedComponentInputWidget(QWidget, AdaptiveWidget):
+class OptimizedComponentInputWidget(AdaptiveWidget):
     """优化版现代化组件输入界面"""
     
     # 信号定义
@@ -34,8 +34,7 @@ class OptimizedComponentInputWidget(QWidget, AdaptiveWidget):
     import_bom_requested = pyqtSignal(str)  # BOM文件路径
     
     def __init__(self, config_manager, parent=None):
-        QWidget.__init__(self, parent)
-        AdaptiveWidget.__init__(self, parent)
+        super().__init__(parent)
         self.config_manager = config_manager
         self.component_validator = ComponentValidator()
         self.bom_parser = BOMParser()

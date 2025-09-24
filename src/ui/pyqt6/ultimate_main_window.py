@@ -6,24 +6,24 @@
 """
 
 import sys
+# 修复相对导入问题
 from pathlib import Path
-from typing import Optional
+sys.path.insert(0, str(Path(__file__).parent))
 
+from pathlib import Path
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                           QPushButton, QLabel, QFrame, QStackedWidget, QStatusBar,
-                           QSplitter, QScrollArea, QGridLayout, QSizePolicy, QSpacerItem)
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QPoint, QTimer, pyqtSignal, QSize
-from PyQt6.QtGui import QColor, QPalette, QLinearGradient, QBrush, QPainter, QFont, QIcon
-
-from .utils.config_manager import ConfigManager
-from .utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
-from .widgets.optimized_component_input_widget import OptimizedComponentInputWidget
-from .utils.ui_effects import LoadingSpinner, ModernCard, SuccessAnimation, ModernProgressBar
-from .utils.responsive_layout import ResponsiveLayoutManager, AdaptiveWidget
+                           QPushButton, QLabel, QFrame, QStackedWidget,
+                           QSplitter, QScrollArea, QSizePolicy)
+from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal
+from utils.config_manager import ConfigManager
+from utils.modern_style import ModernStyle
+from widgets.optimized_component_input_widget import OptimizedComponentInputWidget
+from utils.ui_effects import ModernCard, ModernProgressBar
+from utils.responsive_layout import ResponsiveLayoutManager, AdaptiveWidget
 
 
 class UltimateMainWindow(QMainWindow, AdaptiveWidget):
-    """现代化主窗口 - 专业级布局设计"""
+    """现代化主窗口"""
     
     # 信号定义
     theme_changed = pyqtSignal(str)
@@ -44,20 +44,20 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.load_settings()
         
     def setup_window(self):
-        """设置窗口属性 - 优化默认尺寸"""
-        self.setWindowTitle("EasyKiConverter - 专业级EDA转换工具")
+        """设置窗口属性 - 优化默认尺寸，保留系统标题栏"""
+        self.setWindowTitle("EasyKiConverter")
         self.setMinimumSize(1600, 1100)  # 进一步增加最小尺寸
         self.resize(1800, 1200)  # 进一步增加默认尺寸
         
         # 设置窗口图标
         # self.setWindowIcon(QIcon(":/icons/app_icon.png"))
         
-        # 设置窗口属性
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowSystemMenuHint)
+        # 移除无边框设置，使用系统标题栏
+        # self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        # self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowSystemMenuHint)
         
     def setup_ui(self):
-        """设置用户界面 - 采用专业级空间分配"""
+        """设置用户界面空间分配"""
         # 创建中央部件
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -83,55 +83,52 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.apply_professional_style()
         
     def create_professional_title_bar(self) -> QWidget:
-        """创建专业级标题栏 - 充足的空间和层次，支持拖动"""
+        """创建简洁的标题栏 - 与系统标题栏协调"""
         title_bar = QWidget()
-        title_bar.setFixedHeight(80)  # 增加高度到80px
+        title_bar.setFixedHeight(50)  # 更简洁的高度
         title_bar.setObjectName("professionalTitleBar")
         title_bar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         
-        # 启用鼠标跟踪，支持拖动
-        title_bar.setMouseTracking(True)
-        
         layout = QHBoxLayout(title_bar)
-        layout.setContentsMargins(30, 0, 30, 0)  # 增加左右边距
-        layout.setSpacing(20)  # 增加组件间距
+        layout.setContentsMargins(15, 0, 15, 0)  # 更紧凑的边距
+        layout.setSpacing(10)
         
-        # 左侧品牌区域 - 更大的图标和字体
+        # 左侧品牌区域
         brand_container = QWidget()
         brand_layout = QHBoxLayout(brand_container)
         brand_layout.setContentsMargins(0, 0, 0, 0)
-        brand_layout.setSpacing(15)  # 增加间距
+        brand_layout.setSpacing(8)
         
-        # 应用图标 - 更大尺寸
+        # 应用图标
         app_icon = QLabel("⚡")
         app_icon.setObjectName("professionalAppIcon")
         app_icon.setStyleSheet("""
             QLabel#professionalAppIcon {
-                font-size: 32px;
+                font-size: 20px;
                 font-weight: bold;
                 color: white;
                 background-color: #2563eb;
-                border-radius: 16px;
-                padding: 12px;
-                min-width: 32px;
-                min-height: 32px;
+                border-radius: 10px;
+                padding: 6px;
+                min-width: 20px;
+                min-height: 20px;
                 qproperty-alignment: AlignCenter;
             }
         """)
         brand_layout.addWidget(app_icon)
         
-        # 品牌文字 - 更大字体
+        # 品牌文字
         brand_text = QWidget()
         text_layout = QVBoxLayout(brand_text)
         text_layout.setContentsMargins(0, 0, 0, 0)
-        text_layout.setSpacing(3)
+        text_layout.setSpacing(1)
         
         app_title = QLabel("EasyKiConverter")
         app_title.setObjectName("professionalAppTitle")
         app_title.setStyleSheet("""
             QLabel#professionalAppTitle {
-                font-size: 24px;
-                font-weight: 700;
+                font-size: 16px;
+                font-weight: 600;
                 color: #1e293b;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
@@ -140,7 +137,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
         app_subtitle = QLabel("专业级EDA转换工具")
         app_subtitle.setStyleSheet("""
-            font-size: 14px;
+            font-size: 11px;
             color: #64748b;
             font-weight: 400;
         """)
@@ -151,22 +148,22 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         
         layout.addStretch()
         
-        # 右侧控制区域 - 更大的按钮
+        # 右侧控制区域 - 仅保留主题切换
         control_container = QWidget()
         control_layout = QHBoxLayout(control_container)
         control_layout.setContentsMargins(0, 0, 0, 0)
-        control_layout.setSpacing(12)  # 增加按钮间距
+        control_layout.setSpacing(6)
         
-        # 主题切换按钮 - 更大尺寸
+        # 主题切换按钮
         self.theme_button = QPushButton("🌙")
         self.theme_button.setObjectName("professionalThemeButton")
-        self.theme_button.setFixedSize(48, 48)  # 增大尺寸
+        self.theme_button.setFixedSize(32, 32)
         self.theme_button.setStyleSheet("""
             QPushButton#professionalThemeButton {
                 background-color: transparent;
                 border: none;
-                border-radius: 24px;
-                font-size: 22px;
+                border-radius: 16px;
+                font-size: 16px;
                 color: #64748b;
             }
             QPushButton#professionalThemeButton:hover {
@@ -177,77 +174,36 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         self.theme_button.clicked.connect(self.toggle_theme)
         control_layout.addWidget(self.theme_button)
         
-        # 窗口控制按钮 - 更大尺寸
-        window_buttons = [
-            ("−", self.showMinimized, "minimize"),
-            ("□", self.toggle_maximized, "maximize"),
-            ("×", self.close, "close")
-        ]
-        
-        for text, callback, name in window_buttons:
-            btn = QPushButton(text)
-            btn.setObjectName(f"professionalWindowButton_{name}")
-            btn.setFixedSize(48, 48)  # 统一增大尺寸
-            btn.clicked.connect(callback)
-            
-            if name == "close":
-                btn.setStyleSheet("""
-                    QPushButton#professionalWindowButton_close {
-                        background-color: transparent;
-                        border: none;
-                        border-radius: 24px;
-                        font-size: 20px;
-                        font-weight: 300;
-                        color: #64748b;
-                    }
-                    QPushButton#professionalWindowButton_close:hover {
-                        background-color: #ef4444;
-                        color: white;
-                    }
-                """)
-            else:
-                btn.setStyleSheet("""
-                    QPushButton#professionalWindowButton_%s {
-                        background-color: transparent;
-                        border: none;
-                        border-radius: 24px;
-                        font-size: 20px;
-                        font-weight: 300;
-                        color: #64748b;
-                    }
-                    QPushButton#professionalWindowButton_%s:hover {
-                        background-color: #f1f5f9;
-                        color: #1e293b;
-                    }
-                """ % (name, name))
-                
-            control_layout.addWidget(btn)
-        
         layout.addWidget(control_container)
         
-        # 设置标题栏样式 - 更柔和的边框
+        # 设置标题栏样式
         title_bar.setStyleSheet("""
             QWidget#professionalTitleBar {
-                background-color: #ffffff;
+                background-color: #f8fafc;
                 border-bottom: 1px solid #e2e8f0;
             }
         """)
         
-        # 添加标题栏鼠标事件处理，支持拖动窗口
-        def title_bar_mouse_press(event):
+        # 实现窗口拖动功能
+        def mousePressEvent(event):
             if event.button() == Qt.MouseButton.LeftButton:
-                self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+                self.drag_position = event.globalPosition().toPoint()
                 event.accept()
         
-        def title_bar_mouse_move(event):
+        def mouseMoveEvent(event):
             if event.buttons() == Qt.MouseButton.LeftButton and hasattr(self, 'drag_position'):
-                self.move(event.globalPosition().toPoint() - self.drag_position)
+                # 使用系统API移动窗口
+                self.window().windowHandle().startSystemMove()
                 event.accept()
         
-        title_bar.mousePressEvent = title_bar_mouse_press
-        title_bar.mouseMoveEvent = title_bar_mouse_move
+        title_bar.mousePressEvent = mousePressEvent
+        title_bar.mouseMoveEvent = mouseMoveEvent
         
         return title_bar
+        
+    def show_help(self):
+        """显示帮助信息"""
+        QMessageBox.information(self, "帮助", "EasyKiConverter 使用帮助\n\n1. 输入元器件编号或上传BOM文件\n2. 选择导出选项\n3. 设置导出路径\n4. 点击开始导出")
         
     def create_professional_content_area(self) -> QWidget:
         """创建专业级内容区域 - 合理的空间分配"""
