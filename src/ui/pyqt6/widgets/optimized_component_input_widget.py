@@ -770,8 +770,27 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
             self.import_bom_file(file_path)
     
     def import_bom_file(self, file_path: str):
-        """导入BOM文件 - 保持原有逻辑"""
+        """导入BOM文件 - 修复崩溃问题"""
         try:
+            # 首先验证文件是否存在和可读
+            if not os.path.exists(file_path):
+                QMessageBox.warning(self, "文件错误", f"文件不存在: {file_path}")
+                return
+                
+            if not os.access(file_path, os.R_OK):
+                QMessageBox.warning(self, "文件错误", f"文件无法读取: {file_path}")
+                return
+            
+            # 获取文件信息
+            file_size = os.path.getsize(file_path)
+            if file_size == 0:
+                QMessageBox.warning(self, "文件错误", "BOM文件为空")
+                return
+                
+            if file_size > 10 * 1024 * 1024:  # 10MB限制
+                QMessageBox.warning(self, "文件错误", "BOM文件过大 (>10MB)")
+                return
+            
             # 解析BOM文件
             result = self.bom_parser.parse_bom_file(file_path)
             
@@ -779,7 +798,7 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
                 QMessageBox.warning(self, "BOM解析失败", result['error'])
                 return
                 
-            component_ids = result['component_ids']
+            component_ids = result.get('component_ids', [])
             
             if not component_ids:
                 QMessageBox.information(self, "提示", "BOM文件中没有找到有效的元件编号")
@@ -790,7 +809,7 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
             duplicate_count = 0
             
             for component_id in component_ids:
-                if component_id not in self.components:
+                if component_id and component_id not in self.components:
                     self.components.append(component_id)
                     added_count += 1
                 else:
@@ -810,8 +829,10 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
             self.import_bom_requested.emit(file_path)
             
         except Exception as e:
-            QMessageBox.critical(self, "BOM导入错误", f"导入BOM文件时发生错误：\n{str(e)}")
+            error_msg = f"导入BOM文件时发生错误：\n{str(e)}\n\n请检查：\n1. 文件格式是否正确（Excel/CSV）\n2. 文件是否损坏\n3. 是否缺少依赖库"
+            QMessageBox.critical(self, "BOM导入错误", error_msg)
             self.status_label.setText("❌ BOM导入失败")
+            print(f"BOM导入错误详情: {e}")
     
     def browse_output_path(self):
         """浏览输出目录"""

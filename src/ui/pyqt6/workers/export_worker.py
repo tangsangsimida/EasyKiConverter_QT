@@ -262,15 +262,49 @@ class ExportWorker(QThread):
             with symbol_lib_lock:
                 if not symbol_lib_path.exists():
                     with open(symbol_lib_path, "w+", encoding="utf-8") as my_lib:
-                        my_lib.write(
-                            '''(kicad_symbol_lib
+                        if kicad_version == KicadVersion.v6:
+                            my_lib.write(
+                                """(kicad_symbol_lib
   (version 20211014)
-  (generator kicad_symbol_editor)
-)'''
-                            if kicad_version == KicadVersion.v6
-                            else "EESchema-LIBRARY Version 2.4\n#encoding utf-8\n"
-                        )
+  (generator "kicad_symbol_editor")
+  (generator_version "6.0.0")
+)"""
+                            )
+                        else:
+                            my_lib.write("EESchema-LIBRARY Version 2.4\n#encoding utf-8\n")
                     self.logger.info(f"创建符号库文件: {symbol_lib_path}")
+            
+            # First, process 3D models if enabled (needed for footprint 3D references)
+            model_3d = None
+            if export_options.get('model3d', True):
+                self.logger.info(f"转换3D模型: {lcsc_id}")
+                try:
+                    model_3d_importer = Easyeda3dModelImporter(
+                        easyeda_cp_cad_data=component_data, 
+                        download_raw_3d_model=True
+                    )
+                    model_3d = model_3d_importer.output  # Use the output property directly
+                    
+                    if not model_3d:
+                        self.logger.warning(f"未找到3D模型数据: {lcsc_id}")
+                    else:
+                        self.logger.info(f"3D模型信息: name={model_3d.name}, uuid={model_3d.uuid}")
+                        self.logger.info(f"3D模型数据: raw_obj={'有' if model_3d.raw_obj else '无'}, step={'有' if model_3d.step else '无'}")
+                        
+                        model_3d_exporter = Exporter3dModelKicad(model_3d=model_3d)
+                        model_3d_exporter.export(lib_path=str(base_folder / lib_name))
+                        
+                        # 查找导出的3D模型文件
+                        model_name = getattr(model_3d, 'name', f"{lcsc_id}_3dmodel")
+                        for ext in ['.step', '.wrl']:
+                            model_file = model_dir / f"{model_name}{ext}"
+                            if model_file.exists():
+                                files_created.append(str(model_file.absolute()))
+                                self.logger.info(f"保存3D模型: {model_file}")
+                            else:
+                                self.logger.warning(f"3D模型文件未找到: {model_file}")
+                except Exception as e:
+                    self.logger.error(f"3D模型导出失败 {lcsc_id}: {e}", exc_info=True)
             
             # 导出符号
             if export_options.get('symbol', True):
@@ -307,7 +341,7 @@ class ExportWorker(QThread):
                     
                     files_created.append(str(symbol_lib_path.absolute()))
             
-            # 导出封装
+            # 导出封装 (with 3D model reference if available)
             if export_options.get('footprint', True):
                 self.logger.info(f"转换封装: {lcsc_id}")
                 footprint_importer = EasyedaFootprintImporter(easyeda_cp_cad_data=component_data)
@@ -319,6 +353,7 @@ class ExportWorker(QThread):
                     footprint_exporter = ExporterFootprintKicad(footprint=footprint_data)
                     footprint_filename = footprint_dir / f"{footprint_data.info.name}.kicad_mod"
                     
+                    # Set 3D model path for footprint reference
                     model_3d_path = base_folder / lib_name
                     footprint_exporter.export(
                         footprint_full_path=str(footprint_filename),
@@ -327,29 +362,6 @@ class ExportWorker(QThread):
                     
                     files_created.append(str(footprint_filename.absolute()))
                     self.logger.info(f"保存封装: {footprint_filename}")
-            
-            # 导出3D模型
-            if export_options.get('model3d', True):
-                self.logger.info(f"转换3D模型: {lcsc_id}")
-                model_3d_importer = Easyeda3dModelImporter(
-                    easyeda_cp_cad_data=component_data, 
-                    download_raw_3d_model=True
-                )
-                model_3d = model_3d_importer.create_3d_model()
-                
-                if not model_3d:
-                    self.logger.warning(f"未找到3D模型数据: {lcsc_id}")
-                else:
-                    model_3d_exporter = Exporter3dModelKicad(model_3d=model_3d)
-                    model_3d_exporter.export(lib_path=str(base_folder / lib_name))
-                    
-                    # 查找导出的3D模型文件
-                    model_name = getattr(model_3d, 'name', f"{lcsc_id}_3dmodel")
-                    for ext in ['.step', '.wrl']:
-                        model_file = model_dir / f"{model_name}{ext}"
-                        if model_file.exists():
-                            files_created.append(str(model_file.absolute()))
-                            self.logger.info(f"保存3D模型: {model_file}")
             
             return {
                 "success": True,

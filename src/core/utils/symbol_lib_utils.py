@@ -6,7 +6,7 @@ import logging
 import re
 from typing import Optional
 
-from kicad.parameters_kicad_symbol import KicadVersion
+from ..kicad.parameters_kicad_symbol import KicadVersion
 
 
 def add_component_in_symbol_lib_file(
@@ -27,11 +27,24 @@ def add_component_in_symbol_lib_file(
         with open(file=lib_path, mode="a+", encoding="utf-8") as lib_file:
             lib_file.write(str(component_content))
     elif kicad_version == KicadVersion.v6:
-        with open(file=lib_path, mode="rb+") as lib_file:
-            lib_file.seek(-2, 2)  # 移动到文件末尾倒数第二个字符 / Move to second last character of file
-            lib_file.truncate()  # 删除最后的括号 / Remove the closing bracket
-            lib_file.write(str(component_content).encode(encoding="utf-8"))
-            lib_file.write("\n)".encode(encoding="utf-8"))  # 重新添加括号 / Re-add the closing bracket
+        # Read current content
+        with open(file=lib_path, mode="r", encoding="utf-8") as lib_file:
+            content = lib_file.read()
+        
+        # Remove the closing bracket and add component content
+        if content.endswith(")"):
+            # 移除末尾的换行和括号，确保干净的连接
+            content = content.rstrip()
+            if content.endswith(")"):
+                content = content[:-1] + str(component_content).rstrip() + "\n)"
+            else:
+                content = content + str(component_content).rstrip() + "\n)"
+        else:
+            content = content.rstrip() + str(component_content).rstrip() + "\n)"
+            
+        # Write back the updated content
+        with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
+            lib_file.write(content)
 
         # 保持标准的generator字段，确保KiCad兼容性
         # with open(file=lib_path, encoding="utf-8") as lib_file:

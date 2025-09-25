@@ -239,21 +239,45 @@ class Easyeda3dModelImporter:
         self.output = self.create_3d_model()
 
     def create_3d_model(self) -> Union[Ee3dModel, None]:
-        ee_data = (
-            self.input["packageDetail"]["dataStr"]["shape"]
-            if isinstance(self.input, dict)
-            else self.input
-        )
+        """Create 3D model with enhanced error handling and logging"""
+        try:
+            ee_data = (
+                self.input["packageDetail"]["dataStr"]["shape"]
+                if isinstance(self.input, dict)
+                else self.input
+            )
 
-        if model_3d_info := self.get_3d_model_info(ee_data=ee_data):
-            model_3d: Ee3dModel = self.parse_3d_model_info(info=model_3d_info)
-            if self.download_raw_3d_model:
-                model_3d.raw_obj = EasyedaApi().get_raw_3d_model_obj(uuid=model_3d.uuid)
-                model_3d.step = EasyedaApi().get_step_3d_model(uuid=model_3d.uuid)
-            return model_3d
-
-        logging.warning("No 3D model available for this component")
-        return None
+            if model_3d_info := self.get_3d_model_info(ee_data=ee_data):
+                logging.info(f"Found 3D model info: {model_3d_info.get('title', 'Unknown')}")
+                model_3d: Ee3dModel = self.parse_3d_model_info(info=model_3d_info)
+                
+                if self.download_raw_3d_model:
+                    logging.info(f"Downloading 3D model data for UUID: {model_3d.uuid}")
+                    
+                    # Download OBJ format
+                    raw_obj = EasyedaApi().get_raw_3d_model_obj(uuid=model_3d.uuid)
+                    if raw_obj:
+                        model_3d.raw_obj = raw_obj
+                        logging.info(f"Successfully downloaded OBJ 3D model")
+                    else:
+                        logging.warning(f"Failed to download OBJ 3D model for UUID: {model_3d.uuid}")
+                    
+                    # Download STEP format
+                    step_data = EasyedaApi().get_step_3d_model(uuid=model_3d.uuid)
+                    if step_data:
+                        model_3d.step = step_data
+                        logging.info(f"Successfully downloaded STEP 3D model")
+                    else:
+                        logging.warning(f"Failed to download STEP 3D model for UUID: {model_3d.uuid}")
+                
+                return model_3d
+            else:
+                logging.warning("No 3D model available for this component")
+                return None
+                
+        except Exception as e:
+            logging.error(f"Error creating 3D model: {e}")
+            return None
 
     def get_3d_model_info(self, ee_data: str) -> dict:
         for line in ee_data:

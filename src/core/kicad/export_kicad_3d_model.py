@@ -53,43 +53,75 @@ def get_vertices(obj_data: str) -> list:
 
 
 def generate_wrl_model(model_3d: Ee3dModel) -> Ki3dModel:
+    """Generate WRL model with better error handling"""
+    if not model_3d.raw_obj:
+        return None
+        
     materials = get_materials(obj_data=model_3d.raw_obj)
     vertices = get_vertices(obj_data=model_3d.raw_obj)
 
     raw_wrl = VRML_HEADER
     shapes = model_3d.raw_obj.split("usemtl")[1:]
+    
+    if not shapes:
+        # 如果没有usemtl，处理整个OBJ作为单个形状
+        shapes = [model_3d.raw_obj]
+    
     for shape in shapes:
         lines = shape.splitlines()
-        material = materials[lines[0].replace(" ", "")]
+        if not lines:
+            continue
+            
+        # 获取材质，如果不存在则使用默认材质
+        material_key = lines[0].replace(" ", "") if lines[0] else "default"
+        material = materials.get(material_key, {
+            'diffuse_color': ['0.8', '0.8', '0.8'],
+            'specular_color': ['0.2', '0.2', '0.2'],
+            'transparency': '0'
+        })
+        
         index_counter = 0
         link_dict = {}
         coord_index = []
         points = []
+        
         for line in lines[1:]:
-            if len(line) > 0:
-                face = [int(index) for index in line.replace("//", "").split(" ")[1:]]
-                face_index = []
-                for index in face:
-                    if index not in link_dict:
-                        link_dict[index] = index_counter
-                        face_index.append(str(index_counter))
-                        points.append(vertices[index - 1])
-                        index_counter += 1
-                    else:
-                        face_index.append(str(link_dict[index]))
-                face_index.append("-1")
-                coord_index.append(",".join(face_index) + ",")
-        points.insert(-1, points[-1])
+            if len(line) > 0 and line.startswith('f '):
+                try:
+                    face = [int(index) for index in line.replace("//", "").split(" ")[1:]]
+                    face_index = []
+                    for index in face:
+                        if index not in link_dict:
+                            link_dict[index] = index_counter
+                            face_index.append(str(index_counter))
+                            if index - 1 < len(vertices):
+                                points.append(vertices[index - 1])
+                            else:
+                                points.append("0 0 0")  # 默认顶点
+                            index_counter += 1
+                        else:
+                            face_index.append(str(link_dict[index]))
+                    face_index.append("-1")
+                    coord_index.append(",".join(face_index) + ",")
+                except (ValueError, IndexError) as e:
+                    print(f"Warning: Failed to process face line '{line}': {e}")
+                    continue
+        
+        if not points:
+            continue
+            
+        if points:
+            points.insert(-1, points[-1])
 
         shape_str = textwrap.dedent(
             f"""
             Shape{{
                 appearance Appearance {{
                     material  Material {{
-                        diffuseColor {' '.join(material['diffuse_color'])}
-                        specularColor {' '.join(material['specular_color'])}
+                        diffuseColor {' '.join(material.get('diffuse_color', ['0.8', '0.8', '0.8']))}
+                        specularColor {' '.join(material.get('specular_color', ['0.2', '0.2', '0.2']))}
                         ambientIntensity 0.2
-                        transparency 0
+                        transparency {material.get('transparency', '0')}
                         shininess 0.5
                     }}
                 }}
@@ -126,16 +158,36 @@ class Exporter3dModelKicad:
         self.output_step = model_3d.step
 
     def export(self, lib_path: str) -> None:
-        if self.output:
-            with open(
-                file=f"{lib_path}.3dshapes/{self.output.name}.wrl",
-                mode="w",
-                encoding="utf-8",
-            ) as my_lib:
-                my_lib.write(self.output.raw_wrl)
-        if self.output_step:
-            with open(
-                file=f"{lib_path}.3dshapes/{self.output.name}.step",
-                mode="wb",
-            ) as my_lib:
-                my_lib.write(self.output_step)
+        """Export 3D models in both WRL and STEP formats with enhanced logging"""
+        try:
+            # Create 3D shapes directory if it doesn't exist
+            import os
+            shapes_dir = f"{lib_path}.3dshapes"
+            os.makedirs(shapes_dir, exist_ok=True)
+            print(f"3D shapes directory: {shapes_dir}")
+            
+            # Export WRL format
+            if self.output and self.output.raw_wrl:
+                wrl_path = f"{shapes_dir}/{self.output.name}.wrl"
+                with open(wrl_path, mode="w", encoding="utf-8") as my_lib:
+                    my_lib.write(self.output.raw_wrl)
+                print(f"✅ Exported WRL 3D model: {wrl_path}")
+            elif self.output:
+                print(f"⚠️  No WRL content available for model: {self.output.name}")
+            else:
+                print(f"⚠️  No 3D model output available")
+            
+            # Export STEP format
+            if self.output_step:
+                step_path = f"{shapes_dir}/{self.input.name}.step"
+                with open(step_path, mode="wb") as my_lib:
+                    my_lib.write(self.output_step)
+                print(f"✅ Exported STEP 3D model: {step_path}")
+            elif self.input:
+                print(f"⚠️  No STEP content available for model: {self.input.name}")
+            else:
+                print(f"⚠️  No 3D model input available")
+                
+        except Exception as e:
+            print(f"❌ Error exporting 3D model: {e}")
+            raise

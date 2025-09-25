@@ -91,37 +91,47 @@ class BOMParser:
             }
             
     def _read_bom_file(self, file_path: Path) -> Optional[pd.DataFrame]:
-        """读取BOM文件"""
+        """读取BOM文件 - 修复版本"""
         try:
             file_ext = file_path.suffix.lower()
             
             if file_ext == '.csv':
                 # 尝试不同的编码读取CSV文件
-                encodings = ['utf-8', 'gbk', 'latin-1']
+                encodings = ['utf-8', 'gbk', 'latin-1', 'cp1252']
                 for encoding in encodings:
                     try:
-                        return pd.read_csv(file_path, encoding=encoding)
-                    except UnicodeDecodeError:
+                        return pd.read_csv(file_path, encoding=encoding, engine='python')
+                    except (UnicodeDecodeError, pd.errors.ParserError):
                         continue
-                return None
+                
+                # 如果所有编码都失败，尝试用错误处理
+                try:
+                    return pd.read_csv(file_path, encoding='utf-8', errors='ignore', engine='python')
+                except Exception as e:
+                    print(f"CSV读取最终失败: {e}")
+                    return None
                 
             elif file_ext in ['.xlsx', '.xls']:
                 # Excel文件 - 首先尝试自动检测表头位置
                 try:
                     # 读取前10行来检测表头
-                    df_temp = pd.read_excel(file_path, header=None, nrows=10)
+                    df_temp = pd.read_excel(file_path, header=None, nrows=10, engine='openpyxl')
                     header_row = self._find_header_row(df_temp)
                     
                     if header_row is not None:
                         # 重新读取文件，使用找到的表头行
-                        return pd.read_excel(file_path, header=header_row)
+                        return pd.read_excel(file_path, header=header_row, engine='openpyxl')
                     else:
                         # 如果没找到，尝试默认方式读取
-                        return pd.read_excel(file_path)
+                        return pd.read_excel(file_path, engine='openpyxl')
                         
                 except Exception as e:
                     print(f"Excel读取失败，尝试默认方式: {e}")
-                    return pd.read_excel(file_path)
+                    try:
+                        return pd.read_excel(file_path, engine='openpyxl')
+                    except Exception as e2:
+                        print(f"Excel默认读取也失败: {e2}")
+                        return None
                     
             else:
                 return None

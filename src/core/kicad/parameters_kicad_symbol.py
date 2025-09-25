@@ -211,6 +211,17 @@ class KiSymbolInfo:
         return "\n".join(header)
 
     def export_v6(self) -> List[str]:
+        """Export symbol properties for KiCad v6 format with proper escaping"""
+        def escape_property_value(value: str) -> str:
+            """Escape property values for KiCad format"""
+            if not value:
+                return ""
+            # Escape quotes and other special characters
+            value = value.replace('"', '\\"')
+            # Remove newlines and tabs that could break the format
+            value = value.replace('\n', ' ').replace('\t', ' ')
+            return value.strip()
+        
         property_template = textwrap.indent(
             textwrap.dedent(
                 """
@@ -229,7 +240,7 @@ class KiSymbolInfo:
         header: List[str] = [
             property_template.format(
                 key="Reference",
-                value=self.prefix,
+                value=escape_property_value(self.prefix),
                 id_=0,
                 pos_y=self.y_high + field_offset_y,
                 font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
@@ -238,7 +249,7 @@ class KiSymbolInfo:
             ),
             property_template.format(
                 key="Value",
-                value=self.name,
+                value=escape_property_value(self.name),
                 id_=1,
                 pos_y=self.y_low - field_offset_y,
                 font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
@@ -251,7 +262,7 @@ class KiSymbolInfo:
             header.append(
                 property_template.format(
                     key="Footprint",
-                    value=self.package,
+                    value=escape_property_value(self.package),
                     id_=2,
                     pos_y=self.y_low - field_offset_y,
                     font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
@@ -264,7 +275,7 @@ class KiSymbolInfo:
             header.append(
                 property_template.format(
                     key="Datasheet",
-                    value=self.datasheet,
+                    value=escape_property_value(self.datasheet),
                     id_=3,
                     pos_y=self.y_low - field_offset_y,
                     font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
@@ -277,7 +288,7 @@ class KiSymbolInfo:
             header.append(
                 property_template.format(
                     key="Manufacturer",
-                    value=self.manufacturer,
+                    value=escape_property_value(self.manufacturer),
                     id_=4,
                     pos_y=self.y_low - field_offset_y,
                     font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
@@ -290,7 +301,7 @@ class KiSymbolInfo:
             header.append(
                 property_template.format(
                     key="LCSC Part",
-                    value=self.lcsc_id,
+                    value=escape_property_value(self.lcsc_id),
                     id_=5,
                     pos_y=self.y_low - field_offset_y,
                     font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
@@ -303,7 +314,7 @@ class KiSymbolInfo:
             header.append(
                 property_template.format(
                     key="JLC Part",
-                    value=self.jlc_id,
+                    value=escape_property_value(self.jlc_id),
                     id_=6,
                     pos_y=self.y_low - field_offset_y,
                     font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
