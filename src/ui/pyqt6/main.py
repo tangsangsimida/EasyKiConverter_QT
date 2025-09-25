@@ -19,7 +19,9 @@ from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
+from core.easyeda import EasyEDAImporter, EasyedaSymbolImporter, EasyedaFootprintImporter, Easyeda3dModelImporter
 from core.kicad import KiCadSymbolExporter, KiCadFootprintExporter, KiCad3DModelExporter
+
 
 class ExportWorker(QThread):
     """导出工作线程"""
@@ -56,16 +58,8 @@ class ExportWorker(QThread):
             # 创建导出器
             importer = EasyEDAImporter()
             
-            symbol_exporter = None
-            footprint_exporter = None
-            model3d_exporter = None
-            
-            if self.export_options.get('symbol', True):
-                symbol_exporter = KiCadSymbolExporter()
-            if self.export_options.get('footprint', True):
-                footprint_exporter = KiCadFootprintExporter()
-            if self.export_options.get('model3d', True):
-                model3d_exporter = KiCad3DModelExporter()
+            # 固定使用KiCad 6版本，高版本兼容6版本
+            from core.kicad.parameters_kicad_symbol import KicadVersion
             
             # 逐个处理元件
             for i, component_id in enumerate(self.components):
@@ -81,16 +75,77 @@ class ExportWorker(QThread):
                         continue
                     
                     # 导出符号
-                    if symbol_exporter:
-                        symbol_exporter.export_component(component_data, self.output_path, self.lib_name)
+                    if self.export_options.get('symbol', True):
+                        try:
+                            # 检查是否有符号数据
+                            if 'dataStr' in component_data:
+                                symbol_data = component_data['dataStr']
+                                symbol_importer = EasyedaSymbolImporter(component_data)
+                                symbol = symbol_importer.get_symbol()
+                                if symbol:
+                                    symbol_exporter = KiCadSymbolExporter(symbol, KicadVersion.v6)
+                                    # 实际导出符号到文件
+                                    symbol_content = symbol_exporter.export(footprint_lib_name=self.lib_name or "easyeda_convertlib")
+                                    if symbol_content:
+                                        # 保存符号文件
+                                        symbol_file = self.output_path / f"{self.lib_name or 'easyeda_convertlib'}.kicad_sym"
+                                        with open(symbol_file, 'w', encoding='utf-8') as f:
+                                            f.write(symbol_content)
+                                        print(f"符号文件保存成功: {symbol_file}")
+                                    else:
+                                        print(f"符号导出内容为空: {component_id}")
+                                else:
+                                    print(f"符号数据为空: {component_id}")
+                            else:
+                                print(f"没有符号数据: {component_id}")
+                        except Exception as e:
+                            print(f"符号导出失败 {component_id}: {e}")
                     
                     # 导出封装
-                    if footprint_exporter:
-                        footprint_exporter.export_component(component_data, self.output_path, self.lib_name)
+                    if self.export_options.get('footprint', True):
+                        try:
+                            # 检查是否有封装数据
+                            if 'packageDetail' in component_data:
+                                footprint_data = component_data['packageDetail']
+                                footprint_importer = EasyedaFootprintImporter(component_data)
+                                footprint = footprint_importer.get_footprint()
+                                if footprint:
+                                    footprint_exporter = KiCadFootprintExporter(footprint)
+                                    # 实际导出封装到文件
+                                    footprint_file = self.output_path / f"{component_id}.kicad_mod"
+                                    model_3d_path = self.output_path / "3d_models" if self.export_options.get('model3d') else ""
+                                    footprint_exporter.export(str(footprint_file), str(model_3d_path))
+                                    print(f"封装文件保存成功: {footprint_file}")
+                                else:
+                                    print(f"封装数据为空: {component_id}")
+                            else:
+                                print(f"没有封装数据: {component_id}")
+                        except Exception as e:
+                            print(f"封装导出失败 {component_id}: {e}")
                     
                     # 导出3D模型
-                    if model3d_exporter:
-                        model3d_exporter.export_component(component_data, self.output_path, self.lib_name)
+                    if self.export_options.get('model3d', True):
+                        try:
+                            # 检查是否有3D模型数据
+                            if 'packageDetail' in component_data:
+                                model3d_data = component_data['packageDetail']
+                                # 不下载原始3D模型文件，只转换元数据
+                                model3d_importer = Easyeda3dModelImporter(component_data, download_raw_3d_model=False)
+                                model3d = model3d_importer.output  # 使用output属性而不是get_3d_model方法
+                                if model3d:
+                                    model3d_exporter = KiCad3DModelExporter(model3d)
+                                    # 实际导出3D模型到文件
+                                    model3d_file = self.output_path / "3d_models" / f"{component_id}.step"
+                                    self.output_path.mkdir(parents=True, exist_ok=True)  # 确保目录存在
+                                    (self.output_path / "3d_models").mkdir(parents=True, exist_ok=True)
+                                    model3d_exporter.export(str(model3d_file))
+                                    print(f"3D模型文件保存成功: {model3d_file}")
+                                else:
+                                    print(f"3D模型数据为空: {component_id}")
+                            else:
+                                print(f"没有3D模型数据: {component_id}")
+                        except Exception as e:
+                            print(f"3D模型导出失败 {component_id}: {e}")
                     
                     success_count += 1
                     
@@ -131,30 +186,30 @@ class EasyKiConverterApp(ModernMainWindow):
         if not input_text:
             return
             
-        # 首先尝试提取LCSC ID
-        component_id = self.component_validator.extract_lcsc_id(input_text)
-        
-        # 如果不是LCSC格式，尝试通用元件编号验证
-        if not component_id:
-            if self.component_validator.validate_component_format(input_text):
-                component_id = input_text
-            else:
-                QMessageBox.warning(self, "警告", 
-                    f"无法识别的元件编号格式：{input_text}\n\n支持的格式：\n• LCSC编号：C123456\n• 元件型号：CC2040、ESP32等")
-                return
+        # 严格验证元件ID格式 - 只接受以C开头的LCSC编号
+        if not input_text.startswith('C'):
+            QMessageBox.warning(self, "警告", 
+                f"仅支持LCSC元件编号格式：{input_text}\n\n正确格式：C + 数字（例如：C2040、C123456）")
+            return
+            
+        # 验证是否为有效的LCSC编号（C + 数字）
+        if not input_text[1:].isdigit():
+            QMessageBox.warning(self, "警告", 
+                f"无效的LCSC编号格式：{input_text}\n\n正确格式：C + 数字（例如：C2040、C123456）")
+            return
             
         # 检查是否已存在
         existing_items = []
         for i in range(self.component_list.count()):
             existing_items.append(self.component_list.item(i).text())
             
-        if component_id in existing_items:
-            QMessageBox.information(self, "提示", f"元件 {component_id} 已在列表中")
+        if input_text in existing_items:
+            QMessageBox.information(self, "提示", f"元件 {input_text} 已在列表中")
             self.component_input.clear()
             return
             
         # 添加到列表
-        item = QListWidgetItem(component_id)
+        item = QListWidgetItem(input_text)
         self.component_list.addItem(item)
         self.component_input.clear()
         
@@ -337,7 +392,7 @@ def main():
         print("✅ 主窗口创建成功")
         
         main_window.show()
-
+        print("🎉 应用程序启动成功！")
         
         # 运行应用程序事件循环
         return app.exec()

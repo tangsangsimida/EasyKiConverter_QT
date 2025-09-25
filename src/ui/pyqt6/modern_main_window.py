@@ -755,12 +755,7 @@ class ModernMainWindow(QMainWindow):
             self.symbol_checkbox.setChecked(True)
             
     def request_export(self):
-        """请求导出"""
-        if self.component_list.count() == 0:
-            from PyQt6.QtWidgets import QMessageBox
-            QMessageBox.warning(self, "警告", "请先添加要转换的元器件编号")
-            return
-            
+        """请求导出 - 移除重复检查，由主程序处理"""
         # 显示进度条
         self.progress_bar.setVisible(True)
         self.status_label.setText("正在转换中...")

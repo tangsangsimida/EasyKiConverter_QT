@@ -34,16 +34,24 @@ class EasyEDAImporter:
                 print(f"Failed to fetch data for LCSC ID: {lcsc_id}")
                 return None
                 
-            # 检查API响应是否成功
-            if api_data.get("code") != 0:
-                print(f"API error for LCSC ID {lcsc_id}: {api_data.get('message', 'Unknown error')}")
+            # 检查API响应是否成功 - 适配新的API响应格式
+            if not api_data.get("success", False):
+                print(f"API error for LCSC ID {lcsc_id}: {api_data.get('result', 'Unknown error')}")
                 return None
                 
-            component_data = api_data.get("data", {})
+            component_data = api_data.get("result", {})
             if not component_data:
                 print(f"No component data found for LCSC ID: {lcsc_id}")
                 return None
                 
+            # 调试：打印返回的数据结构
+            print(f"成功获取LCSC ID {lcsc_id} 的数据结构:")
+            print(f"- 数据键: {list(component_data.keys())}")
+            if 'dataStr' in component_data:
+                print(f"- dataStr键: {list(component_data['dataStr'].keys()) if isinstance(component_data['dataStr'], dict) else '不是字典'}")
+            if 'packageDetail' in component_data:
+                print(f"- packageDetail键: {list(component_data['packageDetail'].keys()) if isinstance(component_data['packageDetail'], dict) else '不是字典'}")
+            
             print(f"Successfully imported component data for LCSC ID: {lcsc_id}")
             return component_data
             

@@ -1,5 +1,6 @@
 # Global imports
 import logging
+import json
 
 import requests
 
@@ -45,8 +46,38 @@ class EasyedaApi:
         Returns:
             dict: API响应数据，失败时返回空字典 / API response data, empty dict on failure
         """
-        r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers)
-        api_response = r.json()
+        try:
+            # 构建API URL
+            api_url = API_ENDPOINT.format(lcsc_id=lcsc_id)
+            print(f"正在请求EasyEDA API: {api_url}")
+            
+            # 发送请求
+            r = requests.get(url=api_url, headers=self.headers, timeout=30)
+            
+            # 检查HTTP响应状态
+            print(f"HTTP状态码: {r.status_code}")
+            if r.status_code != 200:
+                print(f"API请求失败，状态码: {r.status_code}")
+                print(f"响应内容: {r.text[:500]}")  # 打印前500个字符
+                return {}
+            
+            # 解析JSON响应
+            api_response = r.json()
+            print(f"API响应结构: {type(api_response)}")
+            print(f"响应键: {list(api_response.keys()) if isinstance(api_response, dict) else '不是字典'}")
+            
+            return api_response
+            
+        except requests.exceptions.RequestException as e:
+            print(f"网络请求错误: {e}")
+            return {}
+        except json.JSONDecodeError as e:
+            print(f"JSON解析错误: {e}")
+            print(f"原始响应: {r.text[:500]}")
+            return {}
+        except Exception as e:
+            print(f"未知错误: {e}")
+            return {}
 
         if not api_response or (
             "code" in api_response and api_response["success"] is False
