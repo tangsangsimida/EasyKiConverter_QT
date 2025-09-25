@@ -225,6 +225,9 @@ class ModernMainWindow(QMainWindow):
         add_btn.clicked.connect(self.add_component)
         input_layout.addWidget(add_btn)
         
+        # 连接回车键事件
+        self.component_input.returnPressed.connect(self.add_component)
+        
         layout.addLayout(input_layout)
         
         # 快捷操作

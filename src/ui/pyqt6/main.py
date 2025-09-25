@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import traceback
-from PyQt6.QtWidgets import QApplication, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem
 from PyQt6.QtCore import QThread, pyqtSignal
 
 from modern_main_window import ModernMainWindow
