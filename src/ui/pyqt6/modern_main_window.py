@@ -57,104 +57,12 @@ class ModernMainWindow(QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         
-        # 顶部标题栏
-        title_bar = self.create_modern_title_bar()
-        main_layout.addWidget(title_bar)
-        
         # 主内容区域
         content_area = self.create_modern_content_area()
         main_layout.addWidget(content_area, 1)
         
         # 应用样式
         self.apply_modern_style()
-        
-    def create_modern_title_bar(self) -> QWidget:
-        """创建现代化标题栏"""
-        title_bar = QWidget()
-        title_bar.setFixedHeight(70)
-        title_bar.setObjectName("modernTitleBar")
-        
-        # 创建渐变背景
-        gradient = QLinearGradient(0, 0, title_bar.width(), title_bar.height())
-        gradient.setColorAt(0, QColor("#667eea"))
-        gradient.setColorAt(1, QColor("#764ba2"))
-        
-        layout = QHBoxLayout(title_bar)
-        layout.setContentsMargins(30, 0, 30, 0)
-        layout.setSpacing(20)
-        
-        # 左侧品牌区域
-        brand_container = QWidget()
-        brand_layout = QHBoxLayout(brand_container)
-        brand_layout.setContentsMargins(0, 0, 0, 0)
-        brand_layout.setSpacing(15)
-        
-        # 应用图标
-        app_icon = QLabel("⚡")
-        app_icon.setObjectName("appIcon")
-        app_icon.setStyleSheet("""
-            QLabel#appIcon {
-                font-size: 32px;
-                font-weight: bold;
-                color: white;
-                background-color: rgba(255, 255, 255, 0.2);
-                border-radius: 15px;
-                padding: 10px;
-                min-width: 30px;
-                min-height: 30px;
-                qproperty-alignment: AlignCenter;
-            }
-        """)
-        brand_layout.addWidget(app_icon)
-        
-        # 品牌文字
-        brand_text = QWidget()
-        text_layout = QVBoxLayout(brand_text)
-        text_layout.setContentsMargins(0, 0, 0, 0)
-        text_layout.setSpacing(2)
-        
-        app_title = QLabel("EasyKiConverter")
-        app_title.setObjectName("appTitle")
-        app_title.setStyleSheet("""
-            QLabel#appTitle {
-                font-size: 24px;
-                font-weight: 700;
-                color: white;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
-        """)
-        text_layout.addWidget(app_title)
-        
-        app_subtitle = QLabel("嘉立创EDA → KiCad 转换工具")
-        app_subtitle.setStyleSheet("""
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 400;
-        """)
-        text_layout.addWidget(app_subtitle)
-        
-        brand_layout.addWidget(brand_text)
-        layout.addWidget(brand_container)
-        
-        layout.addStretch()
-        
-        # 右侧控制区域（移除主题切换）
-        control_container = QWidget()
-        control_layout = QHBoxLayout(control_container)
-        control_layout.setContentsMargins(0, 0, 0, 0)
-        control_layout.setSpacing(10)
-        
-        layout.addWidget(control_container)
-        
-        # 设置标题栏样式
-        title_bar.setStyleSheet("""
-            QWidget#modernTitleBar {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                    stop:0 #667eea, stop:1 #764ba2);
-            }
-        """)
-        
-        return title_bar
         
     def create_modern_content_area(self) -> QWidget:
         """创建现代化内容区域"""
@@ -233,6 +141,8 @@ class ModernMainWindow(QMainWindow):
         
         return content_area
         
+    
+        
     def create_welcome_section(self) -> QWidget:
         """创建欢迎区域"""
         welcome = QWidget()
@@ -261,10 +171,10 @@ class ModernMainWindow(QMainWindow):
         welcome_layout.addWidget(subtitle)
         
         return welcome
-        
+
     def create_input_card(self) -> ModernCard:
         """创建输入卡片"""
-        card = ModernCard("📝 添加元器件", "输入嘉立创元器件编号或URL")
+        card = ModernCard("📝 添加LCSC元件")  # 移除副标题，让界面更简洁
         
         layout = QVBoxLayout()
         layout.setSpacing(15)
@@ -292,12 +202,11 @@ class ModernMainWindow(QMainWindow):
         """)
         input_layout.addWidget(self.component_input)
         
-        # 添加按钮
+        # 添加按钮 - 简洁的蓝色设计
         add_btn = QPushButton("添加")
         add_btn.setStyleSheet("""
             QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                    stop:0 #667eea, stop:1 #764ba2);
+                background-color: #2563eb;
                 color: white;
                 border: none;
                 padding: 15px 30px;
@@ -307,12 +216,10 @@ class ModernMainWindow(QMainWindow):
                 min-height: 50px;
             }
             QPushButton:hover {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                    stop:0 #5a67d8, stop:1 #6b46c1);
+                background-color: #1d4ed8;
             }
             QPushButton:pressed {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, 
-                    stop:0 #4c51bf, stop:1 #553c9a);
+                background-color: #1e40af;
             }
         """)
         add_btn.clicked.connect(self.add_component)
@@ -351,7 +258,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_bom_card(self) -> ModernCard:
         """创建BOM导入卡片"""
-        card = ModernCard("📊 BOM文件导入", "批量导入Excel或CSV格式的BOM文件")
+        card = ModernCard("📊 BOM文件导入")  # 移除副标题
         
         layout = QVBoxLayout()
         layout.setSpacing(15)
@@ -369,7 +276,7 @@ class ModernMainWindow(QMainWindow):
         select_file_btn = QPushButton("选择BOM文件")
         select_file_btn.setStyleSheet("""
             QPushButton {
-                background-color: #8b5cf6;
+                background-color: #3b82f6;
                 color: white;
                 border: none;
                 padding: 12px 25px;
@@ -378,7 +285,7 @@ class ModernMainWindow(QMainWindow):
                 font-weight: 500;
             }
             QPushButton:hover {
-                background-color: #7c3aed;
+                background-color: #2563eb;
             }
         """)
         select_file_btn.clicked.connect(self.select_bom_file)
@@ -397,7 +304,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_list_card(self) -> ModernCard:
         """创建元件列表卡片"""
-        card = ModernCard("📋 待转换列表", "已添加的元器件编号")
+        card = ModernCard("📋 待转换列表")  # 移除副标题
         
         layout = QVBoxLayout()
         layout.setSpacing(15)
@@ -466,7 +373,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_options_card(self) -> ModernCard:
         """创建导出选项卡片"""
-        card = ModernCard("⚙️ 导出选项", "选择要导出的文件类型")
+        card = ModernCard("⚙️ 导出选项")  # 移除副标题
         
         layout = QHBoxLayout()
         layout.setSpacing(30)
@@ -550,7 +457,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_output_card(self) -> ModernCard:
         """创建输出设置卡片"""
-        card = ModernCard("📁 输出设置", "自定义输出路径和库名称")
+        card = ModernCard("📁 输出设置")  # 移除副标题  # 移除副标题
         
         layout = QVBoxLayout()
         layout.setSpacing(20)
@@ -637,7 +544,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_export_card(self) -> ModernCard:
         """创建转换执行卡片"""
-        card = ModernCard("🚀 开始转换", "一键导出所有元器件库文件")
+        card = ModernCard("🚀 开始转换")  # 移除副标题  # 移除副标题
         
         layout = QVBoxLayout()
         layout.setSpacing(20)
