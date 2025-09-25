@@ -28,31 +28,6 @@
 - **无需配置**：开箱即用，无需复杂设置
 - **跨平台支持**：支持 Windows、macOS 和 Linux 系统
 
-## 🚀 快速开始
-
-### 💻 安装与启动
-
-```bash
-# 克隆仓库
-git clone https://github.com/tangsangsimida/EasyKiConverter.git
-cd EasyKiConverter
-```
-
-> 💡 **提示**：启动脚本会自动检查并安装所需依赖，无需手动安装
-
-### 🚀 启动 PyQt6 桌面应用
-
-```bash
-# 使用启动脚本（推荐）
-# Linux/macOS 用户
-./scripts/start_pyqt6.sh
-
-# 或者使用Python模块方式
-python -m src.ui.pyqt6.main
-```
-
-启动应用后，将显示现代化的 PyQt6 桌面界面，支持直观的元件转换操作。
-
 
 
 ## 📚 详细文档
