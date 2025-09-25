@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import traceback
 from PyQt6.QtWidgets import QApplication
-from ultimate_main_window import UltimateMainWindow
+from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 
 def main():
@@ -42,7 +42,7 @@ def main():
         
         # 创建并显示主窗口（使用优化后的界面）
         print("🏗️ 正在创建主窗口...")
-        main_window = UltimateMainWindow(config_manager)
+        main_window = ModernMainWindow(config_manager)
         print("✅ 主窗口创建成功")
         
         main_window.show()
