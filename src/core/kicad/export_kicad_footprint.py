@@ -3,8 +3,8 @@ import logging
 from math import acos, cos, isnan, pi, sin, sqrt
 from typing import Tuple, Union
 
-from easyeda.parameters_easyeda import ee_footprint
-from kicad.parameters_kicad_footprint import *
+from ..easyeda.parameters_easyeda import ee_footprint
+from .parameters_kicad_footprint import *
 
 # ---------------------------------------
 
