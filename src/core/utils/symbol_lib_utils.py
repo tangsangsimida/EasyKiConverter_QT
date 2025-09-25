@@ -33,16 +33,17 @@ def add_component_in_symbol_lib_file(
             lib_file.write(str(component_content).encode(encoding="utf-8"))
             lib_file.write("\n)".encode(encoding="utf-8"))  # 重新添加括号 / Re-add the closing bracket
 
-        with open(file=lib_path, encoding="utf-8") as lib_file:
-            new_lib_data = lib_file.read()
+        # 保持标准的generator字段，确保KiCad兼容性
+        # with open(file=lib_path, encoding="utf-8") as lib_file:
+        #     new_lib_data = lib_file.read()
 
-        with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
-            lib_file.write(
-                new_lib_data.replace(
-                    "(generator kicad_symbol_editor)",
-                    "(generator https://github.com/tangsangsimida/EasyKiConverter)",
-                )
-            )
+        # with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
+        #     lib_file.write(
+        #         new_lib_data.replace(
+        #             "(generator kicad_symbol_editor)",
+        #             "(generator https://github.com/tangsangsimida/EasyKiConverter)",
+        #         )
+        #     )
 
 
 def update_component_in_symbol_lib_file(
@@ -66,10 +67,11 @@ def update_component_in_symbol_lib_file(
             flags=re.DOTALL,
         )
 
-        new_lib = new_lib.replace(
-            "(generator kicad_symbol_editor)",
-            "(generator https://github.com/tangsangsimida/EasyKiConverter)",
-        )
+        # 保持标准的generator字段，确保KiCad兼容性
+        # new_lib = new_lib.replace(
+        #     "(generator kicad_symbol_editor)",
+        #     "(generator https://github.com/tangsangsimida/EasyKiConverter)",
+        # )
 
     with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
         lib_file.write(new_lib)

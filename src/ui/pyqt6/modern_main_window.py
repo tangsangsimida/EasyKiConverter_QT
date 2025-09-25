@@ -430,7 +430,7 @@ class ModernMainWindow(QMainWindow):
         layout.addWidget(self.footprint_checkbox)
         
         # 3D模型导出选项
-        self.model3d_checkbox = QCheckBox("导出3D模型 (.step)")
+        self.model3d_checkbox = QCheckBox("导出3D模型 (.step/.wrl)")
         self.model3d_checkbox.setChecked(True)
         self.model3d_checkbox.setStyleSheet("""
             QCheckBox {
@@ -717,6 +717,9 @@ class ModernMainWindow(QMainWindow):
         """清除所有元件"""
         self.component_list.clear()
         self.component_count_label.setText("共 0 个元器件")
+        
+        # 确保导出按钮保持启用状态（只在用户点击时进行验证）
+        self.export_btn.setEnabled(True)
         
     def show_component_menu(self, position):
         """显示元件右键菜单"""

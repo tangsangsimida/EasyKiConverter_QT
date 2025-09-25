@@ -335,7 +335,7 @@ class ComponentInputWidget(QWidget):
         layout.addWidget(self.footprint_checkbox)
         
         # 3D模型导出选项
-        self.model3d_checkbox = QCheckBox("导出3D模型 (.step)")
+        self.model3d_checkbox = QCheckBox("导出3D模型 (.step/.wrl)")
         self.model3d_checkbox.setChecked(True)
         self.model3d_checkbox.stateChanged.connect(self.update_export_options)
         layout.addWidget(self.model3d_checkbox)

@@ -265,7 +265,7 @@ class ExportWorker(QThread):
                         my_lib.write(
                             '''(kicad_symbol_lib
   (version 20211014)
-  (generator https://github.com/tangsangsimida/EasyKiConverter)
+  (generator kicad_symbol_editor)
 )'''
                             if kicad_version == KicadVersion.v6
                             else "EESchema-LIBRARY Version 2.4\n#encoding utf-8\n"

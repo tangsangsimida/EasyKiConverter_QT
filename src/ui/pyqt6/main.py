@@ -180,6 +180,9 @@ class EasyKiConverterApp(ModernMainWindow):
         # 连接导出按钮
         self.export_btn.clicked.connect(self.start_export)
         
+        # 确保导出按钮初始状态为启用（只在用户点击时进行验证）
+        self.export_btn.setEnabled(True)
+        
     def add_component(self):
         """添加元件（重写父类方法）"""
         input_text = self.component_input.text().strip()
@@ -215,6 +218,9 @@ class EasyKiConverterApp(ModernMainWindow):
         
         # 更新计数
         self.component_count_label.setText(f"共 {self.component_list.count()} 个元器件")
+        
+        # 确保导出按钮保持启用状态（只在用户点击时进行验证）
+        self.export_btn.setEnabled(True)
         
     def select_bom_file(self):
         """选择BOM文件（重写父类方法）"""
@@ -289,8 +295,14 @@ class EasyKiConverterApp(ModernMainWindow):
             
             QMessageBox.information(self, "BOM导入成功", message)
             
+            # 确保导出按钮保持启用状态（只在用户点击时进行验证）
+            self.export_btn.setEnabled(True)
+            
         except Exception as e:
             QMessageBox.critical(self, "BOM导入错误", f"导入BOM文件时发生错误：\n{str(e)}")
+            
+            # 确保导出按钮保持启用状态（只在用户点击时进行验证）
+            self.export_btn.setEnabled(True)
             
     def start_export(self):
         """开始导出"""
