@@ -392,29 +392,18 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
             }
         """)
         
-        # 文件菜单
+        # 文件菜单 - 简化菜单结构
         file_menu = menu_bar.addMenu("文件")
         file_menu.addAction("新建转换", lambda: self.switch_page("component"))
-        file_menu.addAction("打开BOM", self.open_bom)
+        file_menu.addAction("打开BOM文件", self.open_bom)
         file_menu.addAction("保存项目", self.save_project)
         file_menu.addSeparator()
         file_menu.addAction("退出", self.close)
         
-        # 转换菜单
-        convert_menu = menu_bar.addMenu("转换")
-        convert_menu.addAction("单个转换", lambda: self.switch_page("component"))
-        convert_menu.addAction("批量处理", self.batch_process)
-        convert_menu.addAction("转换历史", lambda: self.switch_page("history"))
-        
-        # 工具菜单
-        tools_menu = menu_bar.addMenu("工具")
-        tools_menu.addAction("BOM解析器", self.open_bom_parser)
-        tools_menu.addAction("元件验证", self.open_component_validator)
-        
-        # 帮助菜单
+        # 帮助菜单 - 保留核心帮助功能
         help_menu = menu_bar.addMenu("帮助")
         help_menu.addAction("使用指南", self.show_help)
-        help_menu.addAction("关于", lambda: self.switch_page("about"))
+        help_menu.addAction("关于软件", lambda: self.switch_page("about"))
         
         return menu_bar
         
@@ -603,20 +592,7 @@ class UltimateMainWindow(QMainWindow, AdaptiveWidget):
         # 状态显示已移除，可添加实际保存逻辑
         pass
         
-    def batch_process(self):
-        """批量处理"""
-        # 状态显示已移除，可添加批量处理逻辑
-        self.show_conversion_stats("批量处理模式", "0", "0", "0s")
-        
-    def open_bom_parser(self):
-        """打开BOM解析器"""
-        # 状态显示已移除，可添加BOM解析器逻辑
-        self.show_conversion_stats("BOM解析器", "0", "0", "0s")
-        
-    def open_component_validator(self):
-        """打开元件验证器"""
-        # 状态显示已移除，可添加元件验证器逻辑
-        self.show_conversion_stats("元件验证", "0", "0", "0s")
+    # 移除了不需要的菜单方法：batch_process, open_bom_parser, open_component_validator
         
     def show_help(self):
         """显示帮助"""
