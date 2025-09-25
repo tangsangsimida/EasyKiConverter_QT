@@ -2,7 +2,7 @@
 
 **[English](README_en.md)** | [中文](README.md)
 
-A powerful Python tool for converting LCSC and EasyEDA components to KiCad format, supporting complete conversion of symbols, footprints, and 3D models. Features a modern PyQt6 desktop interface that makes component conversion simple and efficient.
+A powerful Python tool for converting LCSC and EasyEDA components to KiCad format, supporting complete conversion of symbols, footprints, and 3D models. Features a modern PyQt6 desktop interface with card-based layout that makes component conversion simple and efficient.
 
 ## ✨ Features
 
@@ -15,7 +15,7 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 - **Version Compatibility**: Support KiCad 5.x and 6.x+ versions
 
 ### 🖥️ PyQt6 Desktop Interface
-- **Modern Interface**: Beautiful modern design with theme support
+- **Modern Interface**: Beautiful modern design with card-based layout
 - **Real-time Progress**: Visual progress bar for conversion process with parallel processing status
 - **Flexible Input**: Support LCSC part numbers or LCSC links
 - **Selective Export**: Choose to export symbols, footprints, or 3D models
@@ -24,36 +24,15 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 - **Responsive Layout**: Adaptive interface for different screen sizes
 
 ### 🛠️ User-Friendly Design
+- **Intuitive Layout**: Clear top-to-bottom workflow with card-based interface
+
 - **One-Click Launch**: Start desktop app with a simple double-click
+
 - **Zero Configuration**: Ready to use out of the box
+
 - **Cross-Platform**: Supports Windows, macOS, and Linux systems
 
-## 🚀 Quick Start
-
-### 💻 Installation & Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/tangsangsimida/EasyKiConverter.git
-cd EasyKiConverter
-```
-
-> 💡 **Tip**: The startup script will automatically check and install required dependencies
-
-### 🚀 Launch PyQt6 Desktop App
-
-```bash
-# Use startup script (Recommended)
-# Linux/macOS users
-./scripts/start_pyqt6.sh
-
-# Or manual launch
-python -m src.ui.pyqt6.main
-```
-
-After startup, the modern PyQt6 desktop interface will appear, providing intuitive component conversion operations.
-
-
+  
 
 ## 📚 Detailed Documentation
 
@@ -103,12 +82,3 @@ Thanks to [KiCad](https://www.kicad.org/) open source circuit design software.
 ---
 
 **⭐ If this project helps you, please give us a Star!**
-
-## 🔄 Version History
-
-### v2.0.0 (Current Version)
-- 🎉 **Major Update**: Complete refactoring to PyQt6 desktop application
-- 🎨 **UI Upgrade**: Modern design with theme switching support
-- ⚡ **Performance Optimization**: Improved multi-threading processing
-- 🔧 **Architecture Refactoring**: Clearer project structure and modular design
-- 🗑️ **Web UI Removal**: Focused on desktop application experience

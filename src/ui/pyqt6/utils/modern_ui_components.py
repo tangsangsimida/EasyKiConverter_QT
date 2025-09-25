@@ -90,37 +90,6 @@ class ModernCard(QWidget):
         shadow.setColor(QColor(0, 0, 0, 10))
         shadow.setOffset(0, 4)
         self.setGraphicsEffect(shadow)
-        
-    def set_dark_theme(self, is_dark):
-        """设置深色主题"""
-        if is_dark:
-            self.setStyleSheet("""
-                QWidget#cardContainer {
-                    background-color: #1e293b;
-                    border-radius: 16px;
-                    border: 1px solid #334155;
-                }
-                QLabel#cardTitle {
-                    color: #f1f5f9;
-                }
-                QLabel#cardSubtitle {
-                    color: #94a3b8;
-                }
-            """)
-        else:
-            self.setStyleSheet("""
-                QWidget#cardContainer {
-                    background-color: white;
-                    border-radius: 16px;
-                    border: 1px solid #e2e8f0;
-                }
-                QLabel#cardTitle {
-                    color: #1e293b;
-                }
-                QLabel#cardSubtitle {
-                    color: #64748b;
-                }
-            """)
 
 
 class ModernProgressBar(QWidget):
@@ -184,24 +153,3 @@ class ModernProgressBar(QWidget):
         
         # 更新进度文本
         self.progress_label.setText(f"{self.progress}%")
-        
-    def set_dark_theme(self, is_dark):
-        """设置深色主题"""
-        if is_dark:
-            self.setStyleSheet("""
-                QWidget#progressContainer {
-                    background-color: #334155;
-                }
-                QLabel {
-                    color: #94a3b8;
-                }
-            """)
-        else:
-            self.setStyleSheet("""
-                QWidget#progressContainer {
-                    background-color: #e2e8f0;
-                }
-                QLabel {
-                    color: #64748b;
-                }
-            """)

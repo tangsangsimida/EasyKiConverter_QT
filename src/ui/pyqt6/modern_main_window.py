@@ -25,14 +25,10 @@ from utils.modern_ui_components import ModernCard, ModernProgressBar
 class ModernMainWindow(QMainWindow):
     """现代化主窗口 - 酷炫界面"""
     
-    # 信号定义
-    theme_changed = pyqtSignal(str)
-    
     def __init__(self, config_manager: ConfigManager, parent=None):
         super().__init__(parent)
         
         self.config_manager = config_manager
-        self.current_theme = "light"
         self.animation_enabled = True
         
         self.setup_window()
@@ -142,30 +138,11 @@ class ModernMainWindow(QMainWindow):
         
         layout.addStretch()
         
-        # 右侧控制区域
+        # 右侧控制区域（移除主题切换）
         control_container = QWidget()
         control_layout = QHBoxLayout(control_container)
         control_layout.setContentsMargins(0, 0, 0, 0)
         control_layout.setSpacing(10)
-        
-        # 主题切换按钮
-        self.theme_button = QPushButton("🌙")
-        self.theme_button.setObjectName("themeButton")
-        self.theme_button.setFixedSize(40, 40)
-        self.theme_button.setStyleSheet("""
-            QPushButton#themeButton {
-                background-color: rgba(255, 255, 255, 0.2);
-                border: none;
-                border-radius: 20px;
-                font-size: 18px;
-                color: white;
-            }
-            QPushButton#themeButton:hover {
-                background-color: rgba(255, 255, 255, 0.3);
-            }
-        """)
-        self.theme_button.clicked.connect(self.toggle_theme)
-        control_layout.addWidget(self.theme_button)
         
         layout.addWidget(control_container)
         
@@ -721,87 +698,42 @@ class ModernMainWindow(QMainWindow):
         return card
         
     def apply_modern_style(self):
-        """应用现代化样式"""
-        if self.current_theme == "light":
-            self.setStyleSheet("""
-                QMainWindow {
-                    background-color: #f8fafc;
-                }
-                
-                QWidget#modernContentArea {
-                    background-color: #f8fafc;
-                }
-                
-                /* 卡片样式 */
-                ModernCard {
-                    background-color: white;
-                    border-radius: 16px;
-                    border: 1px solid #e2e8f0;
-                }
-                
-                /* 输入框样式 */
-                QLineEdit {
-                    background-color: white;
-                    color: #1e293b;
-                    selection-background-color: #667eea;
-                    selection-color: white;
-                }
-                
-                /* 列表样式 */
-                QListWidget {
-                    background-color: white;
-                    color: #1e293b;
-                }
-                
-                /* 复选框样式 */
-                QCheckBox {
-                    background-color: transparent;
-                }
-            """)
-        else:
-            self.setStyleSheet("""
-                QMainWindow {
-                    background-color: #0f172a;
-                }
-                
-                QWidget#modernContentArea {
-                    background-color: #0f172a;
-                }
-                
-                /* 卡片样式 */
-                ModernCard {
-                    background-color: #1e293b;
-                    border-radius: 16px;
-                    border: 1px solid #334155;
-                }
-                
-                /* 输入框样式 */
-                QLineEdit {
-                    background-color: #1e293b;
-                    color: #f1f5f9;
-                    border-color: #334155;
-                    selection-background-color: #667eea;
-                    selection-color: white;
-                }
-                
-                /* 列表样式 */
-                QListWidget {
-                    background-color: #1e293b;
-                    color: #f1f5f9;
-                    border-color: #334155;
-                }
-                
-                /* 复选框样式 */
-                QCheckBox {
-                    background-color: transparent;
-                    color: #f1f5f9;
-                }
-                
-                /* 标签样式 */
-                QLabel {
-                    color: #f1f5f9;
-                }
-            """)
+        """应用现代化样式（固定浅色主题）"""
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #f8fafc;
+            }
+            
+            QWidget#modernContentArea {
+                background-color: #f8fafc;
+            }
+            
+            /* 卡片样式 */
+            ModernCard {
+                background-color: white;
+                border-radius: 16px;
+                border: 1px solid #e2e8f0;
+            }
+            
+            /* 输入框样式 */
+            QLineEdit {
+                background-color: white;
+                color: #1e293b;
+                selection-background-color: #667eea;
+                selection-color: white;
+            }
+            
+            /* 列表样式 */
+            QListWidget {
+                background-color: white;
+                color: #1e293b;
+            }
+            
+            /* 复选框样式 */
+            QCheckBox {
+                background-color: transparent;
+            }
+        """)
             
     def setup_animations(self):
         """设置动画效果"""
@@ -815,37 +747,15 @@ class ModernMainWindow(QMainWindow):
         # 这里可以连接实际的业务逻辑
         pass
         
-    def toggle_theme(self):
-        """切换主题"""
-        self.current_theme = "dark" if self.current_theme == "light" else "light"
-        self.apply_modern_style()
-        
-        # 更新主题按钮图标
-        icon = "☀️" if self.current_theme == "dark" else "🌙"
-        self.theme_button.setText(icon)
-        
-        # 更新所有卡片的主题
-        for card in self.findChildren(ModernCard):
-            card.set_dark_theme(self.current_theme == "dark")
-            
-        # 更新进度条主题
-        for progress in self.findChildren(ModernProgressBar):
-            progress.set_dark_theme(self.current_theme == "dark")
-        
-        self.theme_changed.emit(self.current_theme)
+    # 主题切换功能已移除
         
     def load_settings(self):
-        """加载设置"""
-        config = self.config_manager.get_config()
-        if 'theme' in config:
-            self.current_theme = config['theme']
-            self.apply_modern_style()
+        """加载设置（移除主题相关）"""
+        pass
             
     def save_settings(self):
-        """保存设置"""
-        config = self.config_manager.get_config()
-        config['theme'] = self.current_theme
-        self.config_manager.save_config(config)
+        """保存设置（移除主题相关）"""
+        pass
         
     # 功能方法
     def add_component(self):
