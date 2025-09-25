@@ -14,14 +14,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtCore import QThread, pyqtSignal
+
 from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
-from core.easyeda.easyeda_importer import EasyEDAImporter
-from core.kicad.export_kicad_symbol import KiCadSymbolExporter
-from core.kicad.export_kicad_footprint import KiCadFootprintExporter
-from core.kicad.export_kicad_3d_model import KiCad3DModelExporter
+from core.kicad import KiCadSymbolExporter, KiCadFootprintExporter, KiCad3DModelExporter
 
 class ExportWorker(QThread):
     """导出工作线程"""
@@ -174,7 +172,7 @@ class EasyKiConverterApp(ModernMainWindow):
             self.import_bom_file(file_path)
             
     def import_bom_file(self, file_path: str):
-        """导入BOM文件"""
+        """导入BOM文件（仅支持元件ID）"""
         try:
             # 解析BOM文件
             result = self.bom_parser.parse_bom_file(file_path)
@@ -188,6 +186,21 @@ class EasyKiConverterApp(ModernMainWindow):
                 QMessageBox.information(self, "提示", "BOM文件中没有找到有效的元件编号")
                 return
                 
+            # 过滤非元件ID格式的项目（只保留C+数字格式）
+            valid_component_ids = []
+            invalid_items = []
+            
+            for component_id in component_ids:
+                if component_id.startswith('C') and component_id[1:].isdigit():
+                    valid_component_ids.append(component_id)
+                else:
+                    invalid_items.append(component_id)
+            
+            if not valid_component_ids:
+                QMessageBox.warning(self, "BOM导入失败", 
+                    "BOM文件中没有找到有效的LCSC元件编号\n\n仅支持C+数字格式（例如：C2040）")
+                return
+                
             # 添加到列表
             added_count = 0
             duplicate_count = 0
@@ -196,7 +209,7 @@ class EasyKiConverterApp(ModernMainWindow):
             for i in range(self.component_list.count()):
                 existing_items.append(self.component_list.item(i).text())
             
-            for component_id in component_ids:
+            for component_id in valid_component_ids:
                 if component_id not in existing_items:
                     item = QListWidgetItem(component_id)
                     self.component_list.addItem(item)
@@ -208,7 +221,9 @@ class EasyKiConverterApp(ModernMainWindow):
             self.component_count_label.setText(f"共 {self.component_list.count()} 个元器件")
             
             # 更新BOM结果显示
-            message = f"从BOM文件解析出 {len(component_ids)} 个元件编号"
+            message = f"从BOM文件解析出 {len(valid_component_ids)} 个有效元件编号"
+            if len(invalid_items) > 0:
+                message += f"，跳过 {len(invalid_items)} 个无效格式"
             if added_count > 0:
                 message += f"，新增 {added_count} 个"
             if duplicate_count > 0:

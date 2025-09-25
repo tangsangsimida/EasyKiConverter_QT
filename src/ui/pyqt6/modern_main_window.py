@@ -274,7 +274,7 @@ class ModernMainWindow(QMainWindow):
         input_layout.setSpacing(10)
         
         self.component_input = QLineEdit()
-        self.component_input.setPlaceholderText("输入元器件编号，例如：C2040 或 https://item.szlcsc.com/12345.html")
+        self.component_input.setPlaceholderText("输入LCSC元件编号，例如：C2040（仅支持C+数字格式）")
         self.component_input.setClearButtonEnabled(True)
         self.component_input.setStyleSheet("""
             QLineEdit {
@@ -764,7 +764,29 @@ class ModernMainWindow(QMainWindow):
         if not input_text:
             return
             
-        # 添加到列表（这里需要实现实际的验证逻辑）
+        # 严格验证元件ID格式 - 只接受以C开头的LCSC编号
+        if not input_text.startswith('C'):
+            QMessageBox.warning(self, "警告", 
+                f"仅支持LCSC元件编号格式：{input_text}\n\n正确格式：C + 数字（例如：C2040、C123456）")
+            return
+            
+        # 验证是否为有效的LCSC编号（C + 数字）
+        if not input_text[1:].isdigit():
+            QMessageBox.warning(self, "警告", 
+                f"无效的LCSC编号格式：{input_text}\n\n正确格式：C + 数字（例如：C2040、C123456）")
+            return
+            
+        # 检查是否已存在
+        existing_items = []
+        for i in range(self.component_list.count()):
+            existing_items.append(self.component_list.item(i).text())
+            
+        if input_text in existing_items:
+            QMessageBox.information(self, "提示", f"元件 {input_text} 已在列表中")
+            self.component_input.clear()
+            return
+            
+        # 添加到列表
         item = QListWidgetItem(input_text)
         self.component_list.addItem(item)
         self.component_input.clear()
