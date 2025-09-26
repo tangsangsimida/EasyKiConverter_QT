@@ -1,10 +1,21 @@
 #!/bin/bash
 # EasyKiConverter macOS 打包脚本
 
+# 进入项目根目录
+cd ..
+
 # 激活虚拟环境
 source even/bin/activate
 
+# 回到output目录
+cd output
+
+# 清理之前的构建文件
+echo "清理之前的构建文件..."
+rm -rf build dist
+
 # 使用PyInstaller打包应用
+echo "开始打包应用..."
 pyinstaller --clean build.spec
 
 # 打包完成后，可执行文件位于 dist/ 目录中
