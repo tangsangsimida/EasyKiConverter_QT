@@ -266,7 +266,7 @@ class ExportWorker(QThread):
                             my_lib.write(
                                 """(kicad_symbol_lib
   (version 20211014)
-  (generator "kicad_symbol_editor")
+  (generator https://github.com/tangsangsimida/EasyKiConverter)
   (generator_version "6.0.0")
 )"""
                             )

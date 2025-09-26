@@ -222,8 +222,8 @@ class KiSymbolInfo:
             value = value.replace('\n', ' ').replace('\t', ' ')
             return value.strip()
         
-        # Use single-line format for KiCad v6 compatibility
-        property_template = '  (property "{key}" "{value}" (id {id_}) (at 0 {pos_y:.2f} 0) (effects (font (size {font_size} {font_size}) {style}) {hide}))'
+        # Use multi-line format for KiCad v6 compatibility with proper separation
+        property_template = '        (property\n            "{key}"\n            "{value}"\n            (id {id_})\n            (at 0 {pos_y:.2f} 0)\n            (effects (font (size {font_size} {font_size}) {style}) {hide})\n        )\n'
 
         field_offset_y = KiExportConfigV6.FIELD_OFFSET_START.value
         header: List[str] = [
@@ -312,6 +312,7 @@ class KiSymbolInfo:
                 )
             )
 
+        # Join all properties with proper separation
         return header
 
 
@@ -638,47 +639,28 @@ class KiSymbol:
         sym_pins = sym_export_data.pop("pins")
         sym_graphic_items = itertools.chain.from_iterable(sym_export_data.values())
 
-        # Format properties without additional indentation since they're already single-line
-        symbol_properties = "\n".join(sym_info)
-        graphic_items = "\n".join(sym_graphic_items)
-        pins = "\n".join(sym_pins)
+        # 构建符号属性字符串
+        symbol_properties = "".join(sym_info)
+        graphic_items = "".join(sym_graphic_items)
+        pins = "".join(sym_pins)
         
-        # Build the symbol structure with proper indentation
-        symbol_lines = [
-            f"  (symbol \"{sanitize_fields(self.info.name)}\"",
-            "    (in_bom yes)",
-            "    (on_board yes)",
-        ]
-        
-        # Add properties with proper indentation
-        if symbol_properties:
-            symbol_lines.append(symbol_properties)
-        
-        # Add symbol content
-        symbol_lines.extend([
-            f"    (symbol \"{sanitize_fields(self.info.name)}_0_1\"",
-        ])
-        
-        # Add graphic items with proper indentation
-        if graphic_items:
-            for item in graphic_items.split("\n"):
-                if item.strip():
-                    symbol_lines.append(f"      {item}")
-        
-        # Add pins with proper indentation
-        if pins:
-            for pin in pins.split("\n"):
-                if pin.strip():
-                    symbol_lines.append(f"      {pin}")
-        
-        # Close the symbol structures
-        symbol_lines.extend([
-            "    )",
-            "  )",
-        ])
-        
-        return "\n".join(symbol_lines)
+        # 构建完整的符号定义，确保缩进一致性
+        symbol_content = f"""    (symbol "{sanitize_fields(self.info.name)}"
+        (in_bom yes)
+        (on_board yes)
+{symbol_properties}
+        (symbol "{sanitize_fields(self.info.name)}_0_1"
+{graphic_items}{pins}
+        )
+    )"""
+
+        return symbol_content
 
     def export(self, kicad_version: KicadVersion) -> str:
         component_data = getattr(self, f"export_{kicad_version.name}")()
-        return re.sub(r"\n\s*\n", "\n", component_data, re.MULTILINE)
+        # Normalize line endings to LF (\n) for maximum compatibility
+        # KiCad on Linux expects LF, and it works on Windows as well
+        component_data = component_data.replace('\r\n', '\n').replace('\r', '\n')  # Normalize to LF
+        # Remove excessive empty lines but preserve single newlines
+        component_data = re.sub(r"\n\s*\n", "\n", component_data, re.MULTILINE)
+        return component_data

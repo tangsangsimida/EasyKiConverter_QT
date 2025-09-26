@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-测试最终修复后的符号库导出
+测试使用四个空格缩进的符号库导出
 """
 
 import sys
@@ -26,17 +26,16 @@ test_symbol = KiSymbol(
 # 导出为KiCad v6格式
 exported_symbol = test_symbol.export(KicadVersion.v6)
 print("=== 导出的符号内容 ===")
-print(repr(exported_symbol))
+print(exported_symbol)
 
-# 创建基础符号库文件内容 - 包含generator_version行用于测试移除功能
+# 创建基础符号库文件内容
 lib_header = """(kicad_symbol_lib
   (version 20211014)
-  (generator kicad_symbol_editor)
-  (generator_version "6.0.0")
+  (generator "https://github.com/tangsangsimida/EasyKiConverter")
 )"""
 
 # 创建测试文件
-test_file_path = "/tmp/test_final_fix.kicad_sym"
+test_file_path = "/tmp/test_indentation.kicad_sym"
 
 # 写入基础库文件
 with open(test_file_path, 'w', encoding='utf-8', newline='\n') as f:
@@ -45,7 +44,7 @@ with open(test_file_path, 'w', encoding='utf-8', newline='\n') as f:
 print("\n=== 基础符号库文件 ===")
 with open(test_file_path, 'r', encoding='utf-8') as f:
     content = f.read()
-    print(repr(content))
+    print(content)
 
 # 添加组件到符号库
 add_component_in_symbol_lib_file(test_file_path, exported_symbol, KicadVersion.v6)
@@ -55,28 +54,13 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
     result = f.read()
 
 print("\n=== 添加组件后的符号库文件 ===")
-print(repr(result))
-
-# 显示文件内容
-print("\n=== 文件内容 ===")
 print(result)
 
-# 检查空行
+# 检查缩进
 lines = result.split('\n')
-print(f"\n总行数: {len(lines)}")
-empty_lines = [i for i, line in enumerate(lines) if not line.strip()]
-if empty_lines:
-    print(f"空行位置: {empty_lines}")
-else:
-    print("没有空行")
-
-# 检查generator_version行
-if 'generator_version' in result:
-    print("文件中仍包含generator_version行")
-else:
-    print("文件中已移除generator_version行")
-
-# 检查文件结构
-print("\n=== 文件结构检查 ===")
-for i, line in enumerate(lines[:10], 1):
-    print(f"第{i}行: {repr(line)}")
+print("\n=== 缩进检查 ===")
+for i, line in enumerate(lines[:20], 1):
+    if line.strip():
+        # 计算行首空格数
+        leading_spaces = len(line) - len(line.lstrip(' '))
+        print(f"第{i}行: {leading_spaces}个空格 - {line.strip()}")

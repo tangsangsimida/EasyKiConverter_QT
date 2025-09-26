@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-测试符号库导出格式问题
+测试修复行尾字符问题后的符号库导出
 """
 
 import sys
@@ -12,12 +12,12 @@ from core.kicad.parameters_kicad_symbol import KicadVersion, KiSymbol, KiSymbolI
 # 创建一个测试符号
 test_symbol = KiSymbol(
     info=KiSymbolInfo(
-        name="RP2040",
-        prefix="U",
-        package="LQFN-56_L7.0-W7.0-P0.4-EP",
+        name="CL05A225MQ5NSNC",
+        prefix="C",
+        package="",
         manufacturer="",
         datasheet="",
-        lcsc_id="C2040",
+        lcsc_id="",
         jlc_id="",
     )
 )
@@ -36,9 +36,9 @@ lib_header = """(kicad_symbol_lib
 lib_footer = "\n)"
 
 # 创建测试文件
-test_file_path = "/tmp/test_symbol_format.kicad_sym"
+test_file_path = "/tmp/test_line_endings.kicad_sym"
 
-with open(test_file_path, 'w', encoding='utf-8') as f:
+with open(test_file_path, 'w', encoding='utf-8', newline='\n') as f:
     f.write(lib_header)
     f.write(exported_symbol)
     f.write(lib_footer)
@@ -48,12 +48,12 @@ with open(test_file_path, 'r', encoding='utf-8') as f:
     content = f.read()
     print(content)
 
-# 语法检查
-print("\n=== 语法检查 ===")
+# 检查行尾字符
+print("\n=== 行尾字符检查 ===")
 lines = content.split('\n')
-for i, line in enumerate(lines, 1):
-    if line.strip() and not line.startswith('  ') and not line.startswith('(') and not line.startswith(')') and not line.startswith('(kicad_symbol_lib') and not line.startswith('(symbol'):
-        print(f"第{i}行可能有格式问题: {line}")
+for i, line in enumerate(lines[:10], 1):
+    if line:
+        print(f"第{i}行: {repr(line)}")
 
 # 检查括号匹配
 open_brackets = content.count('(')

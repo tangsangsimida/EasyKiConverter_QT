@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-测试最终修复后的符号库导出
+测试修复空行和generator_version行问题后的符号库导出
 """
 
 import sys
@@ -36,7 +36,7 @@ lib_header = """(kicad_symbol_lib
 )"""
 
 # 创建测试文件
-test_file_path = "/tmp/test_final_fix.kicad_sym"
+test_file_path = "/tmp/test_no_empty_lines.kicad_sym"
 
 # 写入基础库文件
 with open(test_file_path, 'w', encoding='utf-8', newline='\n') as f:
@@ -75,8 +75,3 @@ if 'generator_version' in result:
     print("文件中仍包含generator_version行")
 else:
     print("文件中已移除generator_version行")
-
-# 检查文件结构
-print("\n=== 文件结构检查 ===")
-for i, line in enumerate(lines[:10], 1):
-    print(f"第{i}行: {repr(line)}")

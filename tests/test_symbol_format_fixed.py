@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-测试符号库导出格式问题
+测试修复后的符号库导出格式
 """
 
 import sys
@@ -36,7 +36,7 @@ lib_header = """(kicad_symbol_lib
 lib_footer = "\n)"
 
 # 创建测试文件
-test_file_path = "/tmp/test_symbol_format.kicad_sym"
+test_file_path = "/tmp/test_symbol_format_fixed.kicad_sym"
 
 with open(test_file_path, 'w', encoding='utf-8') as f:
     f.write(lib_header)

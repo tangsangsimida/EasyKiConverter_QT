@@ -396,14 +396,7 @@ def convert_to_kicad(ee_symbol: EeSymbol, kicad_version: KicadVersion) -> KiSymb
 
 
 def tune_footprint_ref_path(ki_symbol: KiSymbol, footprint_lib_name: str):
-    """Tune footprint reference path, ensuring valid package name"""
-    if ki_symbol.info.package and ki_symbol.info.package.strip():
-        # Only modify if package is not empty and doesn't already have library prefix
-        if not ':' in ki_symbol.info.package:
-            ki_symbol.info.package = f"{footprint_lib_name}:{ki_symbol.info.package}"
-    else:
-        # If no package, set a default empty value to avoid KiCad import errors
-        ki_symbol.info.package = ""
+    ki_symbol.info.package = f"{footprint_lib_name}:{ki_symbol.info.package}"
 
 
 class ExporterSymbolKicad:

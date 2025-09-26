@@ -27,22 +27,57 @@ def add_component_in_symbol_lib_file(
         with open(file=lib_path, mode="a+", encoding="utf-8") as lib_file:
             lib_file.write(str(component_content))
     elif kicad_version == KicadVersion.v6:
-        with open(file=lib_path, mode="rb+") as lib_file:
-            lib_file.seek(-2, 2)  # 移动到文件末尾倒数第二个字符 / Move to second last character of file
-            lib_file.truncate()  # 删除最后的括号 / Remove the closing bracket
-            lib_file.write(str(component_content).encode(encoding="utf-8"))
-            lib_file.write("\n)".encode(encoding="utf-8"))  # 重新添加括号 / Re-add the closing bracket
-
+        # 读取现有文件内容
         with open(file=lib_path, encoding="utf-8") as lib_file:
-            new_lib_data = lib_file.read()
+            lib_data = lib_file.read()
+        
+        # 移除末尾的闭合括号
+        if lib_data.strip().endswith(')'):
+            lib_data = lib_data.strip()[:-1]
+        
+        # 添加新组件内容
+        formatted_content = str(component_content)
+        # 移除组件内容中的空行
+        formatted_content = '\n'.join(line for line in formatted_content.split('\n') if line.strip())
+        if not formatted_content.startswith('\n'):
+            formatted_content = '\n' + formatted_content
+        if not formatted_content.endswith('\n'):
+            formatted_content = formatted_content + '\n'
+        
+        # 重新组合文件内容
+        new_lib_data = lib_data + formatted_content + ')'
+        
+        # 更新生成器字段并移除generator_version行
+        # 替换生成器字段
+        new_lib_data = new_lib_data.replace(
+            "(generator kicad_symbol_editor)",
+            "(generator \"https://github.com/tangsangsimida/EasyKiConverter\")",
+        )
+        
+        # 移除generator_version行
+        new_lib_data = re.sub(r'\s*\(generator_version\s+\"[^\"]*\"\)\s*\n?', '', new_lib_data)
+        
+        # 处理空行：移除多余的空行，但保持必要的结构
+        lines = new_lib_data.split('\n')
+        cleaned_lines = []
+        for i, line in enumerate(lines):
+            # 保留非空行和必要的空行
+            if line.strip() or (i > 0 and i < len(lines) - 1):
+                cleaned_lines.append(line)
+        
+        # 移除连续的空行，只保留单个空行
+        result_lines = []
+        prev_line_empty = False
+        for line in cleaned_lines:
+            is_empty = not line.strip()
+            if not is_empty or not prev_line_empty:
+                result_lines.append(line)
+            prev_line_empty = is_empty
+        
+        new_lib_data = '\n'.join(result_lines) + '\n'
 
         with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
-            lib_file.write(
-                new_lib_data.replace(
-                    "(generator kicad_symbol_editor)",
-                    "(generator https://github.com/tangsangsimida/EasyKiConverter)",
-                )
-            )
+            lib_file.write(new_lib_data)
 
 
 def update_component_in_symbol_lib_file(
