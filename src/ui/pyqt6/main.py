@@ -1,15 +1,18 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 EasyKiConverter PyQt6 UI - 主程序入口
 基于PyQt6的桌面应用程序，用于将嘉立创EDA元器件转换为KiCad格式
 """
 import sys
+import os
 from pathlib import Path
-# 确保可以导入同级模块
-sys.path.insert(0, str(Path(__file__).parent))
-sys.path.insert(0, str(Path(__file__).parent.parent))
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+# 获取当前脚本所在目录
+current_dir = Path(__file__).parent
+# 添加项目根目录到Python路径
+sys.path.insert(0, str(current_dir))
+sys.path.insert(0, str(current_dir.parent))
+sys.path.insert(0, str(current_dir.parent.parent))
 
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog
@@ -31,8 +34,7 @@ from core.kicad.parameters_kicad_symbol import KicadVersion
 from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 
 # 从workers目录导入新的ExportWorker类
-from ui.pyqt6.workers.export_worker import ExportWorker
-
+from workers.export_worker import ExportWorker
 
 class EasyKiConverterApp(ModernMainWindow):
     """EasyKiConverter应用主窗口"""
@@ -251,7 +253,6 @@ class EasyKiConverterApp(ModernMainWindow):
         self.status_label.setText("转换失败")
         QMessageBox.critical(self, "转换失败", f"转换过程中发生错误：\n{error_msg}")
 
-
 def main():
     """主函数"""
     print("🚀 正在启动 EasyKiConverter PyQt6 UI...")
@@ -291,7 +292,6 @@ def main():
         print(f"❌ 应用程序启动失败: {e}")
         traceback.print_exc()
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())
