@@ -222,19 +222,8 @@ class KiSymbolInfo:
             value = value.replace('\n', ' ').replace('\t', ' ')
             return value.strip()
         
-        property_template = textwrap.indent(
-            textwrap.dedent(
-                """
-                (property
-                  "{key}"
-                  "{value}"
-                  (id {id_})
-                  (at 0 {pos_y:.2f} 0)
-                  (effects (font (size {font_size} {font_size}) {style}) {hide})
-                )"""
-            ),
-            "  ",
-        )
+        # Use single-line format for KiCad v6 compatibility
+        property_template = '  (property "{key}" "{value}" (id {id_}) (at 0 {pos_y:.2f} 0) (effects (font (size {font_size} {font_size}) {style}) {hide}))'
 
         field_offset_y = KiExportConfigV6.FIELD_OFFSET_START.value
         header: List[str] = [
@@ -649,30 +638,46 @@ class KiSymbol:
         sym_pins = sym_export_data.pop("pins")
         sym_graphic_items = itertools.chain.from_iterable(sym_export_data.values())
 
-        return textwrap.indent(
-            textwrap.dedent(
-                """
-            (symbol "{library_id}"
-              (in_bom yes)
-              (on_board yes)
-              {symbol_properties}
-              (symbol "{library_id}_0_1"
-                {graphic_items}
-                {pins}
-              )
-            )"""
-            ),
-            "  ",
-        ).format(
-            library_id=sanitize_fields(self.info.name),
-            symbol_properties=textwrap.indent(
-                textwrap.dedent("".join(sym_info)), "  " * 2
-            ),
-            graphic_items=textwrap.indent(
-                textwrap.dedent("".join(sym_graphic_items)), "  " * 3
-            ),
-            pins=textwrap.indent(textwrap.dedent("".join(sym_pins)), "  " * 3),
-        )
+        # Format properties without additional indentation since they're already single-line
+        symbol_properties = "\n".join(sym_info)
+        graphic_items = "\n".join(sym_graphic_items)
+        pins = "\n".join(sym_pins)
+        
+        # Build the symbol structure with proper indentation
+        symbol_lines = [
+            f"  (symbol \"{sanitize_fields(self.info.name)}\"",
+            "    (in_bom yes)",
+            "    (on_board yes)",
+        ]
+        
+        # Add properties with proper indentation
+        if symbol_properties:
+            symbol_lines.append(symbol_properties)
+        
+        # Add symbol content
+        symbol_lines.extend([
+            f"    (symbol \"{sanitize_fields(self.info.name)}_0_1\"",
+        ])
+        
+        # Add graphic items with proper indentation
+        if graphic_items:
+            for item in graphic_items.split("\n"):
+                if item.strip():
+                    symbol_lines.append(f"      {item}")
+        
+        # Add pins with proper indentation
+        if pins:
+            for pin in pins.split("\n"):
+                if pin.strip():
+                    symbol_lines.append(f"      {pin}")
+        
+        # Close the symbol structures
+        symbol_lines.extend([
+            "    )",
+            "  )",
+        ])
+        
+        return "\n".join(symbol_lines)
 
     def export(self, kicad_version: KicadVersion) -> str:
         component_data = getattr(self, f"export_{kicad_version.name}")()
