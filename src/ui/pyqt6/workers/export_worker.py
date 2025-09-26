@@ -230,7 +230,7 @@ class ExportWorker(QThread):
             # 处理导出路径
             if not export_path or export_path.strip() == "":
                 # 使用项目根目录上级目录的output文件夹
-                base_folder = Path(__file__).parent.parent.parent / "output"
+                base_folder = Path(__file__).parent.parent.parent.parent / "output"
             else:
                 base_folder = Path(export_path)
                 if not base_folder.is_absolute():

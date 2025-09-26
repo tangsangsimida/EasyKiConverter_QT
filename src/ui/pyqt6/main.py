@@ -19,8 +19,17 @@ from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
-from core.easyeda import EasyEDAImporter, EasyedaSymbolImporter, EasyedaFootprintImporter, Easyeda3dModelImporter
-from core.kicad import KiCadSymbolExporter, KiCadFootprintExporter, KiCad3DModelExporter
+from core.easyeda.easyeda_api import EasyedaApi
+from core.easyeda.easyeda_importer import (
+    Easyeda3dModelImporter,
+    EasyedaFootprintImporter,
+    EasyedaSymbolImporter,
+)
+from core.kicad.export_kicad_3d_model import Exporter3dModelKicad
+from core.kicad.export_kicad_footprint import ExporterFootprintKicad
+from core.kicad.export_kicad_symbol import ExporterSymbolKicad
+from core.kicad.parameters_kicad_symbol import KicadVersion
+from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 
 
 class ExportWorker(QThread):
@@ -49,17 +58,16 @@ class ExportWorker(QThread):
             
             # 创建输出目录
             if not self.output_path:
-                self.output_path = Path.cwd() / "output"
+                self.output_path = Path.cwd().parent.parent / "output"
             else:
                 self.output_path = Path(self.output_path)
+                if not self.output_path.is_absolute():
+                    self.output_path = Path.cwd() / self.output_path
                 
             self.output_path.mkdir(parents=True, exist_ok=True)
             
-            # 创建导出器
-            importer = EasyEDAImporter()
-            
             # 固定使用KiCad 6版本，高版本兼容6版本
-            from core.kicad.parameters_kicad_symbol import KicadVersion
+            kicad_version = KicadVersion.v6
             
             # 逐个处理元件
             for i, component_id in enumerate(self.components):
@@ -68,82 +76,118 @@ class ExportWorker(QThread):
                     self.progress_updated.emit(progress)
                     self.status_updated.emit(f"正在转换: {component_id} ({i+1}/{total})")
                     
+                    # 初始化EasyEDA API
+                    easyeda_api = EasyedaApi()
+                    
                     # 从EasyEDA获取数据
-                    component_data = importer.import_component(component_id)
+                    component_data = easyeda_api.get_cad_data_of_component(lcsc_id=component_id)
                     if not component_data:
                         failed_count += 1
                         continue
                     
+                    # 使用用户提供的文件名前缀，如果没有则使用默认名称
+                    lib_name = self.lib_name if self.lib_name else "easyeda_convertlib"
+                    
+                    # 创建目录结构
+                    footprint_dir = self.output_path / f"{lib_name}.pretty"
+                    model_dir = self.output_path / f"{lib_name}.3dshapes"
+                    
+                    footprint_dir.mkdir(parents=True, exist_ok=True)
+                    model_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    # 符号库文件路径
+                    lib_extension = "kicad_sym" if kicad_version == KicadVersion.v6 else "lib"
+                    symbol_lib_path = self.output_path / f"{lib_name}.{lib_extension}"
+                    
+                    # 创建符号库文件（如果不存在）
+                    if not symbol_lib_path.exists():
+                        with open(symbol_lib_path, "w+", encoding="utf-8") as my_lib:
+                            my_lib.write(
+                                """(kicad_symbol_lib
+  (version 20211014)
+  (generator "kicad_symbol_editor")
+  (generator_version "6.0.0")
+)"""
+                            )
+                    
                     # 导出符号
                     if self.export_options.get('symbol', True):
                         try:
-                            # 检查是否有符号数据
-                            if 'dataStr' in component_data:
-                                symbol_data = component_data['dataStr']
-                                symbol_importer = EasyedaSymbolImporter(component_data)
-                                symbol = symbol_importer.get_symbol()
-                                if symbol:
-                                    symbol_exporter = KiCadSymbolExporter(symbol, KicadVersion.v6)
-                                    # 实际导出符号到文件
-                                    symbol_content = symbol_exporter.export(footprint_lib_name=self.lib_name or "easyeda_convertlib")
-                                    if symbol_content:
-                                        # 保存符号文件
-                                        symbol_file = self.output_path / f"{self.lib_name or 'easyeda_convertlib'}.kicad_sym"
-                                        with open(symbol_file, 'w', encoding='utf-8') as f:
-                                            f.write(symbol_content)
-                                        print(f"符号文件保存成功: {symbol_file}")
-                                    else:
-                                        print(f"符号导出内容为空: {component_id}")
+                            symbol_importer = EasyedaSymbolImporter(easyeda_cp_cad_data=component_data)
+                            symbol_data = symbol_importer.get_symbol()
+                            
+                            if symbol_data:
+                                symbol_exporter = ExporterSymbolKicad(
+                                    symbol=symbol_data, 
+                                    kicad_version=kicad_version
+                                )
+                                kicad_symbol_str = symbol_exporter.export(
+                                    footprint_lib_name=lib_name
+                                )
+                                
+                                # 添加符号到库文件
+                                if not id_already_in_symbol_lib(
+                                    lib_path=str(symbol_lib_path),
+                                    component_name=symbol_data.info.name,
+                                    kicad_version=kicad_version,
+                                ):
+                                    add_component_in_symbol_lib_file(
+                                        lib_path=str(symbol_lib_path),
+                                        component_content=kicad_symbol_str,
+                                        kicad_version=kicad_version,
+                                    )
+                                    print(f"符号文件保存成功: {symbol_lib_path}")
                                 else:
-                                    print(f"符号数据为空: {component_id}")
+                                    print(f"符号已存在，跳过: {symbol_data.info.name}")
                             else:
-                                print(f"没有符号数据: {component_id}")
+                                print(f"符号数据为空: {component_id}")
                         except Exception as e:
                             print(f"符号导出失败 {component_id}: {e}")
                     
                     # 导出封装
                     if self.export_options.get('footprint', True):
                         try:
-                            # 检查是否有封装数据
-                            if 'packageDetail' in component_data:
-                                footprint_data = component_data['packageDetail']
-                                footprint_importer = EasyedaFootprintImporter(component_data)
-                                footprint = footprint_importer.get_footprint()
-                                if footprint:
-                                    footprint_exporter = KiCadFootprintExporter(footprint)
-                                    # 实际导出封装到文件
-                                    footprint_file = self.output_path / f"{component_id}.kicad_mod"
-                                    model_3d_path = self.output_path / "3d_models" if self.export_options.get('model3d') else ""
-                                    footprint_exporter.export(str(footprint_file), str(model_3d_path))
-                                    print(f"封装文件保存成功: {footprint_file}")
-                                else:
-                                    print(f"封装数据为空: {component_id}")
+                            footprint_importer = EasyedaFootprintImporter(easyeda_cp_cad_data=component_data)
+                            footprint_data = footprint_importer.get_footprint()
+                            
+                            if footprint_data:
+                                footprint_exporter = ExporterFootprintKicad(footprint=footprint_data)
+                                footprint_filename = footprint_dir / f"{footprint_data.info.name}.kicad_mod"
+                                
+                                # 设置3D模型路径
+                                model_3d_path = self.output_path / lib_name
+                                footprint_exporter.export(
+                                    footprint_full_path=str(footprint_filename),
+                                    model_3d_path=str(model_3d_path)
+                                )
+                                print(f"封装文件保存成功: {footprint_filename}")
                             else:
-                                print(f"没有封装数据: {component_id}")
+                                print(f"封装数据为空: {component_id}")
                         except Exception as e:
                             print(f"封装导出失败 {component_id}: {e}")
                     
                     # 导出3D模型
                     if self.export_options.get('model3d', True):
                         try:
-                            # 检查是否有3D模型数据
-                            if 'packageDetail' in component_data:
-                                model3d_data = component_data['packageDetail']
-                                # 不下载原始3D模型文件，只转换元数据
-                                model3d_importer = Easyeda3dModelImporter(component_data, download_raw_3d_model=False)
-                                model3d = model3d_importer.output  # 使用output属性而不是get_3d_model方法
-                                if model3d:
-                                    model3d_exporter = KiCad3DModelExporter(model3d)
-                                    # 实际导出3D模型到文件
-                                    model3d_file = self.output_path / "3d_models" / f"{component_id}.step"
-                                    self.output_path.mkdir(parents=True, exist_ok=True)  # 确保目录存在
-                                    (self.output_path / "3d_models").mkdir(parents=True, exist_ok=True)
-                                    model3d_exporter.export(str(model3d_file))
-                                    print(f"3D模型文件保存成功: {model3d_file}")
-                                else:
-                                    print(f"3D模型数据为空: {component_id}")
+                            model3d_importer = Easyeda3dModelImporter(
+                                easyeda_cp_cad_data=component_data, 
+                                download_raw_3d_model=True
+                            )
+                            model3d = model3d_importer.output
+                            
+                            if model3d:
+                                model3d_exporter = Exporter3dModelKicad(model_3d=model3d)
+                                model3d_exporter.export(lib_path=str(self.output_path / lib_name))
+                                
+                                # 查找导出的3D模型文件
+                                model_name = getattr(model3d, 'name', f"{component_id}_3dmodel")
+                                for ext in ['.step', '.wrl']:
+                                    model_file = model_dir / f"{model_name}{ext}"
+                                    if model_file.exists():
+                                        print(f"3D模型文件保存成功: {model_file}")
+                                        break
                             else:
-                                print(f"没有3D模型数据: {component_id}")
+                                print(f"3D模型数据为空: {component_id}")
                         except Exception as e:
                             print(f"3D模型导出失败 {component_id}: {e}")
                     
