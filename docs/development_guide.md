@@ -12,15 +12,41 @@ python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
 
-# 安装依赖
-pip install -r EasyKiConverter/Web_Ui/requirements.txt
+# 安装核心依赖
+pip install -r requirements/core.txt
+
+# 安装开发依赖（包括测试工具）
+pip install -r requirements/dev.txt
+
+# 安装PyQt6 UI依赖（可选）
+pip install -r requirements/pyqt6.txt
 ```
+
+## 🖥️ PyQt6 UI 开发
+
+```bash
+# 启动PyQt6 UI
+cd src/ui/pyqt6
+python main.py
+```
+
+**UI开发：**
+- 修改 `main.py` - 主程序入口和业务逻辑
+- 修改 `modern_main_window.py` - 主窗口界面
+- 修改 `widgets/` 目录下的各种UI组件
+- 修改 `utils/` 目录下的工具类和样式管理
+
+**核心转换逻辑：**
+
+- 核心转换逻辑在 `src/core/` 目录中
+- EasyEDA数据处理在 `src/core/easyeda/` 目录中
+- KiCad导出引擎在 `src/core/kicad/` 目录中
 
 ## 🌐 Web UI 开发
 
 ```bash
 # 启动开发服务器
-cd EasyKiConverter/Web_Ui
+cd src/Web_Ui
 python app.py
 
 # 访问开发界面
@@ -34,13 +60,13 @@ python app.py
 
 **后端开发：**
 - 修改 `app.py` - API 接口和路由
-- 核心转换逻辑在 `../` 目录中
+- 核心转换逻辑在 `src/core/` 目录中
 
 ## 🛠️ 命令行开发
 
 ```bash
 # 运行基本转换测试
-cd EasyKiConverter
+cd src
 python main.py --lcsc_id C13377 --symbol --debug
 
 # 测试不同组件类型
@@ -50,11 +76,18 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 
 ## 🔧 代码结构
 
-- **easyeda/** - EasyEDA API 和数据处理
-- **kicad/** - KiCad 格式导出引擎
-- **Web_Ui/** - Flask Web 应用
-- **main.py** - 命令行入口
-- **helpers.py** - 共享工具函数
+- **src/core/** - 核心转换引擎
+  - **easyeda/** - EasyEDA API 和数据处理
+  - **kicad/** - KiCad 格式导出引擎
+  - **utils/** - 共享工具函数
+- **src/ui/** - 用户界面
+  - **pyqt6/** - PyQt6 桌面应用
+  - **Web_Ui/** - Flask Web 应用
+- **src/main.py** - 命令行入口
+- **requirements/** - 依赖管理
+  - **core.txt** - 核心依赖
+  - **dev.txt** - 开发依赖
+  - **pyqt6.txt** - PyQt6 UI依赖
 
 ## 🔧 命令行选项
 
@@ -62,7 +95,7 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 python main.py [options]
 
 必需参数:
-  --lcsc_id TEXT         要转换的LCSC元件编号 (例如: C13377)
+  --lcsc_id TEXT         要转换的LCSC元件编号 (例如: C2040)
 
 导出选项 (至少需要一个):
   --symbol               导出符号库 (.kicad_sym)

@@ -67,6 +67,52 @@
 - 遵循项目的编码规范
 - 确保你的代码在提交前经过测试
 
+## 🧪 开发环境设置
+
+```bash
+# 克隆项目
+git clone https://github.com/tangsangsimida/EasyKiConverter.git
+cd EasyKiConverter
+
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate  # Windows
+
+# 安装开发依赖
+pip install -r requirements/dev.txt
+```
+
+## 📁 项目结构
+
+- **src/core/** - 核心转换引擎
+- **src/ui/pyqt6/** - PyQt6 桌面应用
+- **src/Web_Ui/** - Flask Web 应用
+- **docs/** - 详细文档
+- **tests/** - 测试文件
+- **requirements/** - 依赖管理
+
+## 🛠️ 开发工具
+
+- **代码格式化**: 使用 black 格式化代码
+- **代码检查**: 使用 flake8 检查代码质量
+- **类型检查**: 使用 mypy 进行类型检查
+- **测试**: 使用 pytest 运行测试
+
+```bash
+# 代码格式化
+black .
+
+# 代码检查
+flake8
+
+# 类型检查
+mypy src/
+
+# 运行测试
+pytest tests/
+```
+
 ## 🐛 报告问题
 - 使用 [GitHub Issues](https://github.com/tangsangsimida/EasyKiConverter/issues)
 - 提供详细的错误信息和复现步骤

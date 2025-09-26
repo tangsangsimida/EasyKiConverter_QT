@@ -12,15 +12,40 @@ python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
 
-# Install dependencies
-pip install -r EasyKiConverter/Web_Ui/requirements.txt
+# Install core dependencies
+pip install -r requirements/core.txt
+
+# Install development dependencies (including testing tools)
+pip install -r requirements/dev.txt
+
+# Install PyQt6 UI dependencies (optional)
+pip install -r requirements/pyqt6.txt
 ```
+
+## 🖥️ PyQt6 UI Development
+
+```bash
+# Start PyQt6 UI
+cd src/ui/pyqt6
+python main.py
+```
+
+**UI Development:**
+- Modify `main.py` - Main program entry and business logic
+- Modify `modern_main_window.py` - Main window interface
+- Modify various UI components in the `widgets/` directory
+- Modify utility classes and style management in the `utils/` directory
+
+**Core Conversion Logic:**
+- Core conversion logic in the `src/core/` directory
+- EasyEDA data processing in the `src/core/easyeda/` directory
+- KiCad export engines in the `src/core/kicad/` directory
 
 ## 🌐 Web UI Development
 
 ```bash
 # Start development server
-cd EasyKiConverter/Web_Ui
+cd src/Web_Ui
 python app.py
 
 # Access development interface
@@ -34,13 +59,13 @@ python app.py
 
 **Backend Development:**
 - Modify `app.py` - API interfaces and routing
-- Core conversion logic in `../` directory
+- Core conversion logic in the `src/core/` directory
 
 ## 🛠️ Command Line Development
 
 ```bash
 # Run basic conversion test
-cd EasyKiConverter
+cd src
 python main.py --lcsc_id C13377 --symbol --debug
 
 # Test different component types
@@ -50,11 +75,18 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
 
 ## 🔧 Code Structure
 
-- **easyeda/** - EasyEDA API and data processing
-- **kicad/** - KiCad format export engines
-- **Web_Ui/** - Flask web application
-- **main.py** - Command-line entry point
-- **helpers.py** - Shared utility functions
+- **src/core/** - Core conversion engine
+  - **easyeda/** - EasyEDA API and data processing
+  - **kicad/** - KiCad format export engines
+  - **utils/** - Shared utility functions
+- **src/ui/** - User interfaces
+  - **pyqt6/** - PyQt6 desktop application
+  - **Web_Ui/** - Flask web application
+- **src/main.py** - Command-line entry point
+- **requirements/** - Dependency management
+  - **core.txt** - Core dependencies
+  - **dev.txt** - Development dependencies
+  - **pyqt6.txt** - PyQt6 UI dependencies
 
 ## 🔧 Command Line Options
 

@@ -67,6 +67,52 @@ We welcome all forms of contributions! Please follow the standard GitHub collabo
 - Follow project coding standards
 - Ensure your code is tested before submission
 
+## 🧪 Development Environment Setup
+
+```bash
+# Clone the project
+git clone https://github.com/tangsangsimida/EasyKiConverter.git
+cd EasyKiConverter
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate  # Windows
+
+# Install development dependencies
+pip install -r requirements/dev.txt
+```
+
+## 📁 Project Structure
+
+- **src/core/** - Core conversion engine
+- **src/ui/pyqt6/** - PyQt6 desktop application
+- **src/Web_Ui/** - Flask web application
+- **docs/** - Detailed documentation
+- **tests/** - Test files
+- **requirements/** - Dependency management
+
+## 🛠️ Development Tools
+
+- **Code Formatting**: Use black to format code
+- **Code Checking**: Use flake8 to check code quality
+- **Type Checking**: Use mypy for type checking
+- **Testing**: Use pytest to run tests
+
+```bash
+# Code formatting
+black .
+
+# Code checking
+flake8
+
+# Type checking
+mypy src/
+
+# Run tests
+pytest tests/
+```
+
 ## 🐛 Reporting Issues
 - Use [GitHub Issues](https://github.com/tangsangsimida/EasyKiConverter/issues)
 - Provide detailed error information and reproduction steps

@@ -6,10 +6,28 @@
 - **KiCad 5.x or 6.x+** (Use generated library files)
 
 ## Python Dependencies
-- **Flask 2.0+** (Web UI)
+
+### Core Dependencies (core.txt)
+- **requests** >= 2.25.0 (HTTP requests)
+- **pydantic** >= 1.8.0 (Data validation)
+
+### Web UI Dependencies (Web_Ui/requirements.txt)
+- **Flask** 2.0+ (Web UI)
 - **Flask-CORS** (Cross-origin support)
 - **requests** (HTTP requests)
-- **Other dependencies** see requirements.txt
+
+### PyQt6 UI Dependencies (requirements/pyqt6.txt)
+- **PyQt6** >= 6.4.0 (Desktop UI framework)
+- **PyQt6-Qt6** >= 6.4.0 (Qt6 library)
+- **pandas** >= 1.3.0 (Data processing)
+- **openpyxl** >= 3.0.0 (Excel file processing)
+
+### Development Dependencies (requirements/dev.txt)
+- **pytest** >= 6.0.0 (Testing framework)
+- **pytest-cov** >= 2.10.0 (Test coverage)
+- **black** >= 21.0.0 (Code formatting)
+- **flake8** >= 3.8.0 (Code checking)
+- **mypy** >= 0.812 (Type checking)
 
 ## Supported Operating Systems
 - ✅ Windows 10/11
