@@ -21,17 +21,17 @@ sys.path.insert(0, str(parent_dir))
 
 try:
     # 导入EasyKiConverter核心模块
-    from easyeda.easyeda_api import EasyedaApi
-    from easyeda.easyeda_importer import (
+    from core.easyeda.easyeda_api import EasyedaApi
+    from core.easyeda.easyeda_importer import (
         Easyeda3dModelImporter,
         EasyedaFootprintImporter,
         EasyedaSymbolImporter,
     )
-    from kicad.export_kicad_3d_model import Exporter3dModelKicad
-    from kicad.export_kicad_footprint import ExporterFootprintKicad
-    from kicad.export_kicad_symbol import ExporterSymbolKicad
-    from kicad.parameters_kicad_symbol import KicadVersion
-    from symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+    from core.kicad.export_kicad_3d_model import Exporter3dModelKicad
+    from core.kicad.export_kicad_footprint import ExporterFootprintKicad
+    from core.kicad.export_kicad_symbol import ExporterSymbolKicad
+    from core.kicad.parameters_kicad_symbol import KicadVersion
+    from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
     
 except ImportError as e:
     print(f"导入EasyKiConverter模块失败: {e}")
@@ -65,7 +65,7 @@ class ExportWorker(QThread):
         self.file_prefix = file_prefix
         
         # 多线程配置
-        self.max_workers = min(len(component_ids), 15)  # 最大并发线程数
+        self.max_workers = min(len(component_ids), 16)  # 最大并发线程数
         self.file_lock = threading.Lock()  # 文件操作锁
         self.symbol_lib_locks = {}  # 符号库文件锁字典
         self.symbol_lib_locks_lock = threading.Lock()  # 符号库锁字典的锁
@@ -118,13 +118,13 @@ class ExportWorker(QThread):
             
             # 根据元件数量决定是否使用多线程
             if total_components == 1:
-                # 单个元件直接处理
+                # 单个元件直接处理，避免线程开销
                 result = self.process_single_component(self.component_ids[0], 1, total_components)
                 if result['success']:
                     success_count += 1
                 self.component_completed.emit(result)
             else:
-                # 多个元件使用线程池并行处理
+                # 多个元件使用线程池并行处理，线程数根据元件数量动态分配，最多16个线程
                 with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                     # 提交所有任务
                     future_to_component = {

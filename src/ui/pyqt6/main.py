@@ -19,7 +19,6 @@ from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
-from core.easyeda.easyeda_api import EasyedaApi
 from core.easyeda.easyeda_importer import (
     Easyeda3dModelImporter,
     EasyedaFootprintImporter,
@@ -31,178 +30,8 @@ from core.kicad.export_kicad_symbol import ExporterSymbolKicad
 from core.kicad.parameters_kicad_symbol import KicadVersion
 from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 
-
-class ExportWorker(QThread):
-    """导出工作线程"""
-    
-    progress_updated = pyqtSignal(int)
-    status_updated = pyqtSignal(str)
-    export_completed = pyqtSignal(int, int, int, str)
-    export_failed = pyqtSignal(str)
-    
-    def __init__(self, components, export_options, output_path, lib_name):
-        super().__init__()
-        self.components = components
-        self.export_options = export_options
-        self.output_path = output_path
-        self.lib_name = lib_name
-        
-    def run(self):
-        """执行导出任务"""
-        try:
-            total = len(self.components)
-            success_count = 0
-            failed_count = 0
-            
-            self.status_updated.emit(f"开始转换 {total} 个元器件...")
-            
-            # 创建输出目录
-            if not self.output_path:
-                self.output_path = Path.cwd().parent.parent / "output"
-            else:
-                self.output_path = Path(self.output_path)
-                if not self.output_path.is_absolute():
-                    self.output_path = Path.cwd() / self.output_path
-                
-            self.output_path.mkdir(parents=True, exist_ok=True)
-            
-            # 固定使用KiCad 6版本，高版本兼容6版本
-            kicad_version = KicadVersion.v6
-            
-            # 逐个处理元件
-            for i, component_id in enumerate(self.components):
-                try:
-                    progress = int((i + 1) / total * 100)
-                    self.progress_updated.emit(progress)
-                    self.status_updated.emit(f"正在转换: {component_id} ({i+1}/{total})")
-                    
-                    # 初始化EasyEDA API
-                    easyeda_api = EasyedaApi()
-                    
-                    # 从EasyEDA获取数据
-                    component_data = easyeda_api.get_cad_data_of_component(lcsc_id=component_id)
-                    if not component_data:
-                        failed_count += 1
-                        continue
-                    
-                    # 使用用户提供的文件名前缀，如果没有则使用默认名称
-                    lib_name = self.lib_name if self.lib_name else "easyeda_convertlib"
-                    
-                    # 创建目录结构
-                    footprint_dir = self.output_path / f"{lib_name}.pretty"
-                    model_dir = self.output_path / f"{lib_name}.3dshapes"
-                    
-                    footprint_dir.mkdir(parents=True, exist_ok=True)
-                    model_dir.mkdir(parents=True, exist_ok=True)
-                    
-                    # 符号库文件路径
-                    lib_extension = "kicad_sym" if kicad_version == KicadVersion.v6 else "lib"
-                    symbol_lib_path = self.output_path / f"{lib_name}.{lib_extension}"
-                    
-                    # 创建符号库文件（如果不存在）
-                    if not symbol_lib_path.exists():
-                        with open(symbol_lib_path, "w+", encoding="utf-8") as my_lib:
-                            my_lib.write(
-                                """(kicad_symbol_lib
-  (version 20211014)
-  (generator "kicad_symbol_editor")
-  (generator_version "6.0.0")
-)"""
-                            )
-                    
-                    # 导出符号
-                    if self.export_options.get('symbol', True):
-                        try:
-                            symbol_importer = EasyedaSymbolImporter(easyeda_cp_cad_data=component_data)
-                            symbol_data = symbol_importer.get_symbol()
-                            
-                            if symbol_data:
-                                symbol_exporter = ExporterSymbolKicad(
-                                    symbol=symbol_data, 
-                                    kicad_version=kicad_version
-                                )
-                                kicad_symbol_str = symbol_exporter.export(
-                                    footprint_lib_name=lib_name
-                                )
-                                
-                                # 添加符号到库文件
-                                if not id_already_in_symbol_lib(
-                                    lib_path=str(symbol_lib_path),
-                                    component_name=symbol_data.info.name,
-                                    kicad_version=kicad_version,
-                                ):
-                                    add_component_in_symbol_lib_file(
-                                        lib_path=str(symbol_lib_path),
-                                        component_content=kicad_symbol_str,
-                                        kicad_version=kicad_version,
-                                    )
-                                    print(f"符号文件保存成功: {symbol_lib_path}")
-                                else:
-                                    print(f"符号已存在，跳过: {symbol_data.info.name}")
-                            else:
-                                print(f"符号数据为空: {component_id}")
-                        except Exception as e:
-                            print(f"符号导出失败 {component_id}: {e}")
-                    
-                    # 导出封装
-                    if self.export_options.get('footprint', True):
-                        try:
-                            footprint_importer = EasyedaFootprintImporter(easyeda_cp_cad_data=component_data)
-                            footprint_data = footprint_importer.get_footprint()
-                            
-                            if footprint_data:
-                                footprint_exporter = ExporterFootprintKicad(footprint=footprint_data)
-                                footprint_filename = footprint_dir / f"{footprint_data.info.name}.kicad_mod"
-                                
-                                # 设置3D模型路径
-                                model_3d_path = self.output_path / lib_name
-                                footprint_exporter.export(
-                                    footprint_full_path=str(footprint_filename),
-                                    model_3d_path=str(model_3d_path)
-                                )
-                                print(f"封装文件保存成功: {footprint_filename}")
-                            else:
-                                print(f"封装数据为空: {component_id}")
-                        except Exception as e:
-                            print(f"封装导出失败 {component_id}: {e}")
-                    
-                    # 导出3D模型
-                    if self.export_options.get('model3d', True):
-                        try:
-                            model3d_importer = Easyeda3dModelImporter(
-                                easyeda_cp_cad_data=component_data, 
-                                download_raw_3d_model=True
-                            )
-                            model3d = model3d_importer.output
-                            
-                            if model3d:
-                                model3d_exporter = Exporter3dModelKicad(model_3d=model3d)
-                                model3d_exporter.export(lib_path=str(self.output_path / lib_name))
-                                
-                                # 查找导出的3D模型文件
-                                model_name = getattr(model3d, 'name', f"{component_id}_3dmodel")
-                                for ext in ['.step', '.wrl']:
-                                    model_file = model_dir / f"{model_name}{ext}"
-                                    if model_file.exists():
-                                        print(f"3D模型文件保存成功: {model_file}")
-                                        break
-                            else:
-                                print(f"3D模型数据为空: {component_id}")
-                        except Exception as e:
-                            print(f"3D模型导出失败 {component_id}: {e}")
-                    
-                    success_count += 1
-                    
-                except Exception as e:
-                    failed_count += 1
-                    print(f"转换 {component_id} 失败: {e}")
-            
-            # 完成导出
-            avg_time = "0s"
-            self.export_completed.emit(total, success_count, failed_count, avg_time)
-            
-        except Exception as e:
-            self.export_failed.emit(str(e))
+# 从workers目录导入新的ExportWorker类
+from ui.pyqt6.workers.export_worker import ExportWorker
 
 
 class EasyKiConverterApp(ModernMainWindow):
@@ -382,40 +211,45 @@ class EasyKiConverterApp(ModernMainWindow):
         
         # 创建工作线程
         self.export_worker = ExportWorker(components, export_options, export_path, lib_name)
-        self.export_worker.progress_updated.connect(self.update_progress)
-        self.export_worker.status_updated.connect(self.update_status)
-        self.export_worker.export_completed.connect(self.on_export_completed)
-        self.export_worker.export_failed.connect(self.on_export_failed)
+        # 连接新的信号
+        self.export_worker.progress_updated.connect(self.on_progress_updated)
+        self.export_worker.component_completed.connect(self.on_component_completed)
+        self.export_worker.export_finished.connect(self.on_export_finished)
+        self.export_worker.error_occurred.connect(self.on_export_error)
         
         # 开始导出
         self.export_worker.start()
         
-    def update_progress(self, value):
+    def on_progress_updated(self, current, total, component_id):
         """更新进度"""
-        self.progress_bar.set_progress(value)
+        progress = int(current / total * 100)
+        self.progress_bar.set_progress(progress)
+        self.status_label.setText(f"正在转换: {component_id} ({current}/{total})")
         
-    def update_status(self, status):
-        """更新状态"""
-        self.status_label.setText(status)
+    def on_component_completed(self, result):
+        """单个元件转换完成"""
+        # 可以在这里处理单个元件转换完成的逻辑
+        if not result['success']:
+            print(f"转换失败: {result.get('error', 'Unknown error')}")
         
-    def on_export_completed(self, total, success, failed, avg_time):
+    def on_export_finished(self, total, success_count):
         """导出完成"""
         self.export_btn.setEnabled(True)
-        self.status_label.setText(f"转换完成！成功: {success}, 失败: {failed}")
+        self.status_label.setText(f"转换完成！成功: {success_count}, 失败: {total - success_count}")
         
         # 显示结果
-        if failed > 0:
+        if total - success_count > 0:
             QMessageBox.information(self, "转换完成", 
-                f"转换完成！\n总数: {total}\n成功: {success}\n失败: {failed}")
+                f"转换完成！\n总数: {total}\n成功: {success_count}\n失败: {total - success_count}")
         else:
             QMessageBox.information(self, "转换完成", 
-                f"所有 {success} 个元器件转换成功！")
+                f"所有 {success_count} 个元器件转换成功！")
                 
-    def on_export_failed(self, error):
+    def on_export_error(self, error_msg):
         """导出失败"""
         self.export_btn.setEnabled(True)
         self.status_label.setText("转换失败")
-        QMessageBox.critical(self, "转换失败", f"转换过程中发生错误：\n{error}")
+        QMessageBox.critical(self, "转换失败", f"转换过程中发生错误：\n{error_msg}")
 
 
 def main():
