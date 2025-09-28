@@ -4,7 +4,6 @@
 """
 import logging
 import re
-from typing import Optional
 
 from ..kicad.parameters_kicad_symbol import KicadVersion
 

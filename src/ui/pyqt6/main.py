@@ -16,25 +16,16 @@ sys.path.insert(0, str(current_dir.parent.parent))
 
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog
-from PyQt6.QtCore import QThread, pyqtSignal
 
 from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
-from core.easyeda.easyeda_importer import (
-    Easyeda3dModelImporter,
-    EasyedaFootprintImporter,
-    EasyedaSymbolImporter,
-)
-from core.kicad.export_kicad_3d_model import Exporter3dModelKicad
-from core.kicad.export_kicad_footprint import ExporterFootprintKicad
-from core.kicad.export_kicad_symbol import ExporterSymbolKicad
-from core.kicad.parameters_kicad_symbol import KicadVersion
-from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 
 # 从workers目录导入新的ExportWorker类
 from workers.export_worker import ExportWorker
+# 导入转换结果详情组件
+from widgets.conversion_results_widget import ConversionResultsWidget
 
 class EasyKiConverterApp(ModernMainWindow):
     """EasyKiConverter应用主窗口"""
@@ -46,6 +37,16 @@ class EasyKiConverterApp(ModernMainWindow):
         self.component_validator = ComponentValidator()
         self.bom_parser = BOMParser()
         self.export_worker = None
+        
+        # 转换结果存储
+        self.conversion_results = {
+            "success": [],
+            "failed": [],
+            "partial": []
+        }
+        
+        # 转换结果详情组件
+        self.conversion_results_widget = None
         
         # 连接信号
         self.setup_business_connections()
@@ -230,22 +231,78 @@ class EasyKiConverterApp(ModernMainWindow):
         
     def on_component_completed(self, result):
         """单个元件转换完成"""
-        # 可以在这里处理单个元件转换完成的逻辑
-        if not result['success']:
-            print(f"转换失败: {result.get('error', 'Unknown error')}")
+        # 存储转换结果
+        component_id = result.get('componentId', result.get('message', 'Unknown'))
+        if result['success']:
+            self.conversion_results["success"].append(component_id)
+        else:
+            # 提取错误信息中的元件ID
+            error_msg = result.get('error', 'Unknown error')
+            if component_id == 'Unknown' and 'Unknown' in error_msg:
+                # 尝试从错误信息中提取元件ID
+                import re
+                match = re.search(r'[C]\d+', error_msg)
+                if match:
+                    component_id = match.group(0)
+            self.conversion_results["failed"].append({
+                "id": component_id,
+                "error": error_msg
+            })
         
     def on_export_finished(self, total, success_count):
         """导出完成"""
         self.export_btn.setEnabled(True)
-        self.status_label.setText(f"转换完成！成功: {success_count}, 失败: {total - success_count}")
         
-        # 显示结果
-        if total - success_count > 0:
-            QMessageBox.information(self, "转换完成", 
-                f"转换完成！\n总数: {total}\n成功: {success_count}\n失败: {total - success_count}")
+        # 计算详细统计信息
+        failed_count = total - success_count
+        success_rate = f"{(success_count / total * 100):.1f}%" if total > 0 else "0%"
+        
+        # 更新状态标签显示详细统计
+        self.status_label.setText(f"转换完成！总数: {total}, 成功: {success_count}, 失败: {failed_count}, 成功率: {success_rate}")
+        
+        # 显示详细结果列表
+        self.show_detailed_results()
+        
+    def show_detailed_results(self):
+        """显示详细转换结果"""
+        # 创建转换结果详情组件（如果尚未创建）
+        if self.conversion_results_widget is None:
+            self.conversion_results_widget = ConversionResultsWidget()
+            # 将结果详情组件添加到滚动内容布局的底部
+            from PyQt6.QtWidgets import QWidget, QScrollArea
+            central_widget = self.centralWidget()
+            if central_widget:
+                # 找到滚动区域
+                scroll_areas = central_widget.findChildren(QScrollArea)
+                if scroll_areas:
+                    scroll_area = scroll_areas[0]
+                    scroll_content = scroll_area.widget()
+                    if scroll_content and scroll_content.layout():
+                        # 先移除之前的stretch
+                        for i in reversed(range(scroll_content.layout().count())):
+                            item = scroll_content.layout().itemAt(i)
+                            if item and item.spacerItem():
+                                scroll_content.layout().removeItem(item)
+                        
+                        # 添加转换结果详情组件
+                        scroll_content.layout().addWidget(self.conversion_results_widget)
+                        
+                        # 添加stretch以确保详情组件位于底部
+                        scroll_content.layout().addStretch()
         else:
-            QMessageBox.information(self, "转换完成", 
-                f"所有 {success_count} 个元器件转换成功！")
+            # 如果组件已创建，确保它可见
+            if not self.conversion_results_widget.isVisible():
+                self.conversion_results_widget.setVisible(True)
+        
+        # 更新结果显示
+        self.conversion_results_widget.update_results(self.conversion_results)
+        
+        # 清空结果存储，为下次转换做准备
+        self.conversion_results = {
+            "success": [],
+            "failed": [],
+            "partial": []
+        }
                 
     def on_export_error(self, error_msg):
         """导出失败"""

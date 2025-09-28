@@ -5,9 +5,9 @@
 提供美观、现代的界面样式和主题
 """
 
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QPoint, QTimer
-from PyQt6.QtWidgets import QWidget, QPushButton, QLineEdit, QTextEdit, QComboBox
-from PyQt6.QtGui import QColor, QPalette, QLinearGradient, QBrush, QPainter, QFont
+from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve
+from PyQt6.QtWidgets import QPushButton, QLineEdit
+from PyQt6.QtGui import QColor,QFont
 
 
 class ModernStyle:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-现代化主窗口 - 酷炫界面设计
+现代化主窗口 - 界面设计
 采用从上至下的清晰布局，现代化UI元素
 """
 
@@ -10,15 +10,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                           QPushButton, QLabel, QFrame, QStackedWidget,
-                           QScrollArea, QSizePolicy, QMenuBar, QMenu, QGraphicsDropShadowEffect,
-                           QListWidget, QListWidgetItem, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
-                           QApplication)
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal, QPoint
-from PyQt6.QtGui import QLinearGradient, QColor, QPalette, QPainter, QBrush, QPen
-
+                           QPushButton, QLabel, QScrollArea, QMenu, 
+                           QListWidget, QListWidgetItem, QLineEdit, QCheckBox, QMessageBox
+                           )
+from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve  
 from utils.config_manager import ConfigManager
-from widgets.optimized_component_input_widget import OptimizedComponentInputWidget
 from utils.modern_ui_components import ModernCard, ModernProgressBar
 
 
@@ -689,7 +685,13 @@ class ModernMainWindow(QMainWindow):
         # 检查是否已存在
         existing_items = []
         for i in range(self.component_list.count()):
-            existing_items.append(self.component_list.item(i).text())
+            item = self.component_list.item(i)
+            # 获取原始ID
+            original_id = item.data(Qt.ItemDataRole.UserRole)
+            if original_id:
+                existing_items.append(original_id)
+            else:
+                existing_items.append(item.text())
             
         if input_text in existing_items:
             QMessageBox.information(self, "提示", f"元件 {input_text} 已在列表中")
@@ -698,6 +700,7 @@ class ModernMainWindow(QMainWindow):
             
         # 添加到列表
         item = QListWidgetItem(input_text)
+        item.setData(Qt.ItemDataRole.UserRole, input_text)  # 存储原始ID
         self.component_list.addItem(item)
         self.component_input.clear()
         
@@ -721,10 +724,51 @@ class ModernMainWindow(QMainWindow):
         # 确保导出按钮保持启用状态（只在用户点击时进行验证）
         self.export_btn.setEnabled(True)
         
+    def on_item_clicked(self, item):
+        """处理列表项点击事件"""
+        # 检查是否点击了删除部分
+        text = item.text()
+        if text.endswith("[删除]"):
+            reply = QMessageBox.question(self, "确认删除", 
+                f"确定要删除元件 {item.data(Qt.ItemDataRole.UserRole)} 吗？",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            
+            if reply == QMessageBox.StandardButton.Yes:
+                # 删除项目
+                row = self.component_list.row(item)
+                self.component_list.takeItem(row)
+                self.component_count_label.setText(f"共 {self.component_list.count()} 个元器件")
+        
     def show_component_menu(self, position):
         """显示元件右键菜单"""
-        # 实现右键菜单逻辑
-        pass
+        # 获取点击的项目
+        item = self.component_list.itemAt(position)
+        if item:
+            # 创建菜单
+            menu = QMenu()
+            delete_action = menu.addAction("🗑️ 删除元件")
+            
+            # 连接删除动作
+            delete_action.triggered.connect(lambda: self.remove_component(item))
+            
+            # 显示菜单
+            menu.exec(self.component_list.mapToGlobal(position))
+            
+    def remove_component(self, item):
+        """删除指定元件"""
+        # 获取元件ID用于确认对话框
+        component_id = item.data(Qt.ItemDataRole.UserRole) or item.text()
+        if component_id.endswith(" [删除]"):
+            component_id = component_id[:-6].strip()
+            
+        reply = QMessageBox.question(self, "确认删除", 
+            f"确定要删除元件 {component_id} 吗？",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            row = self.component_list.row(item)
+            self.component_list.takeItem(row)
+            self.component_count_label.setText(f"共 {self.component_list.count()} 个元器件")
         
     def select_bom_file(self):
         """选择BOM文件"""

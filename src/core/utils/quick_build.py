@@ -3,7 +3,6 @@
 
 import subprocess
 import sys
-import os
 
 def main():
     print("EasyKiConverter PyQt6 UI 快速打包")
@@ -29,17 +28,14 @@ def main():
     ]
     
     print(f"执行命令: {' '.join(cmd)}")
-    print("
-开始打包...")
+    print("开始打包...")
     
     try:
         subprocess.run(cmd, check=True)
-        print("
-✅ 打包完成！")
+        print("✅ 打包完成！")
         print("可执行文件位置: dist/EasyKiConverter-PyQt6")
     except subprocess.CalledProcessError as e:
-        print(f"
-❌ 打包失败: {e}")
+        print(f"❌ 打包失败: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

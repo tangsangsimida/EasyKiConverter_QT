@@ -8,7 +8,7 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                            QFrame, QGraphicsOpacityEffect, QPushButton)
 from PyQt6.QtCore import (Qt, QPropertyAnimation, QEasingCurve, QTimer, 
-                        QPoint, QSequentialAnimationGroup, QParallelAnimationGroup, pyqtProperty)
+                        QSequentialAnimationGroup)
 from PyQt6.QtGui import QColor, QPainter, QPen, QBrush, QLinearGradient, QFont
 
 

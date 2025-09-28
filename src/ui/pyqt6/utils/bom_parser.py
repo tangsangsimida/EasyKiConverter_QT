@@ -3,7 +3,6 @@
 BOM文件解析器 - 复用Web UI的BOM解析逻辑
 """
 
-import os
 import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Any, Optional

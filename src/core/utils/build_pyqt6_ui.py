@@ -4,7 +4,6 @@
 EasyKiConverter PyQt6 UI 打包脚本
 """
 
-import os
 import sys
 import subprocess
 import shutil
