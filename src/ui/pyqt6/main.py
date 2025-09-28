@@ -24,6 +24,8 @@ from utils.component_validator import ComponentValidator
 
 # 从workers目录导入新的ExportWorker类
 from workers.export_worker import ExportWorker
+# 导入转换结果详情组件
+from widgets.conversion_results_widget import ConversionResultsWidget
 
 class EasyKiConverterApp(ModernMainWindow):
     """EasyKiConverter应用主窗口"""
@@ -42,6 +44,9 @@ class EasyKiConverterApp(ModernMainWindow):
             "failed": [],
             "partial": []
         }
+        
+        # 转换结果详情组件
+        self.conversion_results_widget = None
         
         # 连接信号
         self.setup_business_connections()
@@ -260,37 +265,37 @@ class EasyKiConverterApp(ModernMainWindow):
         
     def show_detailed_results(self):
         """显示详细转换结果"""
-        # 在状态标签下方显示详细结果
-        result_text = "\n\n详细结果:\n"
+        # 创建转换结果详情组件（如果尚未创建）
+        if self.conversion_results_widget is None:
+            self.conversion_results_widget = ConversionResultsWidget()
+            # 将结果详情组件添加到滚动内容布局的底部
+            from PyQt6.QtWidgets import QWidget, QScrollArea
+            central_widget = self.centralWidget()
+            if central_widget:
+                # 找到滚动区域
+                scroll_areas = central_widget.findChildren(QScrollArea)
+                if scroll_areas:
+                    scroll_area = scroll_areas[0]
+                    scroll_content = scroll_area.widget()
+                    if scroll_content and scroll_content.layout():
+                        # 先移除之前的stretch
+                        for i in reversed(range(scroll_content.layout().count())):
+                            item = scroll_content.layout().itemAt(i)
+                            if item and item.spacerItem():
+                                scroll_content.layout().removeItem(item)
+                        
+                        # 添加转换结果详情组件
+                        scroll_content.layout().addWidget(self.conversion_results_widget)
+                        
+                        # 添加stretch以确保详情组件位于底部
+                        scroll_content.layout().addStretch()
+        else:
+            # 如果组件已创建，确保它可见
+            if not self.conversion_results_widget.isVisible():
+                self.conversion_results_widget.setVisible(True)
         
-        # 显示成功转换的元件
-        if self.conversion_results["success"]:
-            result_text += f"✅ 成功 ({len(self.conversion_results['success'])}):\n"
-            for component_id in self.conversion_results["success"]:
-                result_text += f"  • {component_id}\n"
-        
-        # 显示失败的元件
-        if self.conversion_results["failed"]:
-            result_text += f"❌ 失败 ({len(self.conversion_results['failed'])}):\n"
-            for item in self.conversion_results["failed"]:
-                # 如果ID是Unknown，尝试从错误信息中提取元件ID
-                component_id = item['id']
-                if component_id == 'Unknown':
-                    import re
-                    match = re.search(r'[C]\d+', item['error'])
-                    if match:
-                        component_id = match.group(0)
-                result_text += f"  • {component_id}: {item['error']}\n"
-        
-        # 显示部分成功的元件（如果有）
-        if self.conversion_results["partial"]:
-            result_text += f"⚠️ 部分成功 ({len(self.conversion_results['partial'])}):\n"
-            for item in self.conversion_results["partial"]:
-                result_text += f"  • {item['id']}: {item['message']}\n"
-        
-        # 更新状态标签文本
-        current_text = self.status_label.text()
-        self.status_label.setText(current_text + result_text)
+        # 更新结果显示
+        self.conversion_results_widget.update_results(self.conversion_results)
         
         # 清空结果存储，为下次转换做准备
         self.conversion_results = {

@@ -68,6 +68,7 @@ class ModernCard(QWidget):
         
         # 内容区域
         self.content_layout = QVBoxLayout()
+        self.content_layout.setObjectName("contentLayout")
         self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_layout.setSpacing(15)
         card_layout.addLayout(self.content_layout)
