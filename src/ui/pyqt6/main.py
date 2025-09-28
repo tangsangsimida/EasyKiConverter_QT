@@ -36,6 +36,13 @@ class EasyKiConverterApp(ModernMainWindow):
         self.bom_parser = BOMParser()
         self.export_worker = None
         
+        # 转换结果存储
+        self.conversion_results = {
+            "success": [],
+            "failed": [],
+            "partial": []
+        }
+        
         # 连接信号
         self.setup_business_connections()
         
@@ -219,22 +226,78 @@ class EasyKiConverterApp(ModernMainWindow):
         
     def on_component_completed(self, result):
         """单个元件转换完成"""
-        # 可以在这里处理单个元件转换完成的逻辑
-        if not result['success']:
-            print(f"转换失败: {result.get('error', 'Unknown error')}")
+        # 存储转换结果
+        component_id = result.get('componentId', result.get('message', 'Unknown'))
+        if result['success']:
+            self.conversion_results["success"].append(component_id)
+        else:
+            # 提取错误信息中的元件ID
+            error_msg = result.get('error', 'Unknown error')
+            if component_id == 'Unknown' and 'Unknown' in error_msg:
+                # 尝试从错误信息中提取元件ID
+                import re
+                match = re.search(r'[C]\d+', error_msg)
+                if match:
+                    component_id = match.group(0)
+            self.conversion_results["failed"].append({
+                "id": component_id,
+                "error": error_msg
+            })
         
     def on_export_finished(self, total, success_count):
         """导出完成"""
         self.export_btn.setEnabled(True)
-        self.status_label.setText(f"转换完成！成功: {success_count}, 失败: {total - success_count}")
         
-        # 显示结果
-        if total - success_count > 0:
-            QMessageBox.information(self, "转换完成", 
-                f"转换完成！\n总数: {total}\n成功: {success_count}\n失败: {total - success_count}")
-        else:
-            QMessageBox.information(self, "转换完成", 
-                f"所有 {success_count} 个元器件转换成功！")
+        # 计算详细统计信息
+        failed_count = total - success_count
+        success_rate = f"{(success_count / total * 100):.1f}%" if total > 0 else "0%"
+        
+        # 更新状态标签显示详细统计
+        self.status_label.setText(f"转换完成！总数: {total}, 成功: {success_count}, 失败: {failed_count}, 成功率: {success_rate}")
+        
+        # 显示详细结果列表
+        self.show_detailed_results()
+        
+    def show_detailed_results(self):
+        """显示详细转换结果"""
+        # 在状态标签下方显示详细结果
+        result_text = "\n\n详细结果:\n"
+        
+        # 显示成功转换的元件
+        if self.conversion_results["success"]:
+            result_text += f"✅ 成功 ({len(self.conversion_results['success'])}):\n"
+            for component_id in self.conversion_results["success"]:
+                result_text += f"  • {component_id}\n"
+        
+        # 显示失败的元件
+        if self.conversion_results["failed"]:
+            result_text += f"❌ 失败 ({len(self.conversion_results['failed'])}):\n"
+            for item in self.conversion_results["failed"]:
+                # 如果ID是Unknown，尝试从错误信息中提取元件ID
+                component_id = item['id']
+                if component_id == 'Unknown':
+                    import re
+                    match = re.search(r'[C]\d+', item['error'])
+                    if match:
+                        component_id = match.group(0)
+                result_text += f"  • {component_id}: {item['error']}\n"
+        
+        # 显示部分成功的元件（如果有）
+        if self.conversion_results["partial"]:
+            result_text += f"⚠️ 部分成功 ({len(self.conversion_results['partial'])}):\n"
+            for item in self.conversion_results["partial"]:
+                result_text += f"  • {item['id']}: {item['message']}\n"
+        
+        # 更新状态标签文本
+        current_text = self.status_label.text()
+        self.status_label.setText(current_text + result_text)
+        
+        # 清空结果存储，为下次转换做准备
+        self.conversion_results = {
+            "success": [],
+            "failed": [],
+            "partial": []
+        }
                 
     def on_export_error(self, error_msg):
         """导出失败"""
