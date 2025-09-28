@@ -16,22 +16,11 @@ sys.path.insert(0, str(current_dir.parent.parent))
 
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog
-from PyQt6.QtCore import QThread, pyqtSignal
 
 from modern_main_window import ModernMainWindow
 from utils.config_manager import ConfigManager
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
-from core.easyeda.easyeda_importer import (
-    Easyeda3dModelImporter,
-    EasyedaFootprintImporter,
-    EasyedaSymbolImporter,
-)
-from core.kicad.export_kicad_3d_model import Exporter3dModelKicad
-from core.kicad.export_kicad_footprint import ExporterFootprintKicad
-from core.kicad.export_kicad_symbol import ExporterSymbolKicad
-from core.kicad.parameters_kicad_symbol import KicadVersion
-from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
 
 # 从workers目录导入新的ExportWorker类
 from workers.export_worker import ExportWorker

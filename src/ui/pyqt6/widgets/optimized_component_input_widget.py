@@ -6,23 +6,19 @@
 """
 
 import os
-import re
 from pathlib import Path
-from typing import List, Dict, Any, Optional
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
-    QListWidget, QListWidgetItem, QLabel, QGroupBox, QCheckBox,
-    QFileDialog, QMessageBox, QTextEdit, QFrame, QScrollArea,
-    QProgressBar, QSplitter, QGridLayout, QSizePolicy
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
+    QListWidget, QListWidgetItem, QLabel, QCheckBox,
+    QFileDialog, QMessageBox, QFrame, QSizePolicy
 )
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal, QTimer, QSize
-from PyQt6.QtGui import QIcon, QFont, QPalette, QColor, QLinearGradient, QPainter
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer 
+from PyQt6.QtGui import QFont
 
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator
 from utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
-from utils.ui_effects import LoadingSpinner, ModernCard, SuccessAnimation, ModernProgressBar
 from utils.responsive_layout import AdaptiveWidget
 
 

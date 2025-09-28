@@ -12,13 +12,13 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from pathlib import Path
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                           QPushButton, QLabel, QFrame, QStackedWidget,
-                           QSplitter, QScrollArea, QSizePolicy, QMenuBar, QMenu)
+                           QPushButton, QLabel, QStackedWidget,
+                           QScrollArea, QSizePolicy, QMenuBar)
 from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal
 from utils.config_manager import ConfigManager
 from utils.modern_style import ModernStyle
 from widgets.optimized_component_input_widget import OptimizedComponentInputWidget
-from utils.ui_effects import ModernCard, ModernProgressBar
+from utils.ui_effects import ModernProgressBar
 from utils.responsive_layout import ResponsiveLayoutManager, AdaptiveWidget
 
 

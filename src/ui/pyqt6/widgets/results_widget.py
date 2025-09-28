@@ -5,11 +5,10 @@
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGroupBox,
-    QListWidget, QListWidgetItem, QPushButton, QTextEdit,
-    QFrame, QScrollArea, QFileDialog, QMessageBox
+    QListWidget, QListWidgetItem, QPushButton, QFileDialog, QMessageBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QUrl
-from PyQt6.QtGui import QFont, QIcon, QDesktopServices
+from PyQt6.QtGui import QDesktopServices
 from pathlib import Path
 import os
 

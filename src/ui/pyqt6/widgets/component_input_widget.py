@@ -4,17 +4,13 @@
 """
 
 import os
-import re
-from pathlib import Path
-from typing import List, Dict, Any, Optional
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
     QListWidget, QListWidgetItem, QLabel, QGroupBox, QCheckBox,
-    QFileDialog, QMessageBox, QTextEdit, QFrame, QScrollArea
+    QFileDialog, QMessageBox 
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QThread
-from PyQt6.QtGui import QIcon, QFont, QPalette, QColor
+from PyQt6.QtCore import Qt, pyqtSignal 
 
 from utils.bom_parser import BOMParser
 from utils.component_validator import ComponentValidator

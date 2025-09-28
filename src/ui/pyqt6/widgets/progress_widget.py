@@ -5,10 +5,9 @@
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QProgressBar, QLabel,
-    QGroupBox, QTextEdit, QFrame, QScrollArea
+    QGroupBox, QTextEdit
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer
-from PyQt6.QtGui import QFont, QPalette, QColor
+from PyQt6.QtCore import QTimer
 
 
 class ProgressWidget(QWidget):

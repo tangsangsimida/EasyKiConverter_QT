@@ -10,15 +10,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                           QPushButton, QLabel, QFrame, QStackedWidget,
-                           QScrollArea, QSizePolicy, QMenuBar, QMenu, QGraphicsDropShadowEffect,
-                           QListWidget, QListWidgetItem, QLineEdit, QCheckBox, QFileDialog, QMessageBox,
-                           QApplication)
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, pyqtSignal, QPoint
-from PyQt6.QtGui import QLinearGradient, QColor, QPalette, QPainter, QBrush, QPen
-
+                           QPushButton, QLabel, QScrollArea, QMenu, 
+                           QListWidget, QListWidgetItem, QLineEdit, QCheckBox, QMessageBox
+                           )
+from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve  
 from utils.config_manager import ConfigManager
-from widgets.optimized_component_input_widget import OptimizedComponentInputWidget
 from utils.modern_ui_components import ModernCard, ModernProgressBar
 
 
