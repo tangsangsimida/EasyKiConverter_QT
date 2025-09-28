@@ -5,7 +5,7 @@
 cd ..
 
 # 激活虚拟环境
-source even/bin/activate
+source venv/bin/activate
 
 # 回到output目录
 cd output
