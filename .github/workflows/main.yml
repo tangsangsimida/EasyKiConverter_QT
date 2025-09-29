@@ -1,0 +1,90 @@
+name: Build and Release Multi-Platform Binaries
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[release]')
+    
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            asset_name: EasyKiConverter-linux-x64
+          - os: windows-latest
+            asset_name: EasyKiConverter-windows-x64.exe
+          - os: macos-latest
+            asset_name: EasyKiConverter-macos-intel
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r output/requirements_app.txt    # ✅ 使用你的实际依赖文件
+          pip install pyinstaller                       # 确保安装 PyInstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller output/build.spec --noconfirm  # ✅ spec 路径也正确
+
+      - name: Rename executable
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
+          else
+            mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: dist/${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    if: always() && needs.build.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Generate version tag
+        run: |
+          VERSION="EasyKiConverter_QT-$(date +%Y%m%d)"
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          name: ${{ env.RELEASE_VERSION }}
+          body: |
+            ## 📦 下载
+            - Windows: `EasyKiConverter-windows-x64.exe`
+            - Linux: `EasyKiConverter-linux-x64`
+            - macOS: `EasyKiConverter-macos-intel`
+
+            > 💡 **macOS 用户注意**：首次运行时若提示“无法验证开发者”，请右键点击文件 → “Open” 即可运行。
+          draft: false
+          prerelease: false
+          files: |
+            release-assets/*/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动权限，无需额外 token
