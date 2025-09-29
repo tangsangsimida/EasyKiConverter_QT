@@ -16,10 +16,10 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer 
 from PyQt6.QtGui import QFont
 
-from utils.bom_parser import BOMParser
-from utils.component_validator import ComponentValidator
-from utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
-from utils.responsive_layout import AdaptiveWidget
+from src.ui.pyqt6.utils.bom_parser import BOMParser
+from src.ui.pyqt6.utils.component_validator import ComponentValidator
+from src.ui.pyqt6.utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
+from src.ui.pyqt6.utils.responsive_layout import AdaptiveWidget
 
 
 class OptimizedComponentInputWidget(AdaptiveWidget):
@@ -1147,7 +1147,7 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         """)
         
         # 添加阴影效果
-        from utils.modern_style import ModernStyle
+        from src.ui.pyqt6.utils.modern_style import ModernStyle
         ModernStyle.add_shadow_effect(container, blur_radius=25, offset=(0, 6))
         
         layout = QHBoxLayout(container)

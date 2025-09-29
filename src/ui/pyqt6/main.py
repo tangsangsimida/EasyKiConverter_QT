@@ -5,27 +5,19 @@ EasyKiConverter PyQt6 UI - 主程序入口
 """
 import sys
 import os
-from pathlib import Path
-
-# 获取当前脚本所在目录
-current_dir = Path(__file__).parent
-# 添加项目根目录到Python路径
-sys.path.insert(0, str(current_dir))
-sys.path.insert(0, str(current_dir.parent))
-sys.path.insert(0, str(current_dir.parent.parent))
 
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog
 
-from modern_main_window import ModernMainWindow
-from utils.config_manager import ConfigManager
-from utils.bom_parser import BOMParser
-from utils.component_validator import ComponentValidator
+from src.ui.pyqt6.modern_main_window import ModernMainWindow
+from src.ui.pyqt6.utils.config_manager import ConfigManager
+from src.ui.pyqt6.utils.bom_parser import BOMParser
+from src.ui.pyqt6.utils.component_validator import ComponentValidator
 
 # 从workers目录导入新的ExportWorker类
-from workers.export_worker import ExportWorker
+from src.ui.pyqt6.workers.export_worker import ExportWorker
 # 导入转换结果详情组件
-from widgets.conversion_results_widget import ConversionResultsWidget
+from src.ui.pyqt6.widgets.conversion_results_widget import ConversionResultsWidget
 
 class EasyKiConverterApp(ModernMainWindow):
     """EasyKiConverter应用主窗口"""

@@ -5,17 +5,13 @@
 采用从上至下的清晰布局，现代化UI元素
 """
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent))
-
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QScrollArea, QMenu, 
                            QListWidget, QListWidgetItem, QLineEdit, QCheckBox, QMessageBox
                            )
 from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve  
-from utils.config_manager import ConfigManager
-from utils.modern_ui_components import ModernCard, ModernProgressBar
+from src.ui.pyqt6.utils.config_manager import ConfigManager
+from src.ui.pyqt6.utils.modern_ui_components import ModernCard, ModernProgressBar
 
 
 class ModernMainWindow(QMainWindow):
