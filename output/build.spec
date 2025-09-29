@@ -103,7 +103,8 @@ a = Analysis(
         'six',
         'annotated_types',
         'typing_extensions',
-        'typing_inspection'
+        'typing_inspection',
+        'core.kicad.parameters_kicad_symbol'  
     ],
     hookspath=[],
     hooksconfig={},
@@ -125,7 +126,6 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
-
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
