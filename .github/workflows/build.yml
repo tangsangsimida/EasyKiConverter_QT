@@ -34,11 +34,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r output/requirements_app.txt    # ✅ 使用你的实际依赖文件
-          pip install pyinstaller                       # 确保安装 PyInstaller
+          pip install -r output/requirements_app.txt    
+          pip install pyinstaller                       # 安装 PyInstaller
 
       - name: Build with PyInstaller
-        run: pyinstaller output/build.spec --noconfirm  # ✅ spec 路径也正确
+        run: pyinstaller output/build.spec --noconfirm 
 
       - name: Rename executable
         shell: bash
@@ -87,4 +87,4 @@ jobs:
           files: |
             release-assets/*/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动权限，无需额外 token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
