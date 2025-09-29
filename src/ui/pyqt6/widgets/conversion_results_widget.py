@@ -5,7 +5,7 @@
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt6.QtCore import Qt
-from utils.modern_ui_components import ModernCard
+from src.ui.pyqt6.utils.modern_ui_components import ModernCard
 
 
 class ConversionResultsWidget(ModernCard):

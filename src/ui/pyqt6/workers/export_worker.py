@@ -14,24 +14,25 @@ import threading
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
-# 添加父目录到Python路径，确保可以导入EasyKiConverter模块
+# 添加src目录到Python路径，确保可以导入EasyKiConverter模块
 current_dir = Path(__file__).parent
-parent_dir = current_dir.parent
-sys.path.insert(0, str(parent_dir))
+src_dir = current_dir.parent.parent
+if str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))
 
 try:
     # 导入EasyKiConverter核心模块
-    from core.easyeda.easyeda_api import EasyedaApi
-    from core.easyeda.easyeda_importer import (
+    from src.core.easyeda.easyeda_api import EasyedaApi
+    from src.core.easyeda.easyeda_importer import (
         Easyeda3dModelImporter,
         EasyedaFootprintImporter,
         EasyedaSymbolImporter,
     )
-    from core.kicad.export_kicad_3d_model import Exporter3dModelKicad
-    from core.kicad.export_kicad_footprint import ExporterFootprintKicad
-    from core.kicad.export_kicad_symbol import ExporterSymbolKicad
-    from core.kicad.parameters_kicad_symbol import KicadVersion
-    from core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+    from src.core.kicad.export_kicad_3d_model import Exporter3dModelKicad
+    from src.core.kicad.export_kicad_footprint import ExporterFootprintKicad
+    from src.core.kicad.export_kicad_symbol import ExporterSymbolKicad
+    from src.core.kicad.parameters_kicad_symbol import KicadVersion
+    from src.core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
     
 except ImportError as e:
     print(f"导入EasyKiConverter模块失败: {e}")

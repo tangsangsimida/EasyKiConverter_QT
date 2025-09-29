@@ -14,9 +14,9 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 
-from utils.bom_parser import BOMParser
-from utils.component_validator import ComponentValidator
-from utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
+from src.ui.pyqt6.utils.bom_parser import BOMParser
+from src.ui.pyqt6.utils.component_validator import ComponentValidator
+from src.ui.pyqt6.utils.modern_style import ModernStyle, ModernButton, ModernLineEdit
 
 
 class ModernComponentInputWidget(QWidget):
