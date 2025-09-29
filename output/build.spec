@@ -103,8 +103,7 @@ a = Analysis(
         'six',
         'annotated_types',
         'typing_extensions',
-        'typing_inspection',
-        'core.kicad.parameters_kicad_symbol'  
+        'typing_inspection'
     ],
     hookspath=[],
     hooksconfig={},
@@ -113,8 +112,6 @@ a = Analysis(
         'tkinter',
         'matplotlib',
         'scipy',
-        'flask',
-        'flask_cors',
         'jinja2',
         'werkzeug',
         'blinker',
