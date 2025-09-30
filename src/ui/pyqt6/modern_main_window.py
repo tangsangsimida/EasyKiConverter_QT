@@ -705,11 +705,60 @@ class ModernMainWindow(QMainWindow):
         
     def paste_from_clipboard(self):
         """从剪贴板粘贴"""
-        from PyQt6.QtWidgets import QApplication
+        from PyQt6.QtWidgets import QApplication, QMessageBox
+        from src.ui.pyqt6.utils.clipboard_processor import ClipboardProcessor
+        
         clipboard = QApplication.clipboard()
         text = clipboard.text().strip()
-        if text:
+        if not text:
+            return
+            
+        # 使用剪贴板处理器提取元件ID
+        processor = ClipboardProcessor()
+        component_ids = processor.get_clipboard_component_ids()
+        
+        if not component_ids:
+            # 如果没有提取到元件ID，尝试原始方法
             self.component_input.setText(text)
+            self.add_component()
+            return
+            
+        # 如果提取到多个元件ID，批量添加
+        if len(component_ids) > 1:
+            added_count = 0
+            duplicate_count = 0
+            
+            for component_id in component_ids:
+                # 检查是否已存在
+                existing_items = []
+                for i in range(self.component_list.count()):
+                    item = self.component_list.item(i)
+                    original_id = item.data(Qt.ItemDataRole.UserRole)
+                    if original_id:
+                        existing_items.append(original_id)
+                    else:
+                        existing_items.append(item.text())
+                        
+                if component_id not in existing_items:
+                    # 添加到列表
+                    item = QListWidgetItem(component_id)
+                    item.setData(Qt.ItemDataRole.UserRole, component_id)
+                    self.component_list.addItem(item)
+                    added_count += 1
+                else:
+                    duplicate_count += 1
+                    
+            # 更新计数
+            self.component_count_label.setText(f"共 {self.component_list.count()} 个元器件")
+            
+            # 显示结果信息
+            message = f"从剪贴板添加了 {added_count} 个元件"
+            if duplicate_count > 0:
+                message += f"，跳过 {duplicate_count} 个重复项"
+            QMessageBox.information(self, "剪贴板导入", message)
+        else:
+            # 单个元件ID，使用原始方法
+            self.component_input.setText(component_ids[0])
             self.add_component()
             
     def clear_all_components(self):

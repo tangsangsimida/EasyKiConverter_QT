@@ -15,7 +15,24 @@ class ComponentValidator:
     def __init__(self):
         """初始化验证器"""
         # LCSC元件编号的正则表达式模式（C+至少1位数字）
-        self.lcsc_pattern = re.compile(r'C\d+')
+        self.lcsc_patterns = [
+            # 标准LCSC编号格式
+            r'\b(C\d{1,10})\b',
+            # 嘉立创URL中的LCSC编号
+            r'item\.szlcsc\.com/(\d+)',
+            r'item\.szlcsc\.com/(C\d+)',
+            # 可能的变体格式
+            r'LCSC[:\s]*(C\d{1,10})',
+            r'编号[:\s]*(C\d{1,10})',
+            r'Part\s*Number[:\s]*(C\d{1,10})',
+        ]
+        
+        # 通用元件编号模式（用于非LCSC格式）
+        self.generic_patterns = [
+            # 常见的元件编号格式
+            r'\b([A-Z]{1,3}\d{3,8}[A-Z]?)\b',  # 如：CC2040, ESP32, LM358N
+            r'\b([A-Z]\d+[A-Z]+[A-Z0-9]*)\b',  # 如：LM358N, NE555P
+        ]
         
     def extract_lcsc_id(self, component_id: str) -> Optional[str]:
         """
@@ -33,13 +50,44 @@ class ComponentValidator:
         # 清理输入
         component_id = component_id.strip()
         
+        # 遍历所有LCSC模式
+        for pattern in self.lcsc_patterns:
+            matches = re.findall(pattern, component_id, re.IGNORECASE)
+            for match in matches:
+                # 确保ID以C开头
+                if isinstance(match, tuple):
+                    match = match[0]  # 取第一个捕获组
+                    
+                if match and not match.startswith('C'):
+                    match = 'C' + match
+                    
+                # 验证格式
+                if self._is_valid_lcsc_id(match):
+                    return match
+                    
         # 直接匹配LCSC格式（C+数字）
-        match = self.lcsc_pattern.search(component_id)
-        if match:
-            return match.group()
+        lcsc_match = re.search(r'\b(C\d+)\b', component_id)
+        if lcsc_match:
+            return lcsc_match.group(1)
             
         # 如果不是LCSC格式，返回None
         return None
+        
+    def _is_valid_lcsc_id(self, component_id: str) -> bool:
+        """
+        验证LCSC元件ID格式
+        
+        Args:
+            component_id: 元件ID
+            
+        Returns:
+            是否为有效的LCSC元件ID
+        """
+        if not component_id or not isinstance(component_id, str):
+            return False
+            
+        # 必须以C开头，后跟数字
+        return bool(re.match(r'^C\d+$', component_id))
         
     def validate_component_format(self, component_id: str) -> bool:
         """

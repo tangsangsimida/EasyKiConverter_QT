@@ -89,16 +89,19 @@ class ExportWorker(QThread):
         if re.match(r'^C\d+$', url_or_id.strip()):
             return url_or_id.strip()
         
-        # 从URL中提取LCSC ID
+        # 从URL中提取LCSC ID - 更全面的模式
         patterns = [
-            r'item\.szlcsc\.com/(C?\d+)\.html',  # 标准URL格式
-            r'item\.szlcsc\.com/(C\d+)',         # 不带.html的格式
-            r'/(C\d+)(?:\.html)?$',              # 任何以/C数字结尾的URL
-            r'\b(C\d+)\b'                        # 任何包含C+数字的文本
+            r'item\.szlcsc\.com/(\d+)(?:\.html)?',     # 标准URL格式，带或不带.html
+            r'item\.szlcsc\.com/(C\d+)(?:\.html)?',    # 带C的URL格式
+            r'/(\d+)(?:\.html)?$',                     # 任何以/数字结尾的URL
+            r'/(C\d+)(?:\.html)?$',                    # 任何以/C数字结尾的URL
+            r'\b(C\d+)\b',                             # 任何包含C+数字的文本
+            r'LCSC[:\s]*(C\d+)',                       # LCSC: C数字格式
+            r'编号[:\s]*(C\d+)',                        # 编号: C数字格式
         ]
         
         for pattern in patterns:
-            match = re.search(pattern, url_or_id)
+            match = re.search(pattern, url_or_id, re.IGNORECASE)
             if match:
                 lcsc_id = match.group(1)
                 # 确保以C开头
