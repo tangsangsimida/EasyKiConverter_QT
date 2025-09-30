@@ -82,6 +82,7 @@ Description: EasyKiConverter - Convert LCSC and EasyEDA components to KiCad form
  A powerful Python tool for converting LCSC and EasyEDA components to KiCad format,
  supporting complete conversion of symbols, footprints, and 3D models.
 EOF
+            chmod 644 dist/EasyKiConverter-linux-x64-deb/DEBIAN/control
             
             # 创建应用程序目录结构
             mkdir -p dist/EasyKiConverter-linux-x64-deb/usr/bin
@@ -93,7 +94,7 @@ EOF
             cp dist/${{ matrix.asset_name }} dist/EasyKiConverter-linux-x64-deb/usr/share/easykiconverter/
             
             # 创建启动脚本
-            cat > dist/EasyKiConverter-linux-x64-deb/usr/bin/easykiconverter << EOF
+            cat > dist/EasyKiConverter-linux-x64-deb/usr/bin/easykiconverter << 'EOF'
 #!/bin/bash
 python3 /usr/share/easykiconverter/EasyKiConverter "\$@"
 EOF
