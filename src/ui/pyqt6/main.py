@@ -4,9 +4,11 @@ EasyKiConverter PyQt6 UI - 主程序入口
 基于PyQt6的桌面应用程序，用于将嘉立创EDA元器件转换为KiCad格式
 """
 import sys
+import os
 
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog
+from PyQt6.QtGui import QIcon
 
 from src.ui.pyqt6.modern_main_window import ModernMainWindow
 from src.ui.pyqt6.utils.config_manager import ConfigManager
@@ -312,6 +314,35 @@ def main():
     app = QApplication(sys.argv)
     print("✅ QApplication 创建成功")
     
+    # 设置应用程序图标
+    # 使用更可靠的方法查找图标文件
+    try:
+        # 首先尝试从资源目录查找
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+        
+        # 如果在开发环境中找不到，尝试其他可能的路径
+        if not os.path.exists(icon_path):
+            # 检查是否在PyInstaller环境中
+            if getattr(sys, 'frozen', False):
+                # PyInstaller环境
+                application_path = os.path.dirname(sys.executable)
+                icon_path = os.path.join(application_path, "resources", "app_icon.svg")
+            else:
+                # 开发环境
+                icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+                # 如果还是找不到，尝试从当前工作目录查找
+                if not os.path.exists(icon_path):
+                    icon_path = os.path.join(os.getcwd(), "src", "ui", "pyqt6", "resources", "app_icon.svg")
+        
+        if os.path.exists(icon_path):
+            app.setWindowIcon(QIcon(icon_path))
+            print(f"✅ 应用程序图标设置成功: {icon_path}")
+        else:
+            print("⚠️  未找到应用程序图标文件")
+    except Exception as e:
+        print(f"⚠️  设置应用程序图标时出错: {e}")
+    
     # 设置应用程序属性（必须在创建QApplication后）
     app.setApplicationName("EasyKiConverter")
     app.setApplicationVersion("3.0.0")
@@ -331,6 +362,34 @@ def main():
         # 创建并显示主窗口（使用现代化界面）
         print("🏗️ 正在创建主窗口...")
         main_window = EasyKiConverterApp(config_manager)
+        
+        # 为窗口设置图标
+        try:
+            # 使用相同的方法查找图标文件
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+            
+            # 如果在开发环境中找不到，尝试其他可能的路径
+            if not os.path.exists(icon_path):
+                # 检查是否在PyInstaller环境中
+                if getattr(sys, 'frozen', False):
+                    # PyInstaller环境
+                    application_path = os.path.dirname(sys.executable)
+                    icon_path = os.path.join(application_path, "resources", "app_icon.svg")
+                else:
+                    # 开发环境
+                    icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+                    # 如果还是找不到，尝试从当前工作目录查找
+                    if not os.path.exists(icon_path):
+                        icon_path = os.path.join(os.getcwd(), "src", "ui", "pyqt6", "resources", "app_icon.svg")
+            
+            if os.path.exists(icon_path):
+                main_window.setWindowIcon(QIcon(icon_path))
+            else:
+                print("⚠️  未找到窗口图标文件")
+        except Exception as e:
+            print(f"⚠️  设置窗口图标时出错: {e}")
+        
         print("✅ 主窗口创建成功")
         
         main_window.show()
