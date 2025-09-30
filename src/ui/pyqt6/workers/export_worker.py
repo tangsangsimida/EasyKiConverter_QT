@@ -3,7 +3,6 @@
 导出工作线程 - 集成EasyKiConverter核心转换逻辑
 """
 
-import os
 import sys
 import time
 import logging
@@ -338,8 +337,8 @@ class ExportWorker(QThread):
                             self.logger.warning(f"第{attempt + 1}次尝试获取3D模型数据失败: {lcsc_id}")
                             if attempt < 2:  # 不是最后一次尝试，等待后重试
                                 import time
-                                # 限制最大等待时间为1秒，避免用户等待太久
-                                wait_time = min(2 ** attempt, 1.0)
+                                # 第一次等待0.5秒，第二次等待1秒
+                                wait_time = 0.5 if attempt == 0 else 1.0
                                 time.sleep(wait_time)
                     
                     if not success:
@@ -391,8 +390,8 @@ class ExportWorker(QThread):
                         self.logger.warning(f"第{attempt + 1}次尝试获取符号数据失败: {lcsc_id}")
                         if attempt < 2:  # 不是最后一次尝试，等待后重试
                             import time
-                            # 限制最大等待时间为1秒，避免用户等待太久
-                            wait_time = min(2 ** attempt, 1.0)
+                            # 第一次等待0.5秒，第二次等待1秒
+                            wait_time = 0.5 if attempt == 0 else 1.0
                             time.sleep(wait_time)
                 
                 if not success:
@@ -452,8 +451,8 @@ class ExportWorker(QThread):
                         self.logger.warning(f"第{attempt + 1}次尝试获取封装数据失败: {lcsc_id}")
                         if attempt < 2:  # 不是最后一次尝试，等待后重试
                             import time
-                            # 限制最大等待时间为1秒，避免用户等待太久
-                            wait_time = min(2 ** attempt, 1.0)
+                            # 第一次等待0.5秒，第二次等待1秒
+                            wait_time = 0.5 if attempt == 0 else 1.0
                             time.sleep(wait_time)
                 
                 if not success:
