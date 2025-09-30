@@ -4,7 +4,6 @@ EasyKiConverter PyQt6 UI - 主程序入口
 基于PyQt6的桌面应用程序，用于将嘉立创EDA元器件转换为KiCad格式
 """
 import sys
-import os
 
 import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog

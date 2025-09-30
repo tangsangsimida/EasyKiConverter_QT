@@ -174,13 +174,11 @@ class ExportWorker(QThread):
     def process_single_component(self, component_input: str, current: int, total: int) -> Dict[str, Any]:
         """处理单个元件"""
         try:
-            # 更新进度
-            self.progress_updated.emit(current, total, component_input)
-            self.logger.info(f"处理元件 {current}/{total}: {component_input}")
-            
             # 提取LCSC ID
             lcsc_id = self.extract_lcsc_id_from_url(component_input)
             if not lcsc_id:
+                # 更新进度（处理失败的情况）
+                self.progress_updated.emit(current, total, component_input)
                 return {
                     'componentId': component_input,
                     'success': False,
@@ -193,9 +191,15 @@ class ExportWorker(QThread):
             # 调用真实的转换函数
             result = self.export_component_real(lcsc_id, self.export_path, self.options, self.file_prefix)
             
+            # 更新进度（处理完成的情况）
+            self.progress_updated.emit(current, total, component_input)
+            self.logger.info(f"处理元件 {current}/{total}: {component_input}")
+            
             return result
             
         except Exception as e:
+            # 更新进度（处理异常的情况）
+            self.progress_updated.emit(current, total, component_input)
             error_result = {
                 'componentId': component_input,
                 'success': False,
