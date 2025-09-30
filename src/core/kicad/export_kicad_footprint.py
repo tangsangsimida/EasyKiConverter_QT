@@ -543,8 +543,12 @@ class ExporterFootprintKicad:
         if ki.model_3d is not None:
             # 构建3D模型路径：用户导出路径 + 库名.3dshapes/模型名.wrl
             # Build 3D model path: user export path + lib_name.3dshapes/model_name.wrl
+            # 使用正斜杠以确保在Windows和Linux上都能正确显示
+            import os
+            model_3d_path_normalized = model_3d_path.replace(os.sep, "/")
+            model_file_path = f"{model_3d_path_normalized}.3dshapes/{ki.model_3d.name}.wrl"
             ki_lib += KI_MODEL_3D.format(
-                file_3d=f"{model_3d_path}.3dshapes/{ki.model_3d.name}.wrl",
+                file_3d=model_file_path,
                 pos_x=ki.model_3d.translation.x,
                 pos_y=ki.model_3d.translation.y,
                 pos_z=ki.model_3d.translation.z,

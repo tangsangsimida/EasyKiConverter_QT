@@ -5,11 +5,13 @@
 采用从上至下的清晰布局，现代化UI元素
 """
 
+import os
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                            QPushButton, QLabel, QScrollArea, QMenu, 
                            QListWidget, QListWidgetItem, QLineEdit, QCheckBox, QMessageBox
                            )
 from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve  
+from PyQt6.QtGui import QIcon
 from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.modern_ui_components import ModernCard, ModernProgressBar
 
@@ -34,6 +36,29 @@ class ModernMainWindow(QMainWindow):
         self.setWindowTitle("EasyKiConverter - EDA转换工具")
         self.resize(1600, 1000)
         self.setMinimumSize(1200, 800)
+        
+        # 设置窗口图标
+        try:
+            import sys
+            # 使用更可靠的方法查找图标文件
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+            
+            # 如果在开发环境中找不到，尝试其他可能的路径
+            if not os.path.exists(icon_path):
+                # 检查是否在PyInstaller环境中
+                if getattr(sys, 'frozen', False):
+                    # PyInstaller环境
+                    application_path = os.path.dirname(sys.executable)
+                    icon_path = os.path.join(application_path, "resources", "app_icon.svg")
+                else:
+                    # 开发环境
+                    icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+            
+            if os.path.exists(icon_path):
+                self.setWindowIcon(QIcon(icon_path))
+        except Exception as e:
+            print(f"⚠️  设置窗口图标时出错: {e}")
         
         # 设置窗口样式
         self.setWindowFlags(Qt.WindowType.Window)
@@ -705,11 +730,60 @@ class ModernMainWindow(QMainWindow):
         
     def paste_from_clipboard(self):
         """从剪贴板粘贴"""
-        from PyQt6.QtWidgets import QApplication
+        from PyQt6.QtWidgets import QApplication, QMessageBox
+        from src.ui.pyqt6.utils.clipboard_processor import ClipboardProcessor
+        
         clipboard = QApplication.clipboard()
         text = clipboard.text().strip()
-        if text:
+        if not text:
+            return
+            
+        # 使用剪贴板处理器提取元件ID
+        processor = ClipboardProcessor()
+        component_ids = processor.get_clipboard_component_ids()
+        
+        if not component_ids:
+            # 如果没有提取到元件ID，尝试原始方法
             self.component_input.setText(text)
+            self.add_component()
+            return
+            
+        # 如果提取到多个元件ID，批量添加
+        if len(component_ids) > 1:
+            added_count = 0
+            duplicate_count = 0
+            
+            for component_id in component_ids:
+                # 检查是否已存在
+                existing_items = []
+                for i in range(self.component_list.count()):
+                    item = self.component_list.item(i)
+                    original_id = item.data(Qt.ItemDataRole.UserRole)
+                    if original_id:
+                        existing_items.append(original_id)
+                    else:
+                        existing_items.append(item.text())
+                        
+                if component_id not in existing_items:
+                    # 添加到列表
+                    item = QListWidgetItem(component_id)
+                    item.setData(Qt.ItemDataRole.UserRole, component_id)
+                    self.component_list.addItem(item)
+                    added_count += 1
+                else:
+                    duplicate_count += 1
+                    
+            # 更新计数
+            self.component_count_label.setText(f"共 {self.component_list.count()} 个元器件")
+            
+            # 显示结果信息
+            message = f"从剪贴板添加了 {added_count} 个元件"
+            if duplicate_count > 0:
+                message += f"，跳过 {duplicate_count} 个重复项"
+            QMessageBox.information(self, "剪贴板导入", message)
+        else:
+            # 单个元件ID，使用原始方法
+            self.component_input.setText(component_ids[0])
             self.add_component()
             
     def clear_all_components(self):

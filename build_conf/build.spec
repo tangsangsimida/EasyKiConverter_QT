@@ -6,7 +6,11 @@ a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
     binaries=[],
-    datas=[],
+    datas=[
+        ('../src/ui/pyqt6/resources/app_icon.svg', 'resources'),
+        ('../src/ui/pyqt6/resources/app_icon.svg', '.'),
+        ('../src/ui/pyqt6/resources', 'resources'),
+    ],
     hiddenimports=[
         'PyQt6.QtCore',
         'PyQt6.QtGui',
@@ -136,5 +140,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None  # 移除平台特定的图标配置
+    icon='../src/ui/pyqt6/resources/app_icon.ico' if sys.platform.startswith('win') else None
 )

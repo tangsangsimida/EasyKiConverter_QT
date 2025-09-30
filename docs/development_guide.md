@@ -12,14 +12,8 @@ python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
 
-# 安装核心依赖
-pip install -r requirements/core.txt
-
-# 安装开发依赖（包括测试工具）
-pip install -r requirements/dev.txt
-
-# 安装PyQt6 UI依赖（可选）
-pip install -r requirements/pyqt6.txt
+# 安装应用依赖（根据build_conf/requirements_app.txt文件）
+pip install -r build_conf/requirements_app.txt
 ```
 
 ## 🖥️ PyQt6 UI 开发
@@ -42,26 +36,6 @@ python main.py
 - EasyEDA数据处理在 `src/core/easyeda/` 目录中
 - KiCad导出引擎在 `src/core/kicad/` 目录中
 
-## 🌐 Web UI 开发
-
-```bash
-# 启动开发服务器
-cd src/Web_Ui
-python app.py
-
-# 访问开发界面
-# http://localhost:8000
-```
-
-**前端开发：**
-- 修改 `index.html` - 页面结构
-- 修改 `css/styles.css` - 样式和动画
-- 修改 `js/script.js` - 交互逻辑
-
-**后端开发：**
-- 修改 `app.py` - API 接口和路由
-- 核心转换逻辑在 `src/core/` 目录中
-
 ## 🛠️ 命令行开发
 
 ```bash
@@ -82,12 +56,6 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
   - **utils/** - 共享工具函数
 - **src/ui/** - 用户界面
   - **pyqt6/** - PyQt6 桌面应用
-  - **Web_Ui/** - Flask Web 应用
-- **src/main.py** - 命令行入口
-- **requirements/** - 依赖管理
-  - **core.txt** - 核心依赖
-  - **dev.txt** - 开发依赖
-  - **pyqt6.txt** - PyQt6 UI依赖
 
 ## 🔧 命令行选项
 

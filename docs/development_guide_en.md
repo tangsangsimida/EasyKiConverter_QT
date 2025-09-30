@@ -12,14 +12,8 @@ python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
 
-# Install core dependencies
-pip install -r requirements/core.txt
-
-# Install development dependencies (including testing tools)
-pip install -r requirements/dev.txt
-
-# Install PyQt6 UI dependencies (optional)
-pip install -r requirements/pyqt6.txt
+# Install application dependencies (based on build_conf/requirements_app.txt)
+pip install -r build_conf/requirements_app.txt
 ```
 
 ## 🖥️ PyQt6 UI Development
@@ -41,26 +35,6 @@ python main.py
 - EasyEDA data processing in the `src/core/easyeda/` directory
 - KiCad export engines in the `src/core/kicad/` directory
 
-## 🌐 Web UI Development
-
-```bash
-# Start development server
-cd src/Web_Ui
-python app.py
-
-# Access development interface
-# http://localhost:8000
-```
-
-**Frontend Development:**
-- Modify `index.html` - Page structure
-- Modify `css/styles.css` - Styles and animations
-- Modify `js/script.js` - Interaction logic
-
-**Backend Development:**
-- Modify `app.py` - API interfaces and routing
-- Core conversion logic in the `src/core/` directory
-
 ## 🛠️ Command Line Development
 
 ```bash
@@ -81,12 +55,6 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
   - **utils/** - Shared utility functions
 - **src/ui/** - User interfaces
   - **pyqt6/** - PyQt6 desktop application
-  - **Web_Ui/** - Flask web application
-- **src/main.py** - Command-line entry point
-- **requirements/** - Dependency management
-  - **core.txt** - Core dependencies
-  - **dev.txt** - Development dependencies
-  - **pyqt6.txt** - PyQt6 UI dependencies
 
 ## 🔧 Command Line Options
 

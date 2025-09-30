@@ -79,8 +79,8 @@ python -m venv venv
 source venv/bin/activate  # Linux/Mac
 # venv\Scripts\activate  # Windows
 
-# 安装开发依赖
-pip install -r requirements/dev.txt
+# 安装应用依赖（根据build_conf/requirements_app.txt文件）
+pip install -r build_conf/requirements_app.txt
 ```
 
 ## 📁 项目结构
@@ -90,7 +90,7 @@ pip install -r requirements/dev.txt
 - **src/Web_Ui/** - Flask Web 应用
 - **docs/** - 详细文档
 - **tests/** - 测试文件
-- **requirements/** - 依赖管理
+- **build_conf/** - 构建配置目录
 
 ## 🛠️ 开发工具
 

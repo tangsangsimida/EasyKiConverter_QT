@@ -17,7 +17,7 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 ### 🖥️ PyQt6 Desktop Interface
 - **Modern Interface**: Beautiful modern design with card-based layout
 - **Real-time Progress**: Visual progress bar for conversion process with parallel processing status
-- **Flexible Input**: Support LCSC part numbers or LCSC links
+- **Flexible Input**: Support LCSC part numbers
 - **Selective Export**: Choose to export symbols, footprints, or 3D models
 - **Instant Preview**: Real-time display of conversion results with processing time and file statistics
 - **Smart Configuration**: Auto-save export settings with BOM file parsing support

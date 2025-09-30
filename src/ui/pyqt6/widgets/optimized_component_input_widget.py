@@ -1920,12 +1920,49 @@ class OptimizedComponentInputWidget(AdaptiveWidget):
         QTimer.singleShot(2000, lambda: self.status_label.setText("准备就绪"))
         
     def paste_from_clipboard(self):
-        """从剪贴板粘贴 - 保持原有逻辑"""
-        from PyQt6.QtWidgets import QApplication
+        """从剪贴板粘贴"""
+        from PyQt6.QtWidgets import QApplication, QMessageBox
+        from src.ui.pyqt6.utils.clipboard_processor import ClipboardProcessor
+        
         clipboard = QApplication.clipboard()
         text = clipboard.text().strip()
-        if text:
+        if not text:
+            return
+            
+        # 使用剪贴板处理器提取元件ID
+        processor = ClipboardProcessor()
+        component_ids = processor.get_clipboard_component_ids()
+        
+        if not component_ids:
+            # 如果没有提取到元件ID，尝试原始方法
             self.component_input.setText(text)
+            self.add_component()
+            return
+            
+        # 如果提取到多个元件ID，批量添加
+        if len(component_ids) > 1:
+            added_count = 0
+            duplicate_count = 0
+            
+            for component_id in component_ids:
+                # 检查是否已存在
+                if component_id not in self.components:
+                    self.components.append(component_id)
+                    added_count += 1
+                else:
+                    duplicate_count += 1
+                    
+            self.update_component_list()
+            self.save_settings()
+            
+            # 显示结果信息
+            message = f"从剪贴板添加了 {added_count} 个元件"
+            if duplicate_count > 0:
+                message += f"，跳过 {duplicate_count} 个重复项"
+            QMessageBox.information(self, "剪贴板导入", message)
+        else:
+            # 单个元件ID，使用原始方法
+            self.component_input.setText(component_ids[0])
             self.add_component()
             
     def clear_all_components(self):

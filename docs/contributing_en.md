@@ -79,8 +79,8 @@ python -m venv venv
 source venv/bin/activate  # Linux/Mac
 # venv\Scripts\activate  # Windows
 
-# Install development dependencies
-pip install -r requirements/dev.txt
+# Install application dependencies (based on build_conf/requirements_app.txt)
+pip install -r build_conf/requirements_app.txt
 ```
 
 ## 📁 Project Structure
@@ -90,7 +90,7 @@ pip install -r requirements/dev.txt
 - **src/Web_Ui/** - Flask web application
 - **docs/** - Detailed documentation
 - **tests/** - Test files
-- **requirements/** - Dependency management
+- **build_conf/** - Build configuration directory
 
 ## 🛠️ Development Tools
 
