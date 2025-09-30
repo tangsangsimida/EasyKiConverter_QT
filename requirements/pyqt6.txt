@@ -1,8 +1,0 @@
-# PyQt6 UI 依赖
-PyQt6>=6.4.0
-PyQt6-Qt6>=6.4.0
-
-# 核心功能依赖（复用现有模块）
--r core.txt
-pandas>=1.3.0
-openpyxl>=3.0.0
