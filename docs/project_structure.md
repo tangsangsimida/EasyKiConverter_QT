@@ -15,10 +15,6 @@ EasyKiConverter/
 │   ├── contributing_en.md            # 贡献指南（英文版）
 │   ├── performance_en.md             # 性能优化说明（英文版）
 │   └── system_requirements_en.md     # 系统要求（英文版）
-├── requirements/                      # 依赖管理目录
-│   ├── core.txt                      # 核心依赖
-│   ├── dev.txt                       # 开发依赖
-│   └── pyqt6.txt                     # PyQt6 UI依赖
 ├── scripts/                           # 脚本目录
 ├── src/                               # 源代码目录
 │   ├── __init__.py                   # Python包初始化文件
@@ -75,7 +71,9 @@ EasyKiConverter/
 │               ├── __init__.py    # Python包初始化文件
 │               └── export_worker.py # 导出工作线程
 ├── tests/                             # 测试目录
-├── output/                            # 输出目录
+├── build_conf/                        # 构建配置目录
+│   ├── build.spec                    # PyInstaller构建配置
+│   └── requirements_app.txt          # 应用依赖
 ├── start_webui.bat                    # Windows Web UI启动脚本
 ├── LICENSE                           # GPL-3.0 许可证
 ├── README.md                         # 中文文档

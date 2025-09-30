@@ -15,10 +15,6 @@ EasyKiConverter/
 │   ├── contributing_en.md            # Contributing guidelines (English)
 │   ├── performance_en.md             # Performance optimization (English)
 │   └── system_requirements_en.md     # System requirements (English)
-├── requirements/                      # Dependency management directory
-│   ├── core.txt                      # Core dependencies
-│   ├── dev.txt                       # Development dependencies
-│   └── pyqt6.txt                     # PyQt6 UI dependencies
 ├── scripts/                           # Scripts directory
 ├── src/                               # Source code directory
 │   ├── __init__.py                   # Python package initialization file
@@ -75,7 +71,9 @@ EasyKiConverter/
 │               ├── __init__.py    # Python package initialization file
 │               └── export_worker.py # Export worker thread
 ├── tests/                             # Tests directory
-├── output/                            # Output directory
+├── build_conf/                        # Build configuration directory
+│   ├── build.spec                    # PyInstaller build configuration
+│   └── requirements_app.txt          # Application dependencies
 ├── start_webui.bat                    # Windows Web UI startup script
 ├── LICENSE                           # GPL-3.0 license
 ├── README.md                         # Chinese documentation

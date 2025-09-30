@@ -12,14 +12,8 @@ python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
 
-# Install core dependencies
-pip install -r requirements/core.txt
-
-# Install development dependencies (including testing tools)
-pip install -r requirements/dev.txt
-
-# Install PyQt6 UI dependencies (optional)
-pip install -r requirements/pyqt6.txt
+# Install application dependencies (based on build_conf/requirements_app.txt)
+pip install -r build_conf/requirements_app.txt
 ```
 
 ## 🖥️ PyQt6 UI Development
@@ -83,10 +77,6 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
   - **pyqt6/** - PyQt6 desktop application
   - **Web_Ui/** - Flask web application
 - **src/main.py** - Command-line entry point
-- **requirements/** - Dependency management
-  - **core.txt** - Core dependencies
-  - **dev.txt** - Development dependencies
-  - **pyqt6.txt** - PyQt6 UI dependencies
 
 ## 🔧 Command Line Options
 
