@@ -213,14 +213,10 @@ class ExportWorker(QThread):
         self.current_component = component_input
         self.total_components = total
         
-        # 不在开始时立即发送进度更新，而是在实际处理步骤中更新
-        
         try:
             # 提取LCSC ID
             lcsc_id = self.extract_lcsc_id_from_url(component_input)
             if not lcsc_id:
-                # 更新进度（处理失败的情况）
-                self.progress_updated.emit(current, total, f"{component_input} - 无法提取LCSC ID")
                 return {
                     'componentId': component_input,
                     'success': False,
@@ -233,14 +229,11 @@ class ExportWorker(QThread):
             # 调用真实的转换函数
             result = self.export_component_real(lcsc_id, self.export_path, self.options, self.file_prefix)
             
-            # 注意：不在这里更新进度，而是在export_component_real方法中更新
             self.logger.info(f"处理元件 {current}/{total}: {component_input}")
             
             return result
             
         except Exception as e:
-            # 更新进度（处理异常的情况）
-            self.progress_updated.emit(current, total, f"{component_input} - 处理异常: {str(e)}")
             error_result = {
                 'componentId': component_input,
                 'success': False,
@@ -253,7 +246,7 @@ class ExportWorker(QThread):
             return error_result
     
     def export_component_real(self, lcsc_id: str, export_path: str, export_options: Dict[str, bool], file_prefix: str = None) -> Dict[str, Any]:
-        """使用真实的EasyKiConverter工具链导出元器件 - 线程安全版本"""
+        """使用EasyKiConverter工具链导出元器件 - 线程安全版本"""
         try:
             files_created = []
             kicad_version = KicadVersion.v6
@@ -263,7 +256,6 @@ class ExportWorker(QThread):
             
             # 获取元器件数据
             self.logger.info(f"获取元件数据: {lcsc_id}")
-            self.update_progress(f"{lcsc_id} - 获取数据...")
             component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
             
             if not component_data:
@@ -325,16 +317,12 @@ class ExportWorker(QThread):
             model_3d = None
             if export_options.get('model3d', True):
                 self.logger.info(f"转换3D模型: {lcsc_id}")
-                # 不在开始时立即更新进度，而是在重试过程中更新
+                # 不在重试过程中更新进度，只在最终完成或失败时更新
                 try:
                     # 尝试多次获取3D模型数据，以应对网络问题
                     model_3d_importer = None
                     success = False
                     for attempt in range(3):  # 最多尝试3次
-                        # 在每次重试时更新进度，显示当前尝试次数
-                        if attempt > 0:
-                            self.update_progress(f"{lcsc_id} - 3D模型重试 {attempt}/3...")
-                        
                         model_3d_importer = Easyeda3dModelImporter(
                             easyeda_cp_cad_data=component_data, 
                             download_raw_3d_model=True
@@ -345,7 +333,6 @@ class ExportWorker(QThread):
                             success = True
                             if attempt > 0:  # 如果不是第一次就成功，记录重试成功
                                 self.logger.info(f"第{attempt + 1}次尝试成功获取3D模型数据: {lcsc_id}")
-                                self.update_progress(f"{lcsc_id} - 3D模型重试成功")
                             break  # 成功获取到3D模型，跳出循环
                         else:
                             self.logger.warning(f"第{attempt + 1}次尝试获取3D模型数据失败: {lcsc_id}")
@@ -355,7 +342,6 @@ class ExportWorker(QThread):
                     
                     if not success:
                         self.logger.warning(f"最终失败 - 未找到3D模型数据: {lcsc_id}")
-                        self.update_progress(f"{lcsc_id} - 3D模型获取失败")
                     elif model_3d:
                         self.logger.info(f"3D模型信息: name={model_3d.name}, uuid={model_3d.uuid}")
                         self.logger.info(f"3D模型数据: raw_obj={'有' if model_3d.raw_obj else '无'}, step={'有' if model_3d.step else '无'}")
@@ -382,20 +368,15 @@ class ExportWorker(QThread):
                             model_3d.name = sanitized_model_name
                 except Exception as e:
                     self.logger.error(f"3D模型导出失败 {lcsc_id}: {e}", exc_info=True)
-                    self.update_progress(f"{lcsc_id} - 3D模型导出异常")
             
             # 导出符号
             if export_options.get('symbol', True):
                 self.logger.info(f"转换符号: {lcsc_id}")
-                # 不在开始时立即更新进度，而是在重试过程中更新
+                # 不在重试过程中更新进度，只在最终完成或失败时更新
                 # 尝试多次获取符号数据，以应对网络问题
                 symbol_data = None
                 success = False
                 for attempt in range(3):  # 最多尝试3次
-                    # 在每次重试时更新进度，显示当前尝试次数
-                    if attempt > 0:
-                        self.update_progress(f"{lcsc_id} - 符号重试 {attempt}/3...")
-                    
                     symbol_importer = EasyedaSymbolImporter(easyeda_cp_cad_data=component_data)
                     symbol_data = symbol_importer.get_symbol()
                     
@@ -403,7 +384,6 @@ class ExportWorker(QThread):
                         success = True
                         if attempt > 0:  # 如果不是第一次就成功，记录重试成功
                             self.logger.info(f"第{attempt + 1}次尝试成功获取符号数据: {lcsc_id}")
-                            self.update_progress(f"{lcsc_id} - 符号重试成功")
                         break  # 成功获取到符号数据，跳出循环
                     else:
                         self.logger.warning(f"第{attempt + 1}次尝试获取符号数据失败: {lcsc_id}")
@@ -413,7 +393,6 @@ class ExportWorker(QThread):
                 
                 if not success:
                     self.logger.warning(f"最终失败 - 未找到符号数据: {lcsc_id}")
-                    self.update_progress(f"{lcsc_id} - 符号获取失败")
                 elif not symbol_data:
                     self.logger.warning(f"未找到符号数据: {lcsc_id}")
                 else:
@@ -451,9 +430,9 @@ class ExportWorker(QThread):
                 footprint_data = None
                 success = False
                 for attempt in range(3):  # 最多尝试3次
-                    # 在每次重试时更新进度，显示当前尝试次数
-                    if attempt > 0:
-                        self.update_progress(f"{lcsc_id} - 封装重试 {attempt}/3...")
+                    # 移除重试过程中的进度更新调用，避免进度条闪烁
+                    # if attempt > 0:
+                    #     self.update_progress(f"{lcsc_id} - 封装重试 {attempt}/3...")
                     
                     footprint_importer = EasyedaFootprintImporter(easyeda_cp_cad_data=component_data)
                     footprint_data = footprint_importer.get_footprint()
@@ -462,7 +441,8 @@ class ExportWorker(QThread):
                         success = True
                         if attempt > 0:  # 如果不是第一次就成功，记录重试成功
                             self.logger.info(f"第{attempt + 1}次尝试成功获取封装数据: {lcsc_id}")
-                            self.update_progress(f"{lcsc_id} - 封装重试成功")
+                            # 移除重试成功时的进度更新调用
+                            # self.update_progress(f"{lcsc_id} - 封装重试成功")
                         break  # 成功获取到封装数据，跳出循环
                     else:
                         self.logger.warning(f"第{attempt + 1}次尝试获取封装数据失败: {lcsc_id}")
@@ -472,7 +452,8 @@ class ExportWorker(QThread):
                 
                 if not success:
                     self.logger.warning(f"最终失败 - 未找到封装数据: {lcsc_id}")
-                    self.update_progress(f"{lcsc_id} - 封装获取失败")
+                    # 移除获取失败时的进度更新调用
+                    # self.update_progress(f"{lcsc_id} - 封装获取失败")
                 elif not footprint_data:
                     self.logger.warning(f"未找到封装数据: {lcsc_id}")
                 else:

@@ -198,9 +198,10 @@ class EasyKiConverterApp(ModernMainWindow):
             QMessageBox.warning(self, "警告", "请至少选择一种导出类型")
             return
         
-        # 禁用导出按钮，显示进度条
+        # 禁用导出按钮，显示进度条，并重置进度
         self.export_btn.setEnabled(False)
         self.progress_bar.setVisible(True)
+        self.progress_bar.set_progress(0)  # 显式设置进度为0%
         self.status_label.setText("正在准备转换...")
         
         # 创建工作线程
