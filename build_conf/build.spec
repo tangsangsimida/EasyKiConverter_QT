@@ -9,9 +9,7 @@ a = Analysis(
     pathex=['.', '../src'],
     binaries=[],
     datas=[
-        ('../src/ui/pyqt6/resources/app_icon.svg', 'resources'),
         ('../src/ui/pyqt6/resources/app_icon.ico', 'resources'),
-        ('../src/ui/pyqt6/resources/app_icon.svg', '.'),
         ('../src/ui/pyqt6/resources/app_icon.ico', '.'),
         ('../src/ui/pyqt6/resources', 'resources'),
     ],
