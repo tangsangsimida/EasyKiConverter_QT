@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=EasyKiConverter
+Comment=EDA Component Converter for KiCad
+Exec=EasyKiConverter
+Icon=easykiconverter.svg
+Terminal=false
+Type=Application
+Categories=Development;Electronics;

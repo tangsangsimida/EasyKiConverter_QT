@@ -14,7 +14,7 @@ from src.ui.pyqt6.modern_main_window import ModernMainWindow
 from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.bom_parser import BOMParser
 from src.ui.pyqt6.utils.component_validator import ComponentValidator
-from src.ui.pyqt6.utils.resource_utils import resource_path
+from src.ui.pyqt6.utils.resource_utils import resource_path, get_icon_path
 
 # 从workers目录导入新的ExportWorker类
 from src.ui.pyqt6.workers.export_worker import ExportWorker
@@ -317,7 +317,7 @@ def main():
     
     # 设置应用程序图标
     try:
-        icon_path = resource_path("resources/app_icon.ico")
+        icon_path = get_icon_path()
         if os.path.exists(icon_path):
             app.setWindowIcon(QIcon(icon_path))
             print(f"✅ 应用程序图标设置成功: {icon_path}")
@@ -348,7 +348,7 @@ def main():
         
         # 为窗口设置图标
         try:
-            icon_path = resource_path("resources/app_icon.ico")
+            icon_path = get_icon_path()
             if os.path.exists(icon_path):
                 main_window.setWindowIcon(QIcon(icon_path))
                 print(f"✅ 窗口图标设置成功: {icon_path}")

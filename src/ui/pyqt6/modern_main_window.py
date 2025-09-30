@@ -14,7 +14,7 @@ from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QIcon
 from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.modern_ui_components import ModernCard, ModernProgressBar
-from src.ui.pyqt6.utils.resource_utils import resource_path
+from src.ui.pyqt6.utils.resource_utils import resource_path, get_icon_path
 
 
 class ModernMainWindow(QMainWindow):
