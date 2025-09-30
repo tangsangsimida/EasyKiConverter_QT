@@ -67,6 +67,8 @@ class ExportWorker(QThread):
         self.current_component = None
         self.current_position = 0
         self.total_components = 0
+        self.completed_count = 0  # 已完成的元件数量
+        self.completed_count_lock = threading.Lock()  # 已完成计数器锁
         
         # 多线程配置
         self.max_workers = min(len(component_ids), 16)  # 最大并发线程数
@@ -87,7 +89,19 @@ class ExportWorker(QThread):
     def update_progress(self, component_input: str):
         """更新进度"""
         if self.total_components > 0:
-            self.progress_updated.emit(self.current_position, self.total_components, component_input)
+            # 确保线程安全地获取当前信息
+            current_pos = self.current_position
+            total_comps = self.total_components
+            self.progress_updated.emit(current_pos, total_comps, component_input)
+    
+    def update_completed_progress(self, component_input: str):
+        """更新已完成进度"""
+        with self.completed_count_lock:
+            self.completed_count += 1
+            completed = self.completed_count
+            total = self.total_components
+            if total > 0:
+                self.progress_updated.emit(completed, total, f"{component_input} - 完成")
     
     def extract_lcsc_id_from_url(self, url_or_id: str) -> str:
         """从输入中提取LCSC ID"""
@@ -128,8 +142,9 @@ class ExportWorker(QThread):
             self.logger.info(f"开始处理 {total_components} 个元器件，使用 {self.max_workers} 个线程")
             start_time = time.time()
             
-            # 设置总组件数
+            # 设置总组件数和重置完成计数
             self.total_components = total_components
+            self.completed_count = 0
             
             # 根据元件数量决定是否使用多线程
             if total_components == 1:
@@ -196,13 +211,17 @@ class ExportWorker(QThread):
         # 设置当前组件信息
         self.current_position = current
         self.current_component = component_input
+        self.total_components = total
+        
+        # 更新进度（开始处理）
+        self.progress_updated.emit(current, total, f"{component_input} - 开始处理...")
         
         try:
             # 提取LCSC ID
             lcsc_id = self.extract_lcsc_id_from_url(component_input)
             if not lcsc_id:
                 # 更新进度（处理失败的情况）
-                self.progress_updated.emit(current, total, component_input)
+                self.progress_updated.emit(current, total, f"{component_input} - 无法提取LCSC ID")
                 return {
                     'componentId': component_input,
                     'success': False,
@@ -222,7 +241,7 @@ class ExportWorker(QThread):
             
         except Exception as e:
             # 更新进度（处理异常的情况）
-            self.progress_updated.emit(current, total, component_input)
+            self.progress_updated.emit(current, total, f"{component_input} - 处理异常: {str(e)}")
             error_result = {
                 'componentId': component_input,
                 'success': False,
@@ -453,7 +472,7 @@ class ExportWorker(QThread):
                     self.logger.info(f"保存封装: {footprint_filename}")
             
             # 处理完成，更新最终进度
-            self.update_progress(f"{lcsc_id} - 完成")
+            self.update_completed_progress(f"{lcsc_id}")
             
             return {
                 "success": True,
