@@ -46,18 +46,75 @@ jobs:
           if [ "${{ matrix.os }}" == "windows-latest" ]; then
             mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
           elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            # 为Linux创建适当的目录结构
-            mkdir -p dist/EasyKiConverter-linux
-            mv dist/EasyKiConverter dist/EasyKiConverter-linux/
-            cp src/ui/pyqt6/resources/app_icon.ico dist/EasyKiConverter-linux/
-            cp src/ui/pyqt6/resources/app_icon.svg dist/EasyKiConverter-linux/
-            cp src/ui/pyqt6/resources/easykiconverter.desktop dist/EasyKiConverter-linux/
-            # 创建tar.gz归档
+            # 主文件为二进制可执行文件
+            mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
+            
+            # 为Linux创建适当的目录结构用于打包
+            mkdir -p dist/EasyKiConverter-linux-package
+            cp dist/${{ matrix.asset_name }} dist/EasyKiConverter-linux-package/
+            cp src/ui/pyqt6/resources/app_icon.ico dist/EasyKiConverter-linux-package/
+            cp src/ui/pyqt6/resources/app_icon.svg dist/EasyKiConverter-linux-package/
+            cp src/ui/pyqt6/resources/easykiconverter.desktop dist/EasyKiConverter-linux-package/
+            
+            # 创建多种Linux包格式
+            # 1. tar.gz 格式
             cd dist
-            tar -czf ${{ matrix.asset_name }}.tar.gz EasyKiConverter-linux
+            tar -czf EasyKiConverter-linux-x64.tar.gz EasyKiConverter-linux-package
             cd ..
-            # 重命名tar.gz文件以匹配asset_name
-            mv dist/${{ matrix.asset_name }}.tar.gz dist/${{ matrix.asset_name }}
+            
+            # 2. zip 格式
+            cd dist
+            zip -r EasyKiConverter-linux-x64.zip EasyKiConverter-linux-package
+            cd ..
+            
+            # 3. 创建deb包
+            # 创建DEBIAN目录和控制文件
+            mkdir -p dist/EasyKiConverter-linux-x64-deb/DEBIAN
+            cat > dist/EasyKiConverter-linux-x64-deb/DEBIAN/control << EOF
+Package: easykiconverter
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: python3, python3-pyqt6, python3-requests, python3-pandas
+Maintainer: EasyKiConverter Team <easykiconverter@example.com>
+Description: EasyKiConverter - Convert LCSC and EasyEDA components to KiCad format
+ A powerful Python tool for converting LCSC and EasyEDA components to KiCad format,
+ supporting complete conversion of symbols, footprints, and 3D models.
+EOF
+            
+            # 创建应用程序目录结构
+            mkdir -p dist/EasyKiConverter-linux-x64-deb/usr/bin
+            mkdir -p dist/EasyKiConverter-linux-x64-deb/usr/share/applications
+            mkdir -p dist/EasyKiConverter-linux-x64-deb/usr/share/icons/hicolor/scalable/apps
+            mkdir -p dist/EasyKiConverter-linux-x64-deb/usr/share/easykiconverter
+            
+            # 复制应用程序文件
+            cp dist/${{ matrix.asset_name }} dist/EasyKiConverter-linux-x64-deb/usr/share/easykiconverter/
+            
+            # 创建启动脚本
+            cat > dist/EasyKiConverter-linux-x64-deb/usr/bin/easykiconverter << EOF
+#!/bin/bash
+python3 /usr/share/easykiconverter/EasyKiConverter "\$@"
+EOF
+            chmod +x dist/EasyKiConverter-linux-x64-deb/usr/bin/easykiconverter
+            
+            # 复制桌面文件和图标
+            cp src/ui/pyqt6/resources/easykiconverter.desktop dist/EasyKiConverter-linux-x64-deb/usr/share/applications/
+            cp src/ui/pyqt6/resources/app_icon.svg dist/EasyKiConverter-linux-x64-deb/usr/share/icons/hicolor/scalable/apps/easykiconverter.svg
+            
+            # 设置权限
+            chmod 755 dist/EasyKiConverter-linux-x64-deb/DEBIAN
+            chmod 644 dist/EasyKiConverter-linux-x64-deb/DEBIAN/control
+            chmod 755 dist/EasyKiConverter-linux-x64-deb/usr/bin/easykiconverter
+            
+            # 构建deb包
+            sudo dpkg-deb --build dist/EasyKiConverter-linux-x64-deb dist/EasyKiConverter-linux-x64.deb
+            
+            # 重命名压缩包文件
+            mv dist/EasyKiConverter-linux-x64.tar.gz dist/${{ matrix.asset_name }}.tar.gz
+            mv dist/EasyKiConverter-linux-x64.zip dist/${{ matrix.asset_name }}.zip
+            mv dist/EasyKiConverter-linux-x64.deb dist/${{ matrix.asset_name }}.deb
           else
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
@@ -66,7 +123,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
-          path: dist/${{ matrix.asset_name }}
+          path: |
+            dist/${{ matrix.asset_name }}
+            dist/${{ matrix.asset_name }}.tar.gz
+            dist/${{ matrix.asset_name }}.zip
+            dist/${{ matrix.asset_name }}.deb
 
   release:
     needs: build
@@ -91,14 +152,25 @@ jobs:
           body: |
             ## 📦 下载
             - Windows: `EasyKiConverter-windows-x64.exe`
-            - Linux: `EasyKiConverter-linux-x64`
+            - Linux: 
+              * `EasyKiConverter-linux-x64` (二进制可执行文件)
+              * `EasyKiConverter-linux-x64.tar.gz` (tar.gz格式)
+              * `EasyKiConverter-linux-x64.zip` (zip格式)
+              * `EasyKiConverter-linux-x64.deb` (Debian/Ubuntu包)
             - macOS: `EasyKiConverter-macos-intel`
 
             > 💡 **macOS 用户注意**：首次运行时若提示“无法验证开发者”，请右键点击文件 → “Open” 即可运行。
+            
+            > 💡 **Linux 用户注意**：
+              * 二进制可执行文件：直接下载后chmod +x并运行
+              * deb包需要依赖python3, python3-pyqt6, python3-requests, python3-pandas
+              * 如果遇到依赖问题，可以使用tar.gz或zip格式，解压后直接运行
           draft: false
           prerelease: false
           files: |
             release-assets/*/*
             release-assets/*/*.tar.gz
+            release-assets/*/*.zip
+            release-assets/*/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

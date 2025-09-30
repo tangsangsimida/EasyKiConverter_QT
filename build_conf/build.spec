@@ -10,6 +10,9 @@ if sys.platform.startswith('win'):
     icon_path = '../src/ui/pyqt6/resources/app_icon.ico'
 elif sys.platform.startswith('darwin'):
     icon_path = '../src/ui/pyqt6/resources/app_icon.icns'
+elif sys.platform.startswith('linux'):
+    # For Linux, we can use the ICO file as well
+    icon_path = '../src/ui/pyqt6/resources/app_icon.ico'
 
 a = Analysis(
     ['../src/ui/pyqt6/main.py'],
