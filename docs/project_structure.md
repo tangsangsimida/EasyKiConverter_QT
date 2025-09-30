@@ -91,12 +91,12 @@ EasyKiConverter/
 ### 🔧 核心引擎
 | 模块 | 功能描述 |
 |------|----------|
-| **src/core/easyeda/** | EasyEDA API客户端和数据处理模块 |
+| **src/core/easyeda/** | EasyEDA API客户端和数据处理模块，包含网络重试机制 |
 | **src/core/kicad/** | KiCad格式导出引擎，支持符号、封装和3D模型 |
 | **src/core/utils/** | 共享工具函数模块 |
 
 ### 📦 数据处理流程
-1. **API获取**：从EasyEDA/LCSC获取元件数据
+1. **API获取**：从EasyEDA/LCSC获取元件数据（带网络重试机制）
 2. **数据解析**：解析符号、封装和3D模型信息
 3. **格式转换**：转换为KiCad兼容格式
 4. **文件生成**：输出.kicad_sym、.kicad_mod等文件

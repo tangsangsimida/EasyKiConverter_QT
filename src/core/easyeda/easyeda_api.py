@@ -1,8 +1,11 @@
 # Global imports
 import logging
 import json
+import time
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # 版本信息
 __version__ = "1.0.0"
@@ -11,6 +14,26 @@ API_ENDPOINT = "https://easyeda.com/api/products/{lcsc_id}/components?version=6.
 ENDPOINT_3D_MODEL = "https://modules.easyeda.com/3dmodel/{uuid}"
 ENDPOINT_3D_MODEL_STEP = "https://modules.easyeda.com/qAxj6KHrDKw4blvCG8QJPs7Y/{uuid}"
 # ENDPOINT_3D_MODEL_STEP found in https://modules.lceda.cn/smt-gl-engine/0.8.22.6032922c/smt-gl-engine.js : points to the bucket containing the step files.
+
+# 重试策略
+def create_session_with_retries():
+    """Create a requests session with retry strategy"""
+    session = requests.Session()
+    
+    # 定义重试策略
+    retry_strategy = Retry(
+        total=3,  # 总重试次数
+        backoff_factor=1,  # 重试间隔倍数
+        status_forcelist=[429, 500, 502, 503, 504],  # 需要重试的HTTP状态码
+        allowed_methods=["HEAD", "GET", "OPTIONS"]  # 允许重试的HTTP方法
+    )
+    
+    # 创建适配器并应用重试策略
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    
+    return session
 
 # ------------------------------------------------------------
 
@@ -32,6 +55,8 @@ class EasyedaApi:
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             "User-Agent": f"easyeda2kicad v{__version__}",
         }
+        # 创建带重试机制的会话
+        self.session = create_session_with_retries()
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
         """
@@ -51,8 +76,8 @@ class EasyedaApi:
             api_url = API_ENDPOINT.format(lcsc_id=lcsc_id)
             print(f"正在请求EasyEDA API: {api_url}")
             
-            # 发送请求
-            r = requests.get(url=api_url, headers=self.headers, timeout=30)
+            # 发送请求（使用带重试机制的会话）
+            r = self.session.get(url=api_url, headers=self.headers, timeout=30)
             
             # 检查HTTP响应状态
             print(f"HTTP状态码: {r.status_code}")
@@ -70,13 +95,16 @@ class EasyedaApi:
             
         except requests.exceptions.RequestException as e:
             print(f"网络请求错误: {e}")
+            logging.error(f"网络请求错误 (LCSC ID: {lcsc_id}): {e}")
             return {}
         except json.JSONDecodeError as e:
             print(f"JSON解析错误: {e}")
             print(f"原始响应: {r.text[:500]}")
+            logging.error(f"JSON解析错误 (LCSC ID: {lcsc_id}): {e}")
             return {}
         except Exception as e:
             print(f"未知错误: {e}")
+            logging.error(f"未知错误 (LCSC ID: {lcsc_id}): {e}")
             return {}
 
         if not api_response or (
@@ -118,14 +146,36 @@ class EasyedaApi:
         Returns:
             str: 3D模型OBJ文件内容，失败返回None / 3D model OBJ file content, None on failure
         """
-        r = requests.get(
-            url=ENDPOINT_3D_MODEL.format(uuid=uuid),
-            headers={"User-Agent": self.headers["User-Agent"]},
-        )
-        if r.status_code != requests.codes.ok:
-            logging.error(f"No raw 3D model data found for uuid:{uuid} on easyeda")
+        try:
+            r = self.session.get(
+                url=ENDPOINT_3D_MODEL.format(uuid=uuid),
+                headers={"User-Agent": self.headers["User-Agent"]},
+                timeout=30
+            )
+            if r.status_code != requests.codes.ok:
+                logging.error(f"No raw 3D model data found for uuid:{uuid} on easyeda, status code: {r.status_code}")
+                return None
+            return r.content.decode()
+        except requests.exceptions.RequestException as e:
+            logging.error(f"网络请求错误 (3D模型OBJ, UUID: {uuid}): {e}")
+            # 尝试重试一次
+            try:
+                time.sleep(1)  # 等待1秒后重试
+                r = self.session.get(
+                    url=ENDPOINT_3D_MODEL.format(uuid=uuid),
+                    headers={"User-Agent": self.headers["User-Agent"]},
+                    timeout=30
+                )
+                if r.status_code != requests.codes.ok:
+                    logging.error(f"重试后仍失败 - No raw 3D model data found for uuid:{uuid} on easyeda, status code: {r.status_code}")
+                    return None
+                return r.content.decode()
+            except Exception as retry_error:
+                logging.error(f"重试后仍失败 - 网络请求错误 (3D模型OBJ, UUID: {uuid}): {retry_error}")
+                return None
+        except Exception as e:
+            logging.error(f"未知错误 (3D模型OBJ, UUID: {uuid}): {e}")
             return None
-        return r.content.decode()
 
     def get_step_3d_model(self, uuid: str) -> bytes:
         """
@@ -140,11 +190,33 @@ class EasyedaApi:
         Returns:
             bytes: STEP格式的3D模型二进制数据，失败返回None / 3D model binary data in STEP format, None on failure
         """
-        r = requests.get(
-            url=ENDPOINT_3D_MODEL_STEP.format(uuid=uuid),
-            headers={"User-Agent": self.headers["User-Agent"]},
-        )
-        if r.status_code != requests.codes.ok:
-            logging.error(f"No step 3D model data found for uuid:{uuid} on easyeda")
+        try:
+            r = self.session.get(
+                url=ENDPOINT_3D_MODEL_STEP.format(uuid=uuid),
+                headers={"User-Agent": self.headers["User-Agent"]},
+                timeout=30
+            )
+            if r.status_code != requests.codes.ok:
+                logging.error(f"No step 3D model data found for uuid:{uuid} on easyeda, status code: {r.status_code}")
+                return None
+            return r.content
+        except requests.exceptions.RequestException as e:
+            logging.error(f"网络请求错误 (3D模型STEP, UUID: {uuid}): {e}")
+            # 尝试重试一次
+            try:
+                time.sleep(1)  # 等待1秒后重试
+                r = self.session.get(
+                    url=ENDPOINT_3D_MODEL_STEP.format(uuid=uuid),
+                    headers={"User-Agent": self.headers["User-Agent"]},
+                    timeout=30
+                )
+                if r.status_code != requests.codes.ok:
+                    logging.error(f"重试后仍失败 - No step 3D model data found for uuid:{uuid} on easyeda, status code: {r.status_code}")
+                    return None
+                return r.content
+            except Exception as retry_error:
+                logging.error(f"重试后仍失败 - 网络请求错误 (3D模型STEP, UUID: {uuid}): {retry_error}")
+                return None
+        except Exception as e:
+            logging.error(f"未知错误 (3D模型STEP, UUID: {uuid}): {e}")
             return None
-        return r.content

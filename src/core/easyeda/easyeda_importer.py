@@ -254,21 +254,42 @@ class Easyeda3dModelImporter:
                 if self.download_raw_3d_model:
                     logging.info(f"Downloading 3D model data for UUID: {model_3d.uuid}")
                     
-                    # Download OBJ format
-                    raw_obj = EasyedaApi().get_raw_3d_model_obj(uuid=model_3d.uuid)
-                    if raw_obj:
-                        model_3d.raw_obj = raw_obj
-                        logging.info(f"Successfully downloaded OBJ 3D model")
-                    else:
-                        logging.warning(f"Failed to download OBJ 3D model for UUID: {model_3d.uuid}")
+                    # 创建API实例用于下载
+                    api = EasyedaApi()
                     
-                    # Download STEP format
-                    step_data = EasyedaApi().get_step_3d_model(uuid=model_3d.uuid)
-                    if step_data:
-                        model_3d.step = step_data
-                        logging.info(f"Successfully downloaded STEP 3D model")
-                    else:
-                        logging.warning(f"Failed to download STEP 3D model for UUID: {model_3d.uuid}")
+                    # Download OBJ format with retry
+                    raw_obj = None
+                    for attempt in range(3):  # 最多尝试3次
+                        raw_obj = api.get_raw_3d_model_obj(uuid=model_3d.uuid)
+                        if raw_obj:
+                            model_3d.raw_obj = raw_obj
+                            logging.info(f"Successfully downloaded OBJ 3D model")
+                            break
+                        else:
+                            logging.warning(f"Failed to download OBJ 3D model for UUID: {model_3d.uuid}, attempt {attempt + 1}/3")
+                            if attempt < 2:  # 不是最后一次尝试，等待后重试
+                                import time
+                                time.sleep(2 ** attempt)  # 指数退避
+                    
+                    if not raw_obj:
+                        logging.warning(f"最终失败 - Failed to download OBJ 3D model for UUID: {model_3d.uuid} after 3 attempts")
+                    
+                    # Download STEP format with retry
+                    step_data = None
+                    for attempt in range(3):  # 最多尝试3次
+                        step_data = api.get_step_3d_model(uuid=model_3d.uuid)
+                        if step_data:
+                            model_3d.step = step_data
+                            logging.info(f"Successfully downloaded STEP 3D model")
+                            break
+                        else:
+                            logging.warning(f"Failed to download STEP 3D model for UUID: {model_3d.uuid}, attempt {attempt + 1}/3")
+                            if attempt < 2:  # 不是最后一次尝试，等待后重试
+                                import time
+                                time.sleep(2 ** attempt)  # 指数退避
+                    
+                    if not step_data:
+                        logging.warning(f"最终失败 - Failed to download STEP 3D model for UUID: {model_3d.uuid} after 3 attempts")
                 
                 return model_3d
             else:

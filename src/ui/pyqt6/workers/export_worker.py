@@ -287,14 +287,25 @@ class ExportWorker(QThread):
             if export_options.get('model3d', True):
                 self.logger.info(f"转换3D模型: {lcsc_id}")
                 try:
-                    model_3d_importer = Easyeda3dModelImporter(
-                        easyeda_cp_cad_data=component_data, 
-                        download_raw_3d_model=True
-                    )
-                    model_3d = model_3d_importer.output  # Use the output property directly
+                    # 尝试多次获取3D模型数据，以应对网络问题
+                    model_3d_importer = None
+                    for attempt in range(3):  # 最多尝试3次
+                        model_3d_importer = Easyeda3dModelImporter(
+                            easyeda_cp_cad_data=component_data, 
+                            download_raw_3d_model=True
+                        )
+                        model_3d = model_3d_importer.output  # Use the output property directly
+                        
+                        if model_3d:
+                            break  # 成功获取到3D模型，跳出循环
+                        else:
+                            self.logger.warning(f"第{attempt + 1}次尝试获取3D模型数据失败: {lcsc_id}")
+                            if attempt < 2:  # 不是最后一次尝试，等待后重试
+                                import time
+                                time.sleep(2 ** attempt)  # 指数退避
                     
                     if not model_3d:
-                        self.logger.warning(f"未找到3D模型数据: {lcsc_id}")
+                        self.logger.warning(f"最终失败 - 未找到3D模型数据: {lcsc_id}")
                     else:
                         self.logger.info(f"3D模型信息: name={model_3d.name}, uuid={model_3d.uuid}")
                         self.logger.info(f"3D模型数据: raw_obj={'有' if model_3d.raw_obj else '无'}, step={'有' if model_3d.step else '无'}")
@@ -325,8 +336,22 @@ class ExportWorker(QThread):
             # 导出符号
             if export_options.get('symbol', True):
                 self.logger.info(f"转换符号: {lcsc_id}")
-                symbol_importer = EasyedaSymbolImporter(easyeda_cp_cad_data=component_data)
-                symbol_data = symbol_importer.get_symbol()
+                # 尝试多次获取符号数据，以应对网络问题
+                symbol_data = None
+                for attempt in range(3):  # 最多尝试3次
+                    symbol_importer = EasyedaSymbolImporter(easyeda_cp_cad_data=component_data)
+                    symbol_data = symbol_importer.get_symbol()
+                    
+                    if symbol_data:
+                        break  # 成功获取到符号数据，跳出循环
+                    else:
+                        self.logger.warning(f"第{attempt + 1}次尝试获取符号数据失败: {lcsc_id}")
+                        if attempt < 2:  # 不是最后一次尝试，等待后重试
+                            import time
+                            time.sleep(2 ** attempt)  # 指数退避
+                
+                if not symbol_data:
+                    self.logger.warning(f"最终失败 - 未找到符号数据: {lcsc_id}")
                 
                 if not symbol_data:
                     self.logger.warning(f"未找到符号数据: {lcsc_id}")
@@ -360,8 +385,22 @@ class ExportWorker(QThread):
             # 导出封装 (with 3D model reference if available)
             if export_options.get('footprint', True):
                 self.logger.info(f"转换封装: {lcsc_id}")
-                footprint_importer = EasyedaFootprintImporter(easyeda_cp_cad_data=component_data)
-                footprint_data = footprint_importer.get_footprint()
+                # 尝试多次获取封装数据，以应对网络问题
+                footprint_data = None
+                for attempt in range(3):  # 最多尝试3次
+                    footprint_importer = EasyedaFootprintImporter(easyeda_cp_cad_data=component_data)
+                    footprint_data = footprint_importer.get_footprint()
+                    
+                    if footprint_data:
+                        break  # 成功获取到封装数据，跳出循环
+                    else:
+                        self.logger.warning(f"第{attempt + 1}次尝试获取封装数据失败: {lcsc_id}")
+                        if attempt < 2:  # 不是最后一次尝试，等待后重试
+                            import time
+                            time.sleep(2 ** attempt)  # 指数退避
+                
+                if not footprint_data:
+                    self.logger.warning(f"最终失败 - 未找到封装数据: {lcsc_id}")
                 
                 if not footprint_data:
                     self.logger.warning(f"未找到封装数据: {lcsc_id}")
