@@ -4,13 +4,23 @@ import sys
 import os
 block_cipher = None
 
+# Determine the icon file based on the platform
+icon_path = None
+if sys.platform.startswith('win'):
+    icon_path = '../src/ui/pyqt6/resources/app_icon.ico'
+elif sys.platform.startswith('darwin'):
+    icon_path = '../src/ui/pyqt6/resources/app_icon.icns'
+
 a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
     binaries=[],
     datas=[
         ('../src/ui/pyqt6/resources/app_icon.ico', 'resources'),
+        ('../src/ui/pyqt6/resources/app_icon.svg', 'resources'),
+        ('../src/ui/pyqt6/resources/app_icon.icns', 'resources'),
         ('../src/ui/pyqt6/resources/app_icon.ico', '.'),
+        ('../src/ui/pyqt6/resources/easykiconverter.desktop', 'resources'),
         ('../src/ui/pyqt6/resources', 'resources'),
     ],
     hiddenimports=[
@@ -142,5 +152,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='../src/ui/pyqt6/resources/app_icon.ico' if sys.platform.startswith('win') and os.path.exists('../src/ui/pyqt6/resources/app_icon.ico') else None
+    icon=icon_path
 )

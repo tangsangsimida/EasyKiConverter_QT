@@ -40,11 +40,22 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller build_conf/build.spec --noconfirm 
 
-      - name: Rename executable
+      - name: Rename executable and prepare Linux package
         shell: bash
         run: |
           if [ "${{ matrix.os }}" == "windows-latest" ]; then
             mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
+          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            # 为Linux创建适当的目录结构
+            mkdir -p dist/EasyKiConverter-linux
+            mv dist/EasyKiConverter dist/EasyKiConverter-linux/
+            cp src/ui/pyqt6/resources/app_icon.ico dist/EasyKiConverter-linux/
+            cp src/ui/pyqt6/resources/app_icon.svg dist/EasyKiConverter-linux/
+            cp src/ui/pyqt6/resources/easykiconverter.desktop dist/EasyKiConverter-linux/
+            # 创建tar.gz归档
+            cd dist
+            tar -czf ${{ matrix.asset_name }}.tar.gz EasyKiConverter-linux
+            mv ${{ matrix.asset_name }}.tar.gz ../dist/${{ matrix.asset_name }}.tar.gz
           else
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
@@ -86,5 +97,6 @@ jobs:
           prerelease: false
           files: |
             release-assets/*/*
+            release-assets/*/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

@@ -17,3 +17,18 @@ def resource_path(relative_path: str) -> str:
         # 开发环境
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
+
+def get_icon_path() -> str:
+    """获取图标文件路径，根据平台选择合适的格式"""
+    import sys
+    if sys.platform.startswith('win'):
+        # Windows平台使用ICO格式
+        return resource_path("resources/app_icon.ico")
+    else:
+        # Linux/macOS平台优先使用SVG格式，如果不存在则使用ICO格式
+        svg_path = resource_path("resources/app_icon.svg")
+        if os.path.exists(svg_path):
+            return svg_path
+        else:
+            return resource_path("resources/app_icon.ico")
