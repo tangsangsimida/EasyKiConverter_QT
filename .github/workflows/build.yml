@@ -55,7 +55,7 @@ jobs:
             # 创建tar.gz归档
             cd dist
             tar -czf ${{ matrix.asset_name }}.tar.gz EasyKiConverter-linux
-            mv ${{ matrix.asset_name }}.tar.gz ../dist/${{ matrix.asset_name }}.tar.gz
+            cd ..
           else
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
