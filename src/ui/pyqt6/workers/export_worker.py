@@ -338,7 +338,9 @@ class ExportWorker(QThread):
                             self.logger.warning(f"第{attempt + 1}次尝试获取3D模型数据失败: {lcsc_id}")
                             if attempt < 2:  # 不是最后一次尝试，等待后重试
                                 import time
-                                time.sleep(2 ** attempt)  # 指数退避
+                                # 限制最大等待时间为1秒，避免用户等待太久
+                                wait_time = min(2 ** attempt, 1.0)
+                                time.sleep(wait_time)
                     
                     if not success:
                         self.logger.warning(f"最终失败 - 未找到3D模型数据: {lcsc_id}")
@@ -389,7 +391,9 @@ class ExportWorker(QThread):
                         self.logger.warning(f"第{attempt + 1}次尝试获取符号数据失败: {lcsc_id}")
                         if attempt < 2:  # 不是最后一次尝试，等待后重试
                             import time
-                            time.sleep(2 ** attempt)  # 指数退避
+                            # 限制最大等待时间为1秒，避免用户等待太久
+                            wait_time = min(2 ** attempt, 1.0)
+                            time.sleep(wait_time)
                 
                 if not success:
                     self.logger.warning(f"最终失败 - 未找到符号数据: {lcsc_id}")
@@ -448,7 +452,9 @@ class ExportWorker(QThread):
                         self.logger.warning(f"第{attempt + 1}次尝试获取封装数据失败: {lcsc_id}")
                         if attempt < 2:  # 不是最后一次尝试，等待后重试
                             import time
-                            time.sleep(2 ** attempt)  # 指数退避
+                            # 限制最大等待时间为1秒，避免用户等待太久
+                            wait_time = min(2 ** attempt, 1.0)
+                            time.sleep(wait_time)
                 
                 if not success:
                     self.logger.warning(f"最终失败 - 未找到封装数据: {lcsc_id}")
