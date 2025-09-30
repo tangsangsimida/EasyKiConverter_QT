@@ -1,5 +1,7 @@
 name: Build and Release Multi-Platform Binaries
 
+imports: os
+
 on:
   push:
     branches:
