@@ -213,8 +213,7 @@ class ExportWorker(QThread):
         self.current_component = component_input
         self.total_components = total
         
-        # 更新进度（开始处理）
-        self.progress_updated.emit(current, total, f"{component_input} - 开始处理...")
+        # 不在开始时立即发送进度更新，而是在实际处理步骤中更新
         
         try:
             # 提取LCSC ID

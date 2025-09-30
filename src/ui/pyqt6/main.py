@@ -216,8 +216,8 @@ class EasyKiConverterApp(ModernMainWindow):
         
     def on_progress_updated(self, current, total, component_id):
         """更新进度"""
-        # 对于并行处理，我们显示当前正在处理的元件位置
-        # 这样用户可以知道处理到了哪个元件
+        # 对于并行处理，我们显示已完成的元件比例
+        # 这样用户可以知道整体进度
         progress = int(current / total * 100)
         self.progress_bar.set_progress(progress)
         self.status_label.setText(f"正在转换: {component_id} ({current}/{total})")
