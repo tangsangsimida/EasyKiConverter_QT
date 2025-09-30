@@ -14,6 +14,7 @@ from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QIcon
 from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.modern_ui_components import ModernCard, ModernProgressBar
+from src.ui.pyqt6.utils.resource_utils import resource_path
 
 
 class ModernMainWindow(QMainWindow):
@@ -39,52 +40,12 @@ class ModernMainWindow(QMainWindow):
         
         # 设置窗口图标
         try:
-            import sys
-            # 使用更可靠的方法查找图标文件
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            
-            # 所有平台都优先使用ICO文件，然后是SVG文件
-            icon_extensions = [".ico", ".svg"]
-            icon_path = None
-            
-            for ext in icon_extensions:
-                candidate_path = os.path.join(current_dir, "resources", f"app_icon{ext}")
-                if os.path.exists(candidate_path):
-                    icon_path = candidate_path
-                    break
-            
-            # 如果在开发环境中找不到，尝试其他可能的路径
-            if not icon_path:
-                # 检查是否在PyInstaller环境中
-                if getattr(sys, 'frozen', False):
-                    # PyInstaller环境
-                    application_path = os.path.dirname(sys.executable)
-                    for ext in icon_extensions:
-                        candidate_path = os.path.join(application_path, "resources", f"app_icon{ext}")
-                        if os.path.exists(candidate_path):
-                            icon_path = candidate_path
-                            break
-                else:
-                    # 开发环境
-                    for ext in icon_extensions:
-                        candidate_path = os.path.join(current_dir, "resources", f"app_icon{ext}")
-                        if os.path.exists(candidate_path):
-                            icon_path = candidate_path
-                            break
-                    
-                    # 如果还是找不到，尝试从当前工作目录查找
-                    if not icon_path:
-                        for ext in icon_extensions:
-                            candidate_path = os.path.join(os.getcwd(), "src", "ui", "pyqt6", "resources", f"app_icon{ext}")
-                            if os.path.exists(candidate_path):
-                                icon_path = candidate_path
-                                break
-            
-            if icon_path and os.path.exists(icon_path):
+            icon_path = resource_path("resources/app_icon.ico")
+            if os.path.exists(icon_path):
                 self.setWindowIcon(QIcon(icon_path))
                 print(f"✅ 窗口图标设置成功: {icon_path}")
             else:
-                print("⚠️  未找到窗口图标文件")
+                print(f"⚠️  未找到窗口图标文件: {icon_path}")
         except Exception as e:
             print(f"⚠️  设置窗口图标时出错: {e}")
         
