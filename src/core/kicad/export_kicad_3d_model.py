@@ -166,9 +166,13 @@ class Exporter3dModelKicad:
             os.makedirs(shapes_dir, exist_ok=True)
             print(f"3D shapes directory: {shapes_dir}")
             
+            # Sanitize model name for file system compatibility
+            import re
+            sanitized_name = re.sub(r'[<>:"/\\|?*]', '_', self.output.name if self.output else self.input.name)
+            
             # Export WRL format
             if self.output and self.output.raw_wrl:
-                wrl_path = f"{shapes_dir}/{self.output.name}.wrl"
+                wrl_path = f"{shapes_dir}/{sanitized_name}.wrl"
                 with open(wrl_path, mode="w", encoding="utf-8") as my_lib:
                     my_lib.write(self.output.raw_wrl)
                 print(f"✅ Exported WRL 3D model: {wrl_path}")
@@ -179,7 +183,7 @@ class Exporter3dModelKicad:
             
             # Export STEP format
             if self.output_step:
-                step_path = f"{shapes_dir}/{self.input.name}.step"
+                step_path = f"{shapes_dir}/{sanitized_name}.step"
                 with open(step_path, mode="wb") as my_lib:
                     my_lib.write(self.output_step)
                 print(f"✅ Exported STEP 3D model: {step_path}")

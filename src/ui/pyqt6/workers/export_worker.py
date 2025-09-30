@@ -304,13 +304,21 @@ class ExportWorker(QThread):
                         
                         # 查找导出的3D模型文件
                         model_name = getattr(model_3d, 'name', f"{lcsc_id}_3dmodel")
+                        # Sanitize model name for file system compatibility
+                        import re
+                        sanitized_model_name = re.sub(r'[<>:"/\\|?*]', '_', model_name)
                         for ext in ['.step', '.wrl']:
-                            model_file = model_dir / f"{model_name}{ext}"
+                            model_file = model_dir / f"{sanitized_model_name}{ext}"
                             if model_file.exists():
                                 files_created.append(str(model_file.absolute()))
                                 self.logger.info(f"保存3D模型: {model_file}")
                             else:
                                 self.logger.warning(f"3D模型文件未找到: {model_file}")
+                        
+                        # Update the model name in the 3D model object to match the sanitized name
+                        # This ensures consistency between the exported file name and the reference in footprint
+                        if model_3d:
+                            model_3d.name = sanitized_model_name
                 except Exception as e:
                     self.logger.error(f"3D模型导出失败 {lcsc_id}: {e}", exc_info=True)
             
