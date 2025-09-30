@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import sys
+import os
 block_cipher = None
 
 a = Analysis(
@@ -9,7 +10,9 @@ a = Analysis(
     binaries=[],
     datas=[
         ('../src/ui/pyqt6/resources/app_icon.svg', 'resources'),
+        ('../src/ui/pyqt6/resources/app_icon.ico', 'resources'),
         ('../src/ui/pyqt6/resources/app_icon.svg', '.'),
+        ('../src/ui/pyqt6/resources/app_icon.ico', '.'),
         ('../src/ui/pyqt6/resources', 'resources'),
     ],
     hiddenimports=[
@@ -141,5 +144,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='../src/ui/pyqt6/resources/app_icon.ico' if sys.platform.startswith('win') else None
+    icon='../src/ui/pyqt6/resources/app_icon.ico' if sys.platform.startswith('win') and os.path.exists('../src/ui/pyqt6/resources/app_icon.ico') else None
 )

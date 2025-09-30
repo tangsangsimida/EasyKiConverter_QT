@@ -319,23 +319,45 @@ def main():
     try:
         # 首先尝试从资源目录查找
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+        
+        # 所有平台都优先使用ICO文件，然后是SVG文件
+        icon_extensions = [".ico", ".svg"]
+        icon_path = None
+        
+        for ext in icon_extensions:
+            candidate_path = os.path.join(current_dir, "resources", f"app_icon{ext}")
+            if os.path.exists(candidate_path):
+                icon_path = candidate_path
+                break
         
         # 如果在开发环境中找不到，尝试其他可能的路径
-        if not os.path.exists(icon_path):
+        if not icon_path:
             # 检查是否在PyInstaller环境中
             if getattr(sys, 'frozen', False):
                 # PyInstaller环境
                 application_path = os.path.dirname(sys.executable)
-                icon_path = os.path.join(application_path, "resources", "app_icon.svg")
+                for ext in icon_extensions:
+                    candidate_path = os.path.join(application_path, "resources", f"app_icon{ext}")
+                    if os.path.exists(candidate_path):
+                        icon_path = candidate_path
+                        break
             else:
                 # 开发环境
-                icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+                for ext in icon_extensions:
+                    candidate_path = os.path.join(current_dir, "resources", f"app_icon{ext}")
+                    if os.path.exists(candidate_path):
+                        icon_path = candidate_path
+                        break
+                
                 # 如果还是找不到，尝试从当前工作目录查找
-                if not os.path.exists(icon_path):
-                    icon_path = os.path.join(os.getcwd(), "src", "ui", "pyqt6", "resources", "app_icon.svg")
+                if not icon_path:
+                    for ext in icon_extensions:
+                        candidate_path = os.path.join(os.getcwd(), "src", "ui", "pyqt6", "resources", f"app_icon{ext}")
+                        if os.path.exists(candidate_path):
+                            icon_path = candidate_path
+                            break
         
-        if os.path.exists(icon_path):
+        if icon_path and os.path.exists(icon_path):
             app.setWindowIcon(QIcon(icon_path))
             print(f"✅ 应用程序图标设置成功: {icon_path}")
         else:
