@@ -35,26 +35,6 @@ python main.py
 - EasyEDA data processing in the `src/core/easyeda/` directory
 - KiCad export engines in the `src/core/kicad/` directory
 
-## 🌐 Web UI Development
-
-```bash
-# Start development server
-cd src/Web_Ui
-python app.py
-
-# Access development interface
-# http://localhost:8000
-```
-
-**Frontend Development:**
-- Modify `index.html` - Page structure
-- Modify `css/styles.css` - Styles and animations
-- Modify `js/script.js` - Interaction logic
-
-**Backend Development:**
-- Modify `app.py` - API interfaces and routing
-- Core conversion logic in the `src/core/` directory
-
 ## 🛠️ Command Line Development
 
 ```bash
@@ -75,8 +55,6 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
   - **utils/** - Shared utility functions
 - **src/ui/** - User interfaces
   - **pyqt6/** - PyQt6 desktop application
-  - **Web_Ui/** - Flask web application
-- **src/main.py** - Command-line entry point
 
 ## 🔧 Command Line Options
 
