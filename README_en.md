@@ -32,6 +32,12 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 
 - **Cross-Platform**: Supports Windows, macOS, and Linux systems
 
+- **Multi-Architecture**: Supports x86, x64, Intel, and Apple Silicon architectures
+
+- **Multiple Package Formats**: Available as EXE, binary, DEB, RPM, and Tarball distribution formats
+
+- **Distribution-Specific Packages**: Provides dedicated packages for Ubuntu, Fedora, Arch Linux, and other major distributions
+
   
 
 ## 📚 Detailed Documentation

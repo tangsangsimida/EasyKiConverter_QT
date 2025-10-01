@@ -28,6 +28,9 @@
 - **一键启动**：双击启动脚本即可运行桌面应用
 - **无需配置**：开箱即用，无需复杂设置
 - **跨平台支持**：支持 Windows、macOS 和 Linux 系统
+- **多架构支持**：支持 x86、x64、Intel 和 Apple Silicon 架构
+- **多种包格式**：提供 EXE、二进制文件、DEB、RPM、Tarball 等多种分发格式
+- **发行版特定包**：为 Ubuntu、Fedora、Arch Linux 等主流发行版提供专门的软件包
 
 
 

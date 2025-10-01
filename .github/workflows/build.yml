@@ -4,23 +4,67 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[release]')
+    if: contains(github.event.head_commit.message, '[release]') || github.event_name == 'pull_request'
     
-    name: Build on ${{ matrix.os }}
+    name: Build on ${{ matrix.os }} (${{ matrix.distro || matrix.arch || 'default' }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-          - os: ubuntu-latest
-            asset_name: EasyKiConverter-linux-x64
+          # Windows builds
           - os: windows-latest
+            arch: x64
             asset_name: EasyKiConverter-windows-x64.exe
+            package_type: exe
+          - os: windows-latest
+            arch: x86
+            asset_name: EasyKiConverter-windows-x86.exe
+            package_type: exe
+          
+          # Linux builds for different distributions
+          # Ubuntu/Debian-based distributions
+          - os: ubuntu-latest
+            distro: ubuntu
+            arch: x64
+            asset_name: EasyKiConverter-ubuntu-x64.deb
+            package_type: deb
+          
+          # Fedora/RHEL-based distributions
+          - os: ubuntu-latest
+            distro: fedora
+            arch: x64
+            asset_name: EasyKiConverter-fedora-x64.rpm
+            package_type: rpm
+          
+          # Arch Linux
+          - os: ubuntu-latest
+            distro: arch
+            arch: x64
+            asset_name: EasyKiConverter-arch-x64.tar.xz
+            package_type: tarball
+          
+          # Generic Linux binary (works on most distributions)
+          - os: ubuntu-latest
+            distro: generic
+            arch: x64
+            asset_name: EasyKiConverter-linux-x64
+            package_type: binary
+          
+          # macOS builds
           - os: macos-latest
+            arch: intel
             asset_name: EasyKiConverter-macos-intel
+            package_type: binary
+          - os: macos-latest
+            arch: apple-silicon
+            asset_name: EasyKiConverter-macos-apple-silicon
+            package_type: binary
 
     steps:
       - name: Checkout repository
@@ -36,17 +80,202 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r build_conf/requirements_app.txt    
           pip install pyinstaller                       # 安装 PyInstaller
+          
+          # Linux特定依赖
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            sudo apt-get update
+            sudo apt-get install -y rpm tar xz-utils docker.io
+            pip install pyinstaller[hook_testing]  # 用于创建deb包的额外依赖
+            # 启动Docker服务
+            sudo systemctl start docker
+          fi
 
       - name: Build with PyInstaller
-        run: pyinstaller build_conf/build.spec --noconfirm 
+        run: |
+          # 根据平台和架构设置特定参数
+          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
+            # Windows x86构建
+            pyinstaller build_conf/build.spec --noconfirm --additional-hooks-dir=.
+          else
+            # 默认构建
+            pyinstaller build_conf/build.spec --noconfirm
+          fi
 
-      - name: Rename executable
+      - name: Create DEB package (Ubuntu/Debian)
+        if: matrix.os == 'ubuntu-latest' && matrix.distro == 'ubuntu'
+        run: |
+          # 创建DEB包结构（在Ubuntu环境中构建，遵循Debian标准）
+          mkdir -p easykiconverter-deb/usr/bin
+          mkdir -p easykiconverter-deb/usr/share/applications
+          mkdir -p easykiconverter-deb/usr/share/icons/hicolor/256x256/apps
+          mkdir -p easykiconverter-deb/DEBIAN
+          
+          # 复制可执行文件
+          cp dist/EasyKiConverter easykiconverter-deb/usr/bin/
+          
+          # 创建desktop文件（遵循Debian标准）
+          cat > easykiconverter-deb/usr/share/applications/easykiconverter.desktop << EOF
+          [Desktop Entry]
+          Name=EasyKiConverter
+          Comment=Convert LCSC and EasyEDA components to KiCad format
+          Exec=/usr/bin/EasyKiConverter
+          Icon=easykiconverter
+          Terminal=false
+          Type=Application
+          Categories=Development;Electronics;
+          EOF
+          
+          # 复制图标
+          if [ -f "src/ui/pyqt6/resources/app_icon.png" ]; then
+            cp src/ui/pyqt6/resources/app_icon.png easykiconverter-deb/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          fi
+          
+          # 创建control文件（遵循Debian标准）
+          cat > easykiconverter-deb/DEBIAN/control << EOF
+          Package: easykiconverter
+          Version: 1.0.0
+          Section: devel
+          Priority: optional
+          Architecture: amd64
+          Maintainer: EasyKiConverter Team <easykiconverter@example.com>
+          Description: EasyKiConverter - Convert LCSC and EasyEDA components to KiCad format
+           A powerful Python tool for converting LCSC and EasyEDA components to KiCad format,
+           supporting complete conversion of symbols, footprints, and 3D models.
+          EOF
+          
+          # 设置权限（遵循Debian标准）
+          chmod 755 easykiconverter-deb/usr/bin/EasyKiConverter
+          chmod 644 easykiconverter-deb/usr/share/applications/easykiconverter.desktop
+          if [ -f "easykiconverter-deb/usr/share/icons/hicolor/256x256/apps/easykiconverter.png" ]; then
+            chmod 644 easykiconverter-deb/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          fi
+          
+          # 构建DEB包
+          dpkg-deb --build easykiconverter-deb
+          mv easykiconverter-deb.deb dist/${{ matrix.asset_name }}
+
+      - name: Create RPM package (Fedora/RHEL)
+        if: matrix.os == 'ubuntu-latest' && matrix.distro == 'fedora'
+        run: |
+          # 创建RPM构建目录结构（在Ubuntu环境中构建，遵循RPM标准）
+          mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+          
+          # 复制可执行文件到SOURCES目录
+          cp dist/EasyKiConverter rpmbuild/SOURCES/
+          
+          # 复制图标到SOURCES目录
+          if [ -f "src/ui/pyqt6/resources/app_icon.png" ]; then
+            cp src/ui/pyqt6/resources/app_icon.png rpmbuild/SOURCES/easykiconverter.png
+          fi
+          
+          # 创建SPEC文件（遵循RPM标准）
+          cat > rpmbuild/SPECS/easykiconverter.spec << EOF
+          Name: easykiconverter
+          Version: 1.0.0
+          Release: 1
+          Summary: Convert LCSC and EasyEDA components to KiCad format
+          License: GPL-3.0
+          BuildArch: x86_64
+          
+          %description
+          A powerful Python tool for converting LCSC and EasyEDA components to KiCad format,
+          supporting complete conversion of symbols, footprints, and 3D models.
+          
+          %files
+          /usr/bin/EasyKiConverter
+          /usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          /usr/share/applications/easykiconverter.desktop
+          
+          %install
+          mkdir -p %{buildroot}/usr/bin
+          mkdir -p %{buildroot}/usr/share/icons/hicolor/256x256/apps
+          mkdir -p %{buildroot}/usr/share/applications
+          
+          cp %{SOURCE0} %{buildroot}/usr/bin/EasyKiConverter
+          chmod 755 %{buildroot}/usr/bin/EasyKiConverter
+          
+          if [ -f "%{SOURCE1}" ]; then
+            cp %{SOURCE1} %{buildroot}/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+            chmod 644 %{buildroot}/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          fi
+          
+          cat > %{buildroot}/usr/share/applications/easykiconverter.desktop << 'DESKTOP'
+          [Desktop Entry]
+          Name=EasyKiConverter
+          Comment=Convert LCSC and EasyEDA components to KiCad format
+          Exec=/usr/bin/EasyKiConverter
+          Icon=easykiconverter
+          Terminal=false
+          Type=Application
+          Categories=Development;Electronics;
+          DESKTOP
+          
+          chmod 644 %{buildroot}/usr/share/applications/easykiconverter.desktop
+          
+          %prep
+          
+          %build
+          
+          %clean
+          rm -rf %{buildroot}
+          EOF
+          
+          # 构建RPM包（使用标准工具）
+          rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/easykiconverter.spec
+          mv rpmbuild/RPMS/x86_64/*.rpm dist/${{ matrix.asset_name }}
+
+      - name: Create tarball package (Arch Linux)
+        if: matrix.os == 'ubuntu-latest' && matrix.distro == 'arch'
+        run: |
+          # 创建Arch Linux包结构（在Ubuntu环境中构建，但遵循Arch Linux标准）
+          mkdir -p easykiconverter-arch/usr/bin
+          mkdir -p easykiconverter-arch/usr/share/applications
+          mkdir -p easykiconverter-arch/usr/share/icons/hicolor/256x256/apps
+          
+          # 复制可执行文件
+          cp dist/EasyKiConverter easykiconverter-arch/usr/bin/
+          
+          # 复制图标
+          if [ -f "src/ui/pyqt6/resources/app_icon.png" ]; then
+            cp src/ui/pyqt6/resources/app_icon.png easykiconverter-arch/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          fi
+          
+          # 创建desktop文件（遵循Arch Linux标准）
+          cat > easykiconverter-arch/usr/share/applications/easykiconverter.desktop << EOF
+          [Desktop Entry]
+          Name=EasyKiConverter
+          Comment=Convert LCSC and EasyEDA components to KiCad format
+          Exec=/usr/bin/EasyKiConverter
+          Icon=easykiconverter
+          Terminal=false
+          Type=Application
+          Categories=Development;Electronics;
+          EOF
+          
+          # 设置权限（遵循Arch Linux标准）
+          chmod 755 easykiconverter-arch/usr/bin/EasyKiConverter
+          chmod 644 easykiconverter-arch/usr/share/applications/easykiconverter.desktop
+          if [ -f "easykiconverter-arch/usr/share/icons/hicolor/256x256/apps/easykiconverter.png" ]; then
+            chmod 644 easykiconverter-arch/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          fi
+          
+          # 创建tar.xz包（Arch Linux标准压缩格式）
+          tar -cJf dist/${{ matrix.asset_name }} -C easykiconverter-arch .
+
+      - name: Rename executable (Generic Linux binary)
+        if: matrix.os == 'ubuntu-latest' && matrix.distro == 'generic'
         shell: bash
         run: |
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
-          else
+          if [ -f "dist/EasyKiConverter" ]; then
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
+          fi
+
+      - name: Rename Windows executable
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          if [ -f "dist/EasyKiConverter.exe" ]; then
+            mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
           fi
 
       - name: Upload artifact
@@ -57,7 +286,7 @@ jobs:
 
   release:
     needs: build
-    if: always() && needs.build.result == 'success'
+    if: always() && needs.build.result == 'success' && contains(github.event.head_commit.message, '[release]')
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
@@ -77,11 +306,33 @@ jobs:
           name: ${{ env.RELEASE_VERSION }}
           body: |
             ## 📦 下载
-            - Windows: `EasyKiConverter-windows-x64.exe`
-            - Linux: `EasyKiConverter-linux-x64`
-            - macOS: `EasyKiConverter-macos-intel`
+            
+            ### Windows
+            - x64: `EasyKiConverter-windows-x64.exe`
+            - x86: `EasyKiConverter-windows-x86.exe`
+            
+            ### Linux发行版特定包
+            #### Ubuntu/Debian
+            - DEB Package: `EasyKiConverter-ubuntu-x64.deb`
+            
+            #### Fedora/RHEL
+            - RPM Package: `EasyKiConverter-fedora-x64.rpm`
+            
+            #### Arch Linux
+            - Tarball Package: `EasyKiConverter-arch-x64.tar.xz`
+            
+            #### 通用Linux二进制文件（适用于大多数Linux发行版）
+            - Binary: `EasyKiConverter-linux-x64`
+            
+            ### macOS
+            - Intel: `EasyKiConverter-macos-intel`
+            - Apple Silicon: `EasyKiConverter-macos-apple-silicon`
 
-            > 💡 **macOS 用户注意**：首次运行时若提示“无法验证开发者”，请右键点击文件 → “Open” 即可运行。
+            > 💡 **macOS 用户注意**：首次运行时若提示"无法验证开发者"，请右键点击文件 → "Open" 即可运行。
+            > 💡 **Ubuntu/Debian 用户**：推荐使用DEB包，可直接安装和管理。
+            > 💡 **Fedora/RHEL 用户**：推荐使用RPM包，可直接安装和管理。
+            > 💡 **Arch Linux 用户**：推荐使用tar.xz包，解压后可直接使用。
+            > 💡 **其他Linux发行版用户**：可使用通用二进制文件，在大多数Linux发行版上运行。
           draft: false
           prerelease: false
           files: |
