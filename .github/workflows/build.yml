@@ -22,10 +22,6 @@ jobs:
             arch: x64
             asset_name: EasyKiConverter-windows-x64.exe
             package_type: exe
-          - os: windows-latest
-            arch: x86
-            asset_name: EasyKiConverter-windows-x86.exe
-            package_type: exe
           
           # Linux builds for different distributions
           # Ubuntu/Debian-based distributions
@@ -80,14 +76,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           
-          # Windows x86特殊处理 - 分步安装并使用预编译包
-          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
-            echo "Installing dependencies for Windows x86..."
-            # 为32位Windows安装预编译的numpy和pandas
-            pip install --only-binary=numpy numpy==2.3.3
-            pip install --only-binary=pandas pandas==2.3.2
-            # 安装其他依赖（排除可能在Windows上引起问题的包）
-            pip install altgraph==0.17.4 annotated-types==0.7.0 certifi==2025.8.3 charset-normalizer==3.4.3 et_xmlfile==2.0.0 idna==3.10 packaging==25.0 pydantic==2.11.9 pydantic_core==2.33.2 pyinstaller==6.16.0 pyinstaller-hooks-contrib==2025.8 PyQt6==6.9.1 PyQt6-Qt6==6.9.2 PyQt6_sip==13.10.2 python-dateutil==2.9.0.post0 pytz==2025.2 requests==2.32.5 setuptools==80.9.0 six==1.17.0 typing_extensions==4.15.0 typing-inspection==0.4.1 urllib3==2.5.0
+          # Windows依赖安装
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            pip install -r build_conf/requirements_app.txt
           else
             pip install -r build_conf/requirements_app.txt
           fi
@@ -122,8 +113,8 @@ jobs:
           ls -la src/ui/pyqt6/resources/
           
           # 根据平台和架构设置特定参数
-          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
-            # Windows x86构建
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            # Windows构建
             export BUILD_ARCH=${{ matrix.arch }}
             pyinstaller build_conf/build.spec --noconfirm
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
@@ -373,7 +364,6 @@ jobs:
             
             ### Windows
             - x64: `EasyKiConverter-windows-x64.exe`
-            - x86: `EasyKiConverter-windows-x86.exe`
             
             ### Linux发行版特定包
             #### Ubuntu/Debian
@@ -392,6 +382,7 @@ jobs:
             - Intel: `EasyKiConverter-macos-intel`
             - Apple Silicon: `EasyKiConverter-macos-apple-silicon`
 
+            > 💡 **Windows 用户注意**：目前仅支持 64 位 Windows 系统。
             > 💡 **macOS 用户注意**：首次运行时若提示"无法验证开发者"，请右键点击文件 → "Open" 即可运行。
             > 💡 **Ubuntu/Debian 用户**：推荐使用DEB包，可直接安装和管理。
             > 💡 **Fedora/RHEL 用户**：推荐使用RPM包，可直接安装和管理。

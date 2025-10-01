@@ -64,6 +64,14 @@ python main.py --lcsc_id C13377 --model3d --debug    # 测试3D模型
 - **src/ui/** - 用户界面
   - **pyqt6/** - PyQt6 桌面应用
 
+## 📦 依赖版本说明
+
+项目使用最新的依赖包版本以确保功能完整性和安全性：
+- **pandas**: 2.3.2（最新稳定版本）
+- **numpy**: 2.3.3（最新稳定版本）
+
+所有支持的平台（Windows x64、Linux、macOS）均使用相同的依赖版本。
+
 ## 🔧 命令行选项
 
 ```bash
