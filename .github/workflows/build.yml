@@ -94,13 +94,35 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
+          # 显示当前目录和文件结构以进行调试
+          echo "Current directory: $(pwd)"
+          echo "Directory structure:"
+          ls -la
+          echo "Build conf directory:"
+          ls -la build_conf/
+          echo "Source directory:"
+          ls -la src/ui/pyqt6/
+          echo "Resources directory:"
+          ls -la src/ui/pyqt6/resources/
+          
           # 根据平台和架构设置特定参数
           if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
             # Windows x86构建
-            pyinstaller build_conf/build.spec --noconfirm --additional-hooks-dir=.
-          else
-            # 默认构建
+            pyinstaller build_conf/build.spec --noconfirm -- ${matrix.arch}
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            # macOS构建
             pyinstaller build_conf/build.spec --noconfirm
+          else
+            # 默认构建（Linux）
+            pyinstaller build_conf/build.spec --noconfirm
+          fi
+          
+          # 显示构建结果
+          echo "Build completed. Dist directory contents:"
+          if [ -d "dist" ]; then
+            ls -la dist/
+          else
+            echo "Dist directory not found"
           fi
         shell: bash
 
@@ -281,6 +303,14 @@ jobs:
         run: |
           if [ -f "dist/EasyKiConverter.exe" ]; then
             mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
+          fi
+        shell: bash
+
+      - name: Rename macOS executable
+        if: matrix.os == 'macos-latest'
+        run: |
+          if [ -f "dist/EasyKiConverter" ]; then
+            mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
         shell: bash
 

@@ -2,16 +2,31 @@
 
 block_cipher = None
 
+import os
+import sys
+
+# 动态确定资源路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+resources_dir = os.path.join(current_dir, '..', 'src', 'ui', 'pyqt6', 'resources')
+
+# 构建资源文件列表
+icon_files = []
+icon_extensions = ['.ico', '.icns', '.png', '.svg']
+for ext in icon_extensions:
+    icon_path = os.path.join(resources_dir, f'app_icon{ext}')
+    if os.path.exists(icon_path):
+        # 确保在Windows上使用正确的路径分隔符
+        icon_files.append((icon_path, 'resources/'))
+
+# 确定是否需要额外的hooks目录
+additional_hooks_dirs = []
+
 a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
     binaries=[],
-    datas=[
-        ('../src/ui/pyqt6/resources/app_icon.ico', 'resources/'),
-        ('../src/ui/pyqt6/resources/app_icon.icns', 'resources/'),
-        ('../src/ui/pyqt6/resources/app_icon.png', 'resources/'),
-        ('../src/ui/pyqt6/resources/app_icon.svg', 'resources/')
-    ],
+    datas=icon_files,
+    hookspath=additional_hooks_dirs,
     hiddenimports=[
         'PyQt6.QtCore',
         'PyQt6.QtGui',
@@ -121,9 +136,6 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
-import sys
-import os
-
 # 根据平台选择合适的图标文件
 if sys.platform.startswith('win'):
     icon_path = os.path.join('resources', 'app_icon.ico')
@@ -150,7 +162,8 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,
+    # Windows x86架构需要指定target_arch
+    target_arch='x86' if sys.platform.startswith('win') and 'x86' in sys.argv else None,
     codesign_identity=None,
     entitlements_file=None,
     icon=icon_path
