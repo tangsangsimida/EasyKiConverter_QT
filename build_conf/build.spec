@@ -6,7 +6,14 @@ import os
 import sys
 
 # 动态确定资源路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
+# 在PyInstaller环境中使用不同的方法获取当前目录
+if getattr(sys, 'frozen', False):
+    # 如果是PyInstaller打包的环境
+    current_dir = os.path.dirname(sys.executable)
+else:
+    # 如果是正常Python环境
+    current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
+
 resources_dir = os.path.join(current_dir, '..', 'src', 'ui', 'pyqt6', 'resources')
 
 # 构建资源文件列表
