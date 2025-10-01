@@ -5,6 +5,9 @@ block_cipher = None
 import os
 import sys
 
+# 从环境变量获取构建架构
+BUILD_ARCH = os.environ.get('BUILD_ARCH', 'x64')
+
 # 动态确定资源路径
 # 在PyInstaller环境中使用不同的方法获取当前目录
 if getattr(sys, 'frozen', False):
@@ -31,10 +34,6 @@ if sys.platform.startswith('win'):
     icon_path = os.path.join(resources_dir, 'app_icon.ico')
     # 确保路径在Windows上正确格式化
     icon_path = os.path.normpath(icon_path)
-    # 检查文件是否存在，如果不存在则尝试其他路径
-    if not os.path.exists(icon_path):
-        # 尝试使用绝对路径
-        icon_path = os.path.abspath(icon_path)
 elif sys.platform.startswith('darwin'):
     icon_path = os.path.join(resources_dir, 'app_icon.icns')
     icon_path = os.path.normpath(icon_path)
@@ -42,9 +41,6 @@ else:
     # Linux平台通常不使用图标文件，或者使用PNG格式
     icon_path = os.path.join(resources_dir, 'app_icon.png')
     icon_path = os.path.normpath(icon_path)
-    # 如果PNG文件不存在，则不使用图标
-    if not os.path.exists(icon_path):
-        icon_path = None
 
 # 最后检查图标文件是否存在，如果不存在则设置为None
 if icon_path and not os.path.exists(icon_path):
@@ -181,8 +177,10 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    # Windows x86架构需要指定target_arch
-    target_arch='x86' if sys.platform.startswith('win') and 'x86' in sys.argv else None,
+    # 使用环境变量设置target_arch
+    target_arch='x86' if BUILD_ARCH == 'x86' else None,
+    # macOS通用二进制支持
+    universal2=True if sys.platform.startswith('darwin') else False,
     codesign_identity=None,
     entitlements_file=None,
     icon=icon_path

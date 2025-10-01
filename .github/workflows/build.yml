@@ -22,10 +22,6 @@ jobs:
             arch: x64
             asset_name: EasyKiConverter-windows-x64.exe
             package_type: exe
-          - os: windows-latest
-            arch: x86
-            asset_name: EasyKiConverter-windows-x86.exe
-            package_type: exe
           
           # Linux builds for different distributions
           # Ubuntu/Debian-based distributions
@@ -58,11 +54,11 @@ jobs:
           
           # macOS builds
           - os: macos-latest
-            arch: intel
+            arch: x64
             asset_name: EasyKiConverter-macos-intel
             package_type: binary
           - os: macos-latest
-            arch: apple-silicon
+            arch: x64
             asset_name: EasyKiConverter-macos-apple-silicon
             package_type: binary
 
@@ -74,12 +70,23 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          architecture: ${{ matrix.arch == 'apple-silicon' && 'x64' || matrix.arch }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r build_conf/requirements_app.txt    
-          pip install pyinstaller                       # 安装 PyInstaller
+          
+          # Windows依赖安装
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            pip install -r build_conf/requirements_app.txt
+          else
+            pip install -r build_conf/requirements_app.txt
+          fi
+          
+          # 确保PyInstaller已安装
+          if ! python -c "import PyInstaller" 2>/dev/null; then
+            pip install pyinstaller==6.16.0
+          fi
           
           # Linux特定依赖
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
@@ -106,14 +113,17 @@ jobs:
           ls -la src/ui/pyqt6/resources/
           
           # 根据平台和架构设置特定参数
-          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
-            # Windows x86构建
-            pyinstaller build_conf/build.spec --noconfirm -- ${{ matrix.arch }}
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            # Windows构建
+            export BUILD_ARCH=${{ matrix.arch }}
+            pyinstaller build_conf/build.spec --noconfirm
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS构建
+            export BUILD_ARCH=${{ matrix.asset_name == 'EasyKiConverter-macos-apple-silicon' && 'apple-silicon' || 'intel' }}
             pyinstaller build_conf/build.spec --noconfirm
           else
             # 默认构建（Linux）
+            export BUILD_ARCH=${{ matrix.arch }}
             pyinstaller build_conf/build.spec --noconfirm
           fi
           
@@ -354,7 +364,6 @@ jobs:
             
             ### Windows
             - x64: `EasyKiConverter-windows-x64.exe`
-            - x86: `EasyKiConverter-windows-x86.exe`
             
             ### Linux发行版特定包
             #### Ubuntu/Debian
@@ -373,6 +382,7 @@ jobs:
             - Intel: `EasyKiConverter-macos-intel`
             - Apple Silicon: `EasyKiConverter-macos-apple-silicon`
 
+            > 💡 **Windows 用户注意**：目前仅支持 64 位 Windows 系统。
             > 💡 **macOS 用户注意**：首次运行时若提示"无法验证开发者"，请右键点击文件 → "Open" 即可运行。
             > 💡 **Ubuntu/Debian 用户**：推荐使用DEB包，可直接安装和管理。
             > 💡 **Fedora/RHEL 用户**：推荐使用RPM包，可直接安装和管理。
