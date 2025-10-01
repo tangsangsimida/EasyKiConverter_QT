@@ -6,7 +6,12 @@ a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
     binaries=[],
-    datas=[],
+    datas=[
+        ('../src/ui/pyqt6/resources/app_icon.ico', 'resources/'),
+        ('../src/ui/pyqt6/resources/app_icon.icns', 'resources/'),
+        ('../src/ui/pyqt6/resources/app_icon.png', 'resources/'),
+        ('../src/ui/pyqt6/resources/app_icon.svg', 'resources/')
+    ],
     hiddenimports=[
         'PyQt6.QtCore',
         'PyQt6.QtGui',
@@ -116,6 +121,18 @@ a = Analysis(
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+import sys
+import os
+
+# 根据平台选择合适的图标文件
+if sys.platform.startswith('win'):
+    icon_path = os.path.join('resources', 'app_icon.ico')
+elif sys.platform.startswith('darwin'):
+    icon_path = os.path.join('resources', 'app_icon.icns')
+else:
+    # Linux平台通常不使用图标文件，或者使用PNG格式
+    icon_path = None
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -136,5 +153,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None  # 移除平台特定的图标配置
+    icon=icon_path
 )
