@@ -25,6 +25,19 @@ for ext in icon_extensions:
         # 确保在Windows上使用正确的路径分隔符
         icon_files.append((icon_path, 'resources/'))
 
+# 确定图标文件路径用于EXE构建
+icon_path = None
+if sys.platform.startswith('win'):
+    icon_path = os.path.join(resources_dir, 'app_icon.ico')
+elif sys.platform.startswith('darwin'):
+    icon_path = os.path.join(resources_dir, 'app_icon.icns')
+else:
+    # Linux平台通常不使用图标文件，或者使用PNG格式
+    icon_path = os.path.join(resources_dir, 'app_icon.png')
+    # 如果PNG文件不存在，则不使用图标
+    if not os.path.exists(icon_path):
+        icon_path = None
+
 a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
@@ -138,15 +151,6 @@ a = Analysis(
     noarchive=False,
 )
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
-
-# 根据平台选择合适的图标文件
-if sys.platform.startswith('win'):
-    icon_path = os.path.join('resources', 'app_icon.ico')
-elif sys.platform.startswith('darwin'):
-    icon_path = os.path.join('resources', 'app_icon.icns')
-else:
-    # Linux平台通常不使用图标文件，或者使用PNG格式
-    icon_path = None
 
 exe = EXE(
     pyz,
