@@ -211,24 +211,24 @@ jobs:
           supporting complete conversion of symbols, footprints, and 3D models.
           
           %files
-          /usr/bin/EasyKiConverter
-          /usr/share/icons/hicolor/256x256/apps/easykiconverter.png
-          /usr/share/applications/easykiconverter.desktop
+          %{_bindir}/EasyKiConverter
+          %{_datadir}/icons/hicolor/256x256/apps/easykiconverter.png
+          %{_datadir}/applications/easykiconverter.desktop
           
           %install
-          mkdir -p $RPM_BUILD_ROOT/usr/bin
-          mkdir -p $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps
-          mkdir -p $RPM_BUILD_ROOT/usr/share/applications
+          mkdir -p %{buildroot}%{_bindir}
+          mkdir -p %{buildroot}%{_datadir}/icons/hicolor/256x256/apps
+          mkdir -p %{buildroot}%{_datadir}/applications
           
-          cp %{_sourcedir}/EasyKiConverter $RPM_BUILD_ROOT/usr/bin/EasyKiConverter
-          chmod 755 $RPM_BUILD_ROOT/usr/bin/EasyKiConverter
+          cp %{_sourcedir}/EasyKiConverter %{buildroot}%{_bindir}/EasyKiConverter
+          chmod 755 %{buildroot}%{_bindir}/EasyKiConverter
           
           if [ -f "%{_sourcedir}/easykiconverter.png" ]; then
-            cp %{_sourcedir}/easykiconverter.png $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
-            chmod 644 $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+            cp %{_sourcedir}/easykiconverter.png %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/easykiconverter.png
+            chmod 644 %{buildroot}%{_datadir}/icons/hicolor/256x256/apps/easykiconverter.png
           fi
           
-          cat > $RPM_BUILD_ROOT/usr/share/applications/easykiconverter.desktop << 'DESKTOP'
+          cat > %{buildroot}%{_datadir}/applications/easykiconverter.desktop << 'DESKTOP'
           [Desktop Entry]
           Name=EasyKiConverter
           Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -242,7 +242,7 @@ jobs:
           StartupWMClass=EasyKiConverter
           DESKTOP
           
-          chmod 644 $RPM_BUILD_ROOT/usr/share/applications/easykiconverter.desktop
+          chmod 644 %{buildroot}%{_datadir}/applications/easykiconverter.desktop
           
           %prep
           
