@@ -24,5 +24,3 @@ typing_extensions==4.15.0
 typing-inspection==0.4.1
 tzdata==2025.2
 urllib3==2.5.0
-stdeb==0.10.0  # 用于创建DEB包
-rpm==4.14.0    # 用于创建RPM包

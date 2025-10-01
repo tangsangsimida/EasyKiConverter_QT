@@ -44,6 +44,12 @@
 - [性能优化](docs/performance.md) - 多线程并行处理和性能提升
 - [系统要求](docs/system_requirements.md) - 系统要求和支持的元件类型
 
+## 🔧 依赖管理
+
+EasyKiConverter采用分层依赖管理策略：
+- **核心依赖**：所有平台共用的基础依赖
+- **平台特定依赖**：根据不同平台和包格式按需安装
+
 ## 📄 许可证
 
 本项目采用 **GNU General Public License v3.0 (GPL-3.0)** 许可证。

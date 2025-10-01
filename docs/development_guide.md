@@ -14,6 +14,13 @@ venv\Scripts\activate  # Windows
 
 # 安装应用依赖（根据build_conf/requirements_app.txt文件）
 pip install -r build_conf/requirements_app.txt
+
+# Linux用户如需构建特定包格式，安装额外依赖
+# DEB包构建依赖
+# pip install stdeb
+
+# RPM包构建依赖（通过系统包管理器安装）
+# sudo apt-get install rpm
 ```
 
 ## 🖥️ PyQt6 UI 开发

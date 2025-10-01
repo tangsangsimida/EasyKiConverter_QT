@@ -50,6 +50,12 @@ For more detailed information, please refer to the documentation in the `docs` d
 - [Performance Optimization](docs/performance.md) - Multi-threading parallel processing and performance improvements
 - [System Requirements](docs/system_requirements.md) - System requirements and supported component types
 
+## 🔧 Dependency Management
+
+EasyKiConverter uses a layered dependency management strategy:
+- **Core Dependencies**: Base dependencies shared by all platforms
+- **Platform-Specific Dependencies**: Installed on-demand based on platform and package format
+
 ## 📄 License
 
 This project is licensed under **GNU General Public License v3.0 (GPL-3.0)**.

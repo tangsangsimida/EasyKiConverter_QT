@@ -84,10 +84,11 @@ jobs:
           # Linux特定依赖
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             sudo apt-get update
-            sudo apt-get install -y rpm tar xz-utils docker.io
-            pip install pyinstaller[hook_testing]  # 用于创建deb包的额外依赖
-            # 启动Docker服务
-            sudo systemctl start docker
+            sudo apt-get install -y rpm tar xz-utils
+            # 根据包类型安装特定依赖
+            if [ "${{ matrix.package_type }}" == "deb" ]; then
+              pip install stdeb  # 用于创建deb包的额外依赖
+            fi
           fi
 
       - name: Build with PyInstaller
