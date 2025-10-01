@@ -90,6 +90,7 @@ jobs:
               pip install stdeb  # 用于创建deb包的额外依赖
             fi
           fi
+        shell: bash
 
       - name: Build with PyInstaller
         run: |
@@ -101,6 +102,7 @@ jobs:
             # 默认构建
             pyinstaller build_conf/build.spec --noconfirm
           fi
+        shell: bash
 
       - name: Create DEB package (Ubuntu/Debian)
         if: matrix.os == 'ubuntu-latest' && matrix.distro == 'ubuntu'
@@ -154,6 +156,7 @@ jobs:
           # 构建DEB包
           dpkg-deb --build easykiconverter-deb
           mv easykiconverter-deb.deb dist/${{ matrix.asset_name }}
+        shell: bash
 
       - name: Create RPM package (Fedora/RHEL)
         if: matrix.os == 'ubuntu-latest' && matrix.distro == 'fedora'
@@ -224,6 +227,7 @@ jobs:
           # 构建RPM包（使用标准工具）
           rpmbuild --define "_topdir $(pwd)/rpmbuild" -bb rpmbuild/SPECS/easykiconverter.spec
           mv rpmbuild/RPMS/x86_64/*.rpm dist/${{ matrix.asset_name }}
+        shell: bash
 
       - name: Create tarball package (Arch Linux)
         if: matrix.os == 'ubuntu-latest' && matrix.distro == 'arch'
@@ -262,22 +266,23 @@ jobs:
           
           # 创建tar.xz包（Arch Linux标准压缩格式）
           tar -cJf dist/${{ matrix.asset_name }} -C easykiconverter-arch .
+        shell: bash
 
       - name: Rename executable (Generic Linux binary)
         if: matrix.os == 'ubuntu-latest' && matrix.distro == 'generic'
-        shell: bash
         run: |
           if [ -f "dist/EasyKiConverter" ]; then
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
+        shell: bash
 
       - name: Rename Windows executable
         if: matrix.os == 'windows-latest'
-        shell: bash
         run: |
           if [ -f "dist/EasyKiConverter.exe" ]; then
             mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
           fi
+        shell: bash
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
