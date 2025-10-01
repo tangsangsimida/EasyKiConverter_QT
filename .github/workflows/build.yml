@@ -23,17 +23,9 @@ jobs:
             asset_name: EasyKiConverter-windows-x64.exe
             package_type: exe
           - os: windows-latest
-            arch: x64
-            asset_name: EasyKiConverter-windows-x64.msi
-            package_type: msi
-          - os: windows-latest
             arch: x86
             asset_name: EasyKiConverter-windows-x86.exe
             package_type: exe
-          - os: windows-latest
-            arch: x86
-            asset_name: EasyKiConverter-windows-x86.msi
-            package_type: msi
           
           # Linux builds for different distributions
           # Ubuntu/Debian-based distributions
@@ -89,14 +81,6 @@ jobs:
           pip install -r build_conf/requirements_app.txt    
           pip install pyinstaller                       # 安装 PyInstaller
           
-          # Windows特定依赖 - 安装WiX Toolset用于MSI构建
-          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.package_type }}" == "msi" ]; then
-            # 下载并安装WiX Toolset
-            curl -L -o wixtoolset.exe https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe
-            ./wixtoolset.exe /install /quiet /norestart
-            echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $GITHUB_PATH
-          fi
-          
           # Linux特定依赖
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             sudo apt-get update
@@ -124,12 +108,12 @@ jobs:
           # 根据平台和架构设置特定参数
           if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
             # Windows x86构建
-            pyinstaller build_conf/build.spec --noconfirm --arch ${{ matrix.arch }}
+            pyinstaller build_conf/build.spec --noconfirm -- ${{ matrix.arch }}
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS构建
             pyinstaller build_conf/build.spec --noconfirm
           else
-            # 默认构建（Linux和Windows x64）
+            # 默认构建（Linux）
             pyinstaller build_conf/build.spec --noconfirm
           fi
           
@@ -139,77 +123,6 @@ jobs:
             ls -la dist/
           else
             echo "Dist directory not found"
-          fi
-        shell: bash
-
-      - name: Create MSI package (Windows)
-        if: matrix.os == 'windows-latest' && matrix.package_type == 'msi'
-        run: |
-          # 检查是否成功构建了可执行文件
-          if [ -f "dist/EasyKiConverter.exe" ]; then
-            # 创建MSI构建目录
-            mkdir -p msi-build
-            
-            # 复制可执行文件和资源
-            cp dist/EasyKiConverter.exe msi-build/
-            
-            # 复制图标文件
-            if [ -f "src/ui/pyqt6/resources/app_icon.ico" ]; then
-              cp src/ui/pyqt6/resources/app_icon.ico msi-build/
-            fi
-            
-            # 创建WiX源文件
-            cat > msi-build/product.wxs << 'EOF'
-            <?xml version="1.0" encoding="UTF-8"?>
-            <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-              <Product Id="*" Name="EasyKiConverter" Language="1033" Version="1.0.0.0" 
-                       Manufacturer="EasyKiConverter Team" UpgradeCode="12345678-1234-1234-1234-123456789012">
-                <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
-                
-                <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-                <MediaTemplate />
-                
-                <Feature Id="ProductFeature" Title="EasyKiConverter" Level="1">
-                  <ComponentGroupRef Id="ProductComponents" />
-                </Feature>
-                
-                <!-- 创建桌面快捷方式 -->
-                <Icon Id="app_icon.ico" SourceFile="app_icon.ico" />
-                <Property Id="ARPPRODUCTICON" Value="app_icon.ico" />
-              </Product>
-              
-              <Fragment>
-                <Directory Id="TARGETDIR" Name="SourceDir">
-                  <Directory Id="ProgramFilesFolder">
-                    <Directory Id="INSTALLFOLDER" Name="EasyKiConverter" />
-                  </Directory>
-                  <Directory Id="DesktopFolder" Name="Desktop" />
-                </Directory>
-              </Fragment>
-              
-              <Fragment>
-                <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-                  <Component Id="MainExecutable" Guid="12345678-1234-1234-1234-123456789013">
-                    <File Id="EasyKiConverter.exe" Source="EasyKiConverter.exe" KeyPath="yes">
-                      <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="EasyKiConverter" 
-                                WorkingDirectory="INSTALLFOLDER" Icon="app_icon.ico" />
-                    </File>
-                  </Component>
-                  <Component Id="AppIcon" Guid="12345678-1234-1234-1234-123456789014">
-                    <File Id="app_icon.ico" Source="app_icon.ico" KeyPath="yes" />
-                  </Component>
-                </ComponentGroup>
-              </Fragment>
-            </Wix>
-            EOF
-            
-            # 使用WiX工具构建MSI
-            cd msi-build
-            candle product.wxs
-            light product.wixobj -out ../dist/${{ matrix.asset_name }}
-            cd ..
-          else
-            echo "Executable not found, skipping MSI creation"
           fi
         shell: bash
 
@@ -226,7 +139,7 @@ jobs:
           cp dist/EasyKiConverter easykiconverter-deb/usr/bin/
           
           # 创建desktop文件（遵循Debian标准）
-          cat > easykiconverter-deb/usr/share/applications/easykiconverter.desktop << 'EOF'
+          cat > easykiconverter-deb/usr/share/applications/easykiconverter.desktop << EOF
           [Desktop Entry]
           Name=EasyKiConverter
           Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -246,7 +159,7 @@ jobs:
           fi
           
           # 创建control文件（遵循Debian标准）
-          cat > easykiconverter-deb/DEBIAN/control << 'EOF'
+          cat > easykiconverter-deb/DEBIAN/control << EOF
           Package: easykiconverter
           Version: 1.0.0
           Section: devel
@@ -285,7 +198,7 @@ jobs:
           fi
           
           # 创建SPEC文件（遵循RPM标准）
-          cat > rpmbuild/SPECS/easykiconverter.spec << 'EOF'
+          cat > rpmbuild/SPECS/easykiconverter.spec << EOF
           Name: easykiconverter
           Version: 1.0.0
           Release: 1
@@ -361,7 +274,7 @@ jobs:
           fi
           
           # 创建desktop文件（遵循Arch Linux标准）
-          cat > easykiconverter-arch/usr/share/applications/easykiconverter.desktop << 'EOF'
+          cat > easykiconverter-arch/usr/share/applications/easykiconverter.desktop << EOF
           [Desktop Entry]
           Name=EasyKiConverter
           Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -386,136 +299,26 @@ jobs:
           tar -cJf dist/${{ matrix.asset_name }} -C easykiconverter-arch .
         shell: bash
 
-      - name: Create desktop files and icons for Generic Linux binary
+      - name: Rename executable (Generic Linux binary)
         if: matrix.os == 'ubuntu-latest' && matrix.distro == 'generic'
         run: |
           if [ -f "dist/EasyKiConverter" ]; then
-            # 创建目录结构
-            mkdir -p easykiconverter-linux/usr/bin
-            mkdir -p easykiconverter-linux/usr/share/applications
-            mkdir -p easykiconverter-linux/usr/share/icons/hicolor/256x256/apps
-            
-            # 复制可执行文件
-            cp dist/EasyKiConverter easykiconverter-linux/usr/bin/
-            
-            # 复制图标
-            if [ -f "src/ui/pyqt6/resources/app_icon.png" ]; then
-              cp src/ui/pyqt6/resources/app_icon.png easykiconverter-linux/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
-            fi
-            
-            # 创建desktop文件
-            cat > easykiconverter-linux/usr/share/applications/easykiconverter.desktop << 'EOF'
-            [Desktop Entry]
-            Name=EasyKiConverter
-            Comment=Convert LCSC and EasyEDA components to KiCad format
-            Exec=/usr/bin/EasyKiConverter
-            Icon=easykiconverter
-            Terminal=false
-            Type=Application
-            Categories=Development;Electronics;
-            # 添加任务栏图标支持
-            StartupNotify=true
-            StartupWMClass=EasyKiConverter
-            EOF
-            
-            # 设置权限
-            chmod 755 easykiconverter-linux/usr/bin/EasyKiConverter
-            chmod 644 easykiconverter-linux/usr/share/applications/easykiconverter.desktop
-            if [ -f "easykiconverter-linux/usr/share/icons/hicolor/256x256/apps/easykiconverter.png" ]; then
-              chmod 644 easykiconverter-linux/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
-            fi
-            
-            # 创建tar.gz包
-            tar -czf dist/${{ matrix.asset_name }}.tar.gz -C easykiconverter-linux .
-            
-            # 也创建一个不带目录结构的可执行文件
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
         shell: bash
 
-      - name: Create Windows package with icons
-        if: matrix.os == 'windows-latest' && matrix.package_type == 'exe'
+      - name: Rename Windows executable
+        if: matrix.os == 'windows-latest'
         run: |
           if [ -f "dist/EasyKiConverter.exe" ]; then
-            # 创建Windows安装包结构
-            mkdir -p easykiconverter-windows
-            
-            # 复制可执行文件
-            cp dist/EasyKiConverter.exe easykiconverter-windows/
-            
-            # 复制图标文件
-            if [ -f "src/ui/pyqt6/resources/app_icon.ico" ]; then
-              cp src/ui/pyqt6/resources/app_icon.ico easykiconverter-windows/
-            fi
-            
-            # 创建批处理文件用于创建桌面快捷方式
-            cat > easykiconverter-windows/install.bat << 'EOF'
-            @echo off
-            echo Creating desktop shortcut...
-            copy "%~dp0EasyKiConverter.exe" "%USERPROFILE%\Desktop\EasyKiConverter.exe"
-            echo Shortcut created on desktop
-            pause
-            EOF
-            
-            # 创建ZIP包
-            cd easykiconverter-windows
-            7z a ../dist/${{ matrix.asset_name }}.zip *
-            cd ..
-            
-            # 也创建一个单独的EXE文件
             mv dist/EasyKiConverter.exe dist/${{ matrix.asset_name }}
           fi
         shell: bash
 
-      - name: Create macOS package with icons
+      - name: Rename macOS executable
         if: matrix.os == 'macos-latest'
         run: |
           if [ -f "dist/EasyKiConverter" ]; then
-            # 创建macOS应用包结构
-            mkdir -p EasyKiConverter.app/Contents/MacOS
-            mkdir -p EasyKiConverter.app/Contents/Resources
-            mkdir -p EasyKiConverter.app/Contents/Resources/AppIcon.iconset
-            
-            # 复制可执行文件
-            cp dist/EasyKiConverter EasyKiConverter.app/Contents/MacOS/
-            
-            # 复制图标文件
-            if [ -f "src/ui/pyqt6/resources/app_icon.icns" ]; then
-              cp src/ui/pyqt6/resources/app_icon.icns EasyKiConverter.app/Contents/Resources/
-            fi
-            
-            # 创建Info.plist文件
-            cat > EasyKiConverter.app/Contents/Info.plist << 'EOF'
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-            <dict>
-                <key>CFBundleExecutable</key>
-                <string>EasyKiConverter</string>
-                <key>CFBundleIconFile</key>
-                <string>app_icon.icns</string>
-                <key>CFBundleIdentifier</key>
-                <string>com.easykiconverter.app</string>
-                <key>CFBundleName</key>
-                <string>EasyKiConverter</string>
-                <key>CFBundlePackageType</key>
-                <string>APPL</string>
-                <key>CFBundleShortVersionString</key>
-                <string>1.0.0</string>
-                <key>CFBundleVersion</key>
-                <string>1.0.0</string>
-                <key>LSMinimumSystemVersion</key>
-                <string>10.12</string>
-                <key>NSHumanReadableCopyright</key>
-                <string>Copyright © 2025 EasyKiConverter Team</string>
-            </dict>
-            </plist>
-            EOF
-            
-            # 创建ZIP包
-            zip -r dist/${{ matrix.asset_name }}.zip EasyKiConverter.app
-            
-            # 也创建一个单独的可执行文件
             mv dist/EasyKiConverter dist/${{ matrix.asset_name }}
           fi
         shell: bash
@@ -550,45 +353,34 @@ jobs:
             ## 📦 下载
             
             ### Windows
-            - x64: `EasyKiConverter-windows-x64.exe` (单独可执行文件)
-            - x64: `EasyKiConverter-windows-x64.exe.zip` (包含图标和安装脚本的ZIP包)
-            - x64: `EasyKiConverter-windows-x64.msi` (MSI安装包，包含完整桌面集成)
-            - x86: `EasyKiConverter-windows-x86.exe` (单独可执行文件)
-            - x86: `EasyKiConverter-windows-x86.exe.zip` (包含图标和安装脚本的ZIP包)
-            - x86: `EasyKiConverter-windows-x86.msi` (MSI安装包，包含完整桌面集成)
+            - x64: `EasyKiConverter-windows-x64.exe`
+            - x86: `EasyKiConverter-windows-x86.exe`
             
             ### Linux发行版特定包
             #### Ubuntu/Debian
-            - DEB Package: `EasyKiConverter-ubuntu-x64.deb` (完整DEB包，包含桌面图标和任务栏支持)
+            - DEB Package: `EasyKiConverter-ubuntu-x64.deb`
             
             #### Fedora/RHEL
-            - RPM Package: `EasyKiConverter-fedora-x64.rpm` (完整RPM包，包含桌面图标和任务栏支持)
+            - RPM Package: `EasyKiConverter-fedora-x64.rpm`
             
             #### Arch Linux
-            - Tarball Package: `EasyKiConverter-arch-x64.tar.xz` (完整tar.xz包，包含桌面图标和任务栏支持)
+            - Tarball Package: `EasyKiConverter-arch-x64.tar.xz`
             
             #### 通用Linux二进制文件（适用于大多数Linux发行版）
-            - Binary: `EasyKiConverter-linux-x64` (单独可执行文件)
-            - Binary Package: `EasyKiConverter-linux-x64.tar.gz` (包含桌面图标和任务栏支持的完整包)
+            - Binary: `EasyKiConverter-linux-x64`
             
             ### macOS
-            - Intel: `EasyKiConverter-macos-intel` (单独可执行文件)
-            - Intel: `EasyKiConverter-macos-intel.zip` (完整应用包，包含图标和Info.plist)
-            - Apple Silicon: `EasyKiConverter-macos-apple-silicon` (单独可执行文件)
-            - Apple Silicon: `EasyKiConverter-macos-apple-silicon.zip` (完整应用包，包含图标和Info.plist)
+            - Intel: `EasyKiConverter-macos-intel`
+            - Apple Silicon: `EasyKiConverter-macos-apple-silicon`
 
-            > 💡 **macOS 用户注意**：首次运行时若提示"无法验证开发者"，请右键点击文件 → "Open" 即可运行。推荐使用ZIP包以获得完整的应用体验。
-            > 💡 **Ubuntu/Debian 用户**：推荐使用DEB包，可直接安装和管理，包含完整的桌面集成。
-            > 💡 **Fedora/RHEL 用户**：推荐使用RPM包，可直接安装和管理，包含完整的桌面集成。
-            > 💡 **Arch Linux 用户**：推荐使用tar.xz包，解压后可直接使用，包含完整的桌面集成。
-            > 💡 **其他Linux发行版用户**：推荐使用tar.gz包以获得完整的桌面集成体验，或使用单独的二进制文件。
-            > 💡 **Windows 用户**：推荐使用MSI安装包以获得完整的桌面集成体验（包括开始菜单项、桌面图标和程序卸载支持），或使用ZIP包以获得图标和安装脚本，也可使用单独的EXE文件。
+            > 💡 **macOS 用户注意**：首次运行时若提示"无法验证开发者"，请右键点击文件 → "Open" 即可运行。
+            > 💡 **Ubuntu/Debian 用户**：推荐使用DEB包，可直接安装和管理。
+            > 💡 **Fedora/RHEL 用户**：推荐使用RPM包，可直接安装和管理。
+            > 💡 **Arch Linux 用户**：推荐使用tar.xz包，解压后可直接使用。
+            > 💡 **其他Linux发行版用户**：可使用通用二进制文件，在大多数Linux发行版上运行。
           draft: false
           prerelease: false
           files: |
             release-assets/*/*
-            dist/*.tar.gz
-            dist/*.zip
-            dist/*.msi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
