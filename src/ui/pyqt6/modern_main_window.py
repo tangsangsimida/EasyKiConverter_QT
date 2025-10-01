@@ -31,6 +31,9 @@ class ModernMainWindow(QMainWindow):
         self.setup_connections()
         self.load_settings()
         
+        # 确保窗口图标正确设置
+        self.ensure_window_icon()
+        
     def setup_window(self):
         """设置窗口属性"""
         self.setWindowTitle("EasyKiConverter - EDA转换工具")
@@ -40,29 +43,90 @@ class ModernMainWindow(QMainWindow):
         # 设置窗口图标
         try:
             import sys
-            # 使用更可靠的方法查找图标文件
+            # 使用更可靠的方法查找图标文件，支持多种格式
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
             
-            # 如果在开发环境中找不到，尝试其他可能的路径
-            if not os.path.exists(icon_path):
-                # 检查是否在PyInstaller环境中
-                if getattr(sys, 'frozen', False):
-                    # PyInstaller环境
-                    application_path = os.path.dirname(sys.executable)
-                    icon_path = os.path.join(application_path, "resources", "app_icon.svg")
-                else:
-                    # 开发环境
-                    icon_path = os.path.join(current_dir, "resources", "app_icon.svg")
+            # 支持的图标格式列表（按优先级排序）
+            icon_formats = [
+                "app_icon.png",    # PNG格式 - 跨平台通用
+                "app_icon.svg",    # SVG格式 - 矢量图形
+                "app_icon.ico",    # ICO格式 - Windows
+                "app_icon.icns"    # ICNS格式 - macOS
+            ]
             
-            if os.path.exists(icon_path):
+            # 查找路径列表
+            search_paths = [
+                os.path.join(current_dir, "resources"),  # 开发环境
+            ]
+            
+            # 如果在PyInstaller环境中，添加可执行文件目录
+            if getattr(sys, 'frozen', False):
+                application_path = os.path.dirname(sys.executable)
+                search_paths.insert(0, os.path.join(application_path, "resources"))
+            
+            # 遍历所有路径和格式，找到第一个存在的图标文件
+            icon_path = None
+            for search_path in search_paths:
+                for icon_format in icon_formats:
+                    potential_path = os.path.join(search_path, icon_format)
+                    if os.path.exists(potential_path):
+                        icon_path = potential_path
+                        break
+                if icon_path:
+                    break
+            
+            if icon_path and os.path.exists(icon_path):
                 self.setWindowIcon(QIcon(icon_path))
         except Exception as e:
             print(f"⚠️  设置窗口图标时出错: {e}")
         
         # 设置窗口样式
         self.setWindowFlags(Qt.WindowType.Window)
-        
+    
+    def ensure_window_icon(self):
+        """确保窗口图标正确设置"""
+        try:
+            # 如果窗口图标尚未设置，尝试再次设置
+            if self.windowIcon().isNull():
+                import sys
+                import os
+                from PyQt6.QtGui import QIcon
+                
+                # 支持的图标格式列表（按优先级排序）
+                icon_formats = [
+                    "app_icon.png",    # PNG格式 - 跨平台通用
+                    "app_icon.svg",    # SVG格式 - 矢量图形
+                    "app_icon.ico",    # ICO格式 - Windows
+                    "app_icon.icns"    # ICNS格式 - macOS
+                ]
+                
+                # 查找路径列表
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                search_paths = [
+                    os.path.join(current_dir, "resources"),  # 开发环境
+                ]
+                
+                # 如果在PyInstaller环境中，添加可执行文件目录
+                if getattr(sys, 'frozen', False):
+                    application_path = os.path.dirname(sys.executable)
+                    search_paths.insert(0, os.path.join(application_path, "resources"))
+                
+                # 遍历所有路径和格式，找到第一个存在的图标文件
+                icon_path = None
+                for search_path in search_paths:
+                    for icon_format in icon_formats:
+                        potential_path = os.path.join(search_path, icon_format)
+                        if os.path.exists(potential_path):
+                            icon_path = potential_path
+                            break
+                    if icon_path:
+                        break
+                
+                if icon_path and os.path.exists(icon_path):
+                    self.setWindowIcon(QIcon(icon_path))
+        except Exception as e:
+            print(f"⚠️  确保窗口图标时出错: {e}")
+    
     def setup_ui(self):
         """设置用户界面"""
         # 创建中央部件

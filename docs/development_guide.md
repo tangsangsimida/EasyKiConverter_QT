@@ -14,6 +14,13 @@ venv\Scripts\activate  # Windows
 
 # 安装应用依赖（根据build_conf/requirements_app.txt文件）
 pip install -r build_conf/requirements_app.txt
+
+# Linux用户如需构建特定包格式，安装额外依赖
+# DEB包构建依赖
+# pip install stdeb
+
+# RPM包构建依赖（通过系统包管理器安装）
+# sudo apt-get install rpm
 ```
 
 ## 🖥️ PyQt6 UI 开发
@@ -94,3 +101,32 @@ python main.py --lcsc_id C13377 --symbol --footprint --lib_name MyComponents
 # 启用调试模式
 python main.py --lcsc_id C13377 --symbol --debug
 ```
+
+## 📦 多平台构建
+
+### 支持的平台和架构
+- **Windows**: x86和x64架构
+- **Linux**: x64架构，支持二进制文件和DEB包格式
+- **macOS**: Intel和Apple Silicon架构
+
+### 构建所有平台版本
+```bash
+# 使用GitHub Actions自动构建所有平台版本
+# 推送带有[release]标记的提交触发构建流程
+
+# 或者手动构建特定平台
+# Windows (x64)
+pyinstaller build_conf/build.spec --noconfirm
+
+# Linux (创建DEB包)
+# 需要先安装dpkg-deb工具
+sudo apt-get install dpkg-dev
+# 然后按照build.yml中的步骤创建DEB包
+```
+
+### 包格式说明
+- **EXE文件**: Windows平台可执行文件
+- **二进制文件**: Linux和macOS平台可执行文件
+- **DEB包**: Debian/Ubuntu等基于Debian的Linux发行版的软件包格式
+- **RPM包**: Fedora/RHEL等基于RPM的Linux发行版的软件包格式
+- **Tarball包**: Arch Linux等发行版的软件包格式

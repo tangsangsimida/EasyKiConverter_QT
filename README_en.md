@@ -32,6 +32,12 @@ A powerful Python tool for converting LCSC and EasyEDA components to KiCad forma
 
 - **Cross-Platform**: Supports Windows, macOS, and Linux systems
 
+- **Multi-Architecture**: Supports x86, x64, Intel, and Apple Silicon architectures
+
+- **Multiple Package Formats**: Available as EXE, binary, DEB, RPM, and Tarball distribution formats
+
+- **Distribution-Specific Packages**: Provides dedicated packages for Ubuntu, Fedora, Arch Linux, and other major distributions
+
   
 
 ## 📚 Detailed Documentation
@@ -43,6 +49,12 @@ For more detailed information, please refer to the documentation in the `docs` d
 - [Contributing Guide](docs/contributing.md) - How to contribute to the project
 - [Performance Optimization](docs/performance.md) - Multi-threading parallel processing and performance improvements
 - [System Requirements](docs/system_requirements.md) - System requirements and supported component types
+
+## 🔧 Dependency Management
+
+EasyKiConverter uses a layered dependency management strategy:
+- **Core Dependencies**: Base dependencies shared by all platforms
+- **Platform-Specific Dependencies**: Installed on-demand based on platform and package format
 
 ## 📄 License
 

@@ -28,6 +28,9 @@
 - **一键启动**：双击启动脚本即可运行桌面应用
 - **无需配置**：开箱即用，无需复杂设置
 - **跨平台支持**：支持 Windows、macOS 和 Linux 系统
+- **多架构支持**：支持 x86、x64、Intel 和 Apple Silicon 架构
+- **多种包格式**：提供 EXE、二进制文件、DEB、RPM、Tarball 等多种分发格式
+- **发行版特定包**：为 Ubuntu、Fedora、Arch Linux 等主流发行版提供专门的软件包
 
 
 
@@ -40,6 +43,12 @@
 - [贡献指南](docs/contributing.md) - 如何参与项目贡献
 - [性能优化](docs/performance.md) - 多线程并行处理和性能提升
 - [系统要求](docs/system_requirements.md) - 系统要求和支持的元件类型
+
+## 🔧 依赖管理
+
+EasyKiConverter采用分层依赖管理策略：
+- **核心依赖**：所有平台共用的基础依赖
+- **平台特定依赖**：根据不同平台和包格式按需安装
 
 ## 📄 许可证
 

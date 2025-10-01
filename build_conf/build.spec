@@ -2,11 +2,59 @@
 
 block_cipher = None
 
+import os
+import sys
+
+# 动态确定资源路径
+# 在PyInstaller环境中使用不同的方法获取当前目录
+if getattr(sys, 'frozen', False):
+    # 如果是PyInstaller打包的环境
+    current_dir = os.path.dirname(sys.executable)
+else:
+    # 如果是正常Python环境
+    current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
+
+resources_dir = os.path.join(current_dir, '..', 'src', 'ui', 'pyqt6', 'resources')
+
+# 构建资源文件列表
+icon_files = []
+icon_extensions = ['.ico', '.icns', '.png', '.svg']
+for ext in icon_extensions:
+    icon_path = os.path.join(resources_dir, f'app_icon{ext}')
+    if os.path.exists(icon_path):
+        # 确保在Windows上使用正确的路径分隔符
+        icon_files.append((icon_path, 'resources/'))
+
+# 确定图标文件路径用于EXE构建
+icon_path = None
+if sys.platform.startswith('win'):
+    icon_path = os.path.join(resources_dir, 'app_icon.ico')
+    # 确保路径在Windows上正确格式化
+    icon_path = os.path.normpath(icon_path)
+    # 检查文件是否存在，如果不存在则尝试其他路径
+    if not os.path.exists(icon_path):
+        # 尝试使用绝对路径
+        icon_path = os.path.abspath(icon_path)
+elif sys.platform.startswith('darwin'):
+    icon_path = os.path.join(resources_dir, 'app_icon.icns')
+    icon_path = os.path.normpath(icon_path)
+else:
+    # Linux平台通常不使用图标文件，或者使用PNG格式
+    icon_path = os.path.join(resources_dir, 'app_icon.png')
+    icon_path = os.path.normpath(icon_path)
+    # 如果PNG文件不存在，则不使用图标
+    if not os.path.exists(icon_path):
+        icon_path = None
+
+# 最后检查图标文件是否存在，如果不存在则设置为None
+if icon_path and not os.path.exists(icon_path):
+    icon_path = None
+
 a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
     binaries=[],
-    datas=[],
+    datas=icon_files,
     hiddenimports=[
         'PyQt6.QtCore',
         'PyQt6.QtGui',
@@ -133,8 +181,9 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,
+    # Windows x86架构需要指定target_arch
+    target_arch='x86' if sys.platform.startswith('win') and 'x86' in sys.argv else None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None  # 移除平台特定的图标配置
+    icon=icon_path
 )
