@@ -148,6 +148,9 @@ jobs:
           Terminal=false
           Type=Application
           Categories=Development;Electronics;
+          # 添加任务栏图标支持
+          StartupNotify=true
+          StartupWMClass=EasyKiConverter
           EOF
           
           # 复制图标
@@ -234,6 +237,9 @@ jobs:
           Terminal=false
           Type=Application
           Categories=Development;Electronics;
+          # 添加任务栏图标支持
+          StartupNotify=true
+          StartupWMClass=EasyKiConverter
           DESKTOP
           
           chmod 644 %{buildroot}/usr/share/applications/easykiconverter.desktop
@@ -277,6 +283,9 @@ jobs:
           Terminal=false
           Type=Application
           Categories=Development;Electronics;
+          # 添加任务栏图标支持
+          StartupNotify=true
+          StartupWMClass=EasyKiConverter
           EOF
           
           # 设置权限（遵循Arch Linux标准）
