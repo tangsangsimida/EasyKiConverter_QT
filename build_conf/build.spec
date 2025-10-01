@@ -179,6 +179,8 @@ exe = EXE(
     argv_emulation=False,
     # 使用环境变量设置target_arch
     target_arch='x86' if BUILD_ARCH == 'x86' else None,
+    # macOS通用二进制支持
+    universal2=True if sys.platform.startswith('darwin') else False,
     codesign_identity=None,
     entitlements_file=None,
     icon=icon_path

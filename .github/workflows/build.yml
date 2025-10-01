@@ -58,11 +58,11 @@ jobs:
           
           # macOS builds
           - os: macos-latest
-            arch: intel
+            arch: x64
             asset_name: EasyKiConverter-macos-intel
             package_type: binary
           - os: macos-latest
-            arch: apple-silicon
+            arch: x64
             asset_name: EasyKiConverter-macos-apple-silicon
             package_type: binary
 
@@ -74,7 +74,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          architecture: ${{ matrix.arch }}
+          architecture: ${{ matrix.arch == 'apple-silicon' && 'x64' || matrix.arch }}
 
       - name: Install dependencies
         run: |
@@ -113,7 +113,7 @@ jobs:
             pyinstaller build_conf/build.spec --noconfirm
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS构建
-            export BUILD_ARCH=${{ matrix.arch }}
+            export BUILD_ARCH=${{ matrix.asset_name == 'EasyKiConverter-macos-apple-silicon' && 'apple-silicon' || 'intel' }}
             pyinstaller build_conf/build.spec --noconfirm
           else
             # 默认构建（Linux）
