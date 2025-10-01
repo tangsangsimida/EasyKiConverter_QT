@@ -18,15 +18,11 @@ for ext in icon_extensions:
         # 确保在Windows上使用正确的路径分隔符
         icon_files.append((icon_path, 'resources/'))
 
-# 确定是否需要额外的hooks目录
-additional_hooks_dirs = []
-
 a = Analysis(
     ['../src/ui/pyqt6/main.py'],
     pathex=['.', '../src'],
     binaries=[],
     datas=icon_files,
-    hookspath=additional_hooks_dirs,
     hiddenimports=[
         'PyQt6.QtCore',
         'PyQt6.QtGui',
