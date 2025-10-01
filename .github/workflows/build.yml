@@ -80,15 +80,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           
-          # Windows x86特殊处理 - 使用预编译的wheel包避免编译问题
+          # Windows x86特殊处理 - 分步安装并使用预编译包
           if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
-            # 为32位Windows安装预编译的pandas和numpy
-            pip install --only-binary=all -r build_conf/requirements_app.txt
+            echo "Installing dependencies for Windows x86..."
+            # 为32位Windows安装预编译的numpy和pandas
+            pip install --only-binary=numpy numpy==2.3.3
+            pip install --only-binary=pandas pandas==2.3.2
+            # 安装其他依赖（排除可能在Windows上引起问题的包）
+            pip install altgraph==0.17.4 annotated-types==0.7.0 certifi==2025.8.3 charset-normalizer==3.4.3 et_xmlfile==2.0.0 idna==3.10 packaging==25.0 pydantic==2.11.9 pydantic_core==2.33.2 pyinstaller==6.16.0 pyinstaller-hooks-contrib==2025.8 PyQt6==6.9.1 PyQt6-Qt6==6.9.2 PyQt6_sip==13.10.2 python-dateutil==2.9.0.post0 pytz==2025.2 requests==2.32.5 setuptools==80.9.0 six==1.17.0 typing_extensions==4.15.0 typing-inspection==0.4.1 urllib3==2.5.0
           else
             pip install -r build_conf/requirements_app.txt
           fi
           
-          pip install pyinstaller                       # 安装 PyInstaller
+          # 确保PyInstaller已安装
+          if ! python -c "import PyInstaller" 2>/dev/null; then
+            pip install pyinstaller==6.16.0
+          fi
           
           # Linux特定依赖
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
