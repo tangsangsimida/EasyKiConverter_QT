@@ -122,33 +122,14 @@ jobs:
           ls -la src/ui/pyqt6/resources/
           
           # 根据平台和架构设置特定参数
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            # Windows构建
-            if [ -f "src/ui/pyqt6/resources/app_icon.ico" ]; then
-              if [ "${{ matrix.arch }}" == "x86" ]; then
-                # Windows x86构建
-                pyinstaller build_conf/build.spec --noconfirm -i src/ui/pyqt6/resources/app_icon.ico --arch ${{ matrix.arch }}
-              else
-                # Windows x64构建
-                pyinstaller build_conf/build.spec --noconfirm -i src/ui/pyqt6/resources/app_icon.ico
-              fi
-            else
-              # 没有找到图标文件，使用默认构建
-              if [ "${{ matrix.arch }}" == "x86" ]; then
-                pyinstaller build_conf/build.spec --noconfirm --arch ${{ matrix.arch }}
-              else
-                pyinstaller build_conf/build.spec --noconfirm
-              fi
-            fi
+          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
+            # Windows x86构建
+            pyinstaller build_conf/build.spec --noconfirm --arch ${{ matrix.arch }}
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS构建
-            if [ -f "src/ui/pyqt6/resources/app_icon.icns" ]; then
-              pyinstaller build_conf/build.spec --noconfirm -i src/ui/pyqt6/resources/app_icon.icns
-            else
-              pyinstaller build_conf/build.spec --noconfirm
-            fi
+            pyinstaller build_conf/build.spec --noconfirm
           else
-            # Linux构建
+            # 默认构建（Linux和Windows x64）
             pyinstaller build_conf/build.spec --noconfirm
           fi
           
