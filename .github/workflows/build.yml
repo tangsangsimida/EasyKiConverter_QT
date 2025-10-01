@@ -520,15 +520,7 @@ jobs:
           fi
         shell: bash
 
-      - name: Upload MSI artifact
-        if: matrix.os == 'windows-latest' && matrix.package_type == 'msi' && matrix.asset_name endsWith '.msi'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.asset_name }}
-          path: dist/${{ matrix.asset_name }}
-
       - name: Upload artifact
-        if: !(matrix.os == 'windows-latest' && matrix.package_type == 'msi' && matrix.asset_name endsWith '.msi')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
