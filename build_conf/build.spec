@@ -5,6 +5,9 @@ block_cipher = None
 import os
 import sys
 
+# 从环境变量获取构建架构
+BUILD_ARCH = os.environ.get('BUILD_ARCH', 'x64')
+
 # 动态确定资源路径
 # 在PyInstaller环境中使用不同的方法获取当前目录
 if getattr(sys, 'frozen', False):
@@ -174,8 +177,8 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    # Windows x86架构需要指定target_arch
-    target_arch='x86' if sys.platform.startswith('win') and 'x86' in sys.argv else None,
+    # 使用环境变量设置target_arch
+    target_arch='x86' if BUILD_ARCH == 'x86' else None,
     codesign_identity=None,
     entitlements_file=None,
     icon=icon_path
