@@ -216,19 +216,19 @@ jobs:
           /usr/share/applications/easykiconverter.desktop
           
           %install
-          mkdir -p %{buildroot}/usr/bin
-          mkdir -p %{buildroot}/usr/share/icons/hicolor/256x256/apps
-          mkdir -p %{buildroot}/usr/share/applications
+          mkdir -p $RPM_BUILD_ROOT/usr/bin
+          mkdir -p $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps
+          mkdir -p $RPM_BUILD_ROOT/usr/share/applications
           
-          cp %{SOURCE0} %{buildroot}/usr/bin/EasyKiConverter
-          chmod 755 %{buildroot}/usr/bin/EasyKiConverter
+          cp %{_sourcedir}/EasyKiConverter $RPM_BUILD_ROOT/usr/bin/EasyKiConverter
+          chmod 755 $RPM_BUILD_ROOT/usr/bin/EasyKiConverter
           
-          if [ -f "%{SOURCE1}" ]; then
-            cp %{SOURCE1} %{buildroot}/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
-            chmod 644 %{buildroot}/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+          if [ -f "%{_sourcedir}/easykiconverter.png" ]; then
+            cp %{_sourcedir}/easykiconverter.png $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
+            chmod 644 $RPM_BUILD_ROOT/usr/share/icons/hicolor/256x256/apps/easykiconverter.png
           fi
           
-          cat > %{buildroot}/usr/share/applications/easykiconverter.desktop << 'DESKTOP'
+          cat > $RPM_BUILD_ROOT/usr/share/applications/easykiconverter.desktop << 'DESKTOP'
           [Desktop Entry]
           Name=EasyKiConverter
           Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -242,7 +242,7 @@ jobs:
           StartupWMClass=EasyKiConverter
           DESKTOP
           
-          chmod 644 %{buildroot}/usr/share/applications/easykiconverter.desktop
+          chmod 644 $RPM_BUILD_ROOT/usr/share/applications/easykiconverter.desktop
           
           %prep
           
