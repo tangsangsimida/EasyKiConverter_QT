@@ -108,7 +108,7 @@ jobs:
           # 根据平台和架构设置特定参数
           if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
             # Windows x86构建
-            pyinstaller build_conf/build.spec --noconfirm -- ${matrix.arch}
+            pyinstaller build_conf/build.spec --noconfirm -- ${{ matrix.arch }}
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS构建
             pyinstaller build_conf/build.spec --noconfirm
