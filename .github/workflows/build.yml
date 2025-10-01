@@ -122,14 +122,33 @@ jobs:
           ls -la src/ui/pyqt6/resources/
           
           # 根据平台和架构设置特定参数
-          if [ "${{ matrix.os }}" == "windows-latest" ] && [ "${{ matrix.arch }}" == "x86" ]; then
-            # Windows x86构建
-            pyinstaller build_conf/build.spec --noconfirm --arch ${{ matrix.arch }}
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            # Windows构建
+            if [ -f "src/ui/pyqt6/resources/app_icon.ico" ]; then
+              if [ "${{ matrix.arch }}" == "x86" ]; then
+                # Windows x86构建
+                pyinstaller build_conf/build.spec --noconfirm -i src/ui/pyqt6/resources/app_icon.ico --arch ${{ matrix.arch }}
+              else
+                # Windows x64构建
+                pyinstaller build_conf/build.spec --noconfirm -i src/ui/pyqt6/resources/app_icon.ico
+              fi
+            else
+              # 没有找到图标文件，使用默认构建
+              if [ "${{ matrix.arch }}" == "x86" ]; then
+                pyinstaller build_conf/build.spec --noconfirm --arch ${{ matrix.arch }}
+              else
+                pyinstaller build_conf/build.spec --noconfirm
+              fi
+            fi
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
             # macOS构建
-            pyinstaller build_conf/build.spec --noconfirm
+            if [ -f "src/ui/pyqt6/resources/app_icon.icns" ]; then
+              pyinstaller build_conf/build.spec --noconfirm -i src/ui/pyqt6/resources/app_icon.icns
+            else
+              pyinstaller build_conf/build.spec --noconfirm
+            fi
           else
-            # 默认构建（Linux）
+            # Linux构建
             pyinstaller build_conf/build.spec --noconfirm
           fi
           
@@ -226,7 +245,7 @@ jobs:
           cp dist/EasyKiConverter easykiconverter-deb/usr/bin/
           
           # 创建desktop文件（遵循Debian标准）
-          cat > easykiconverter-deb/usr/share/applications/easykiconverter.desktop << EOF
+          cat > easykiconverter-deb/usr/share/applications/easykiconverter.desktop << 'EOF'
           [Desktop Entry]
           Name=EasyKiConverter
           Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -246,7 +265,7 @@ jobs:
           fi
           
           # 创建control文件（遵循Debian标准）
-          cat > easykiconverter-deb/DEBIAN/control << EOF
+          cat > easykiconverter-deb/DEBIAN/control << 'EOF'
           Package: easykiconverter
           Version: 1.0.0
           Section: devel
@@ -285,7 +304,7 @@ jobs:
           fi
           
           # 创建SPEC文件（遵循RPM标准）
-          cat > rpmbuild/SPECS/easykiconverter.spec << EOF
+          cat > rpmbuild/SPECS/easykiconverter.spec << 'EOF'
           Name: easykiconverter
           Version: 1.0.0
           Release: 1
@@ -361,7 +380,7 @@ jobs:
           fi
           
           # 创建desktop文件（遵循Arch Linux标准）
-          cat > easykiconverter-arch/usr/share/applications/easykiconverter.desktop << EOF
+          cat > easykiconverter-arch/usr/share/applications/easykiconverter.desktop << 'EOF'
           [Desktop Entry]
           Name=EasyKiConverter
           Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -404,7 +423,7 @@ jobs:
             fi
             
             # 创建desktop文件
-            cat > easykiconverter-linux/usr/share/applications/easykiconverter.desktop << EOF
+            cat > easykiconverter-linux/usr/share/applications/easykiconverter.desktop << 'EOF'
             [Desktop Entry]
             Name=EasyKiConverter
             Comment=Convert LCSC and EasyEDA components to KiCad format
@@ -449,7 +468,7 @@ jobs:
             fi
             
             # 创建批处理文件用于创建桌面快捷方式
-            cat > easykiconverter-windows/install.bat << EOF
+            cat > easykiconverter-windows/install.bat << 'EOF'
             @echo off
             echo Creating desktop shortcut...
             copy "%~dp0EasyKiConverter.exe" "%USERPROFILE%\Desktop\EasyKiConverter.exe"
@@ -485,7 +504,7 @@ jobs:
             fi
             
             # 创建Info.plist文件
-            cat > EasyKiConverter.app/Contents/Info.plist << EOF
+            cat > EasyKiConverter.app/Contents/Info.plist << 'EOF'
             <?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
             <plist version="1.0">
