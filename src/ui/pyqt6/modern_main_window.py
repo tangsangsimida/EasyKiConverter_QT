@@ -453,84 +453,16 @@ class ModernMainWindow(QMainWindow):
         """创建导出选项卡片"""
         card = ModernCard("⚙️ 导出选项")
         
-        layout = QHBoxLayout()
-        layout.setSpacing(30)
+        # 导入新的现代化导出选项组件
+        from src.ui.pyqt6.widgets.modern_export_options_widget import ModernExportOptionsWidget
         
-        # 符号导出选项
-        self.symbol_checkbox = QCheckBox("导出原理图符号 (.kicad_sym)")
-        self.symbol_checkbox.setChecked(True)
-        self.symbol_checkbox.setStyleSheet("""
-            QCheckBox {
-                font-size: 15px;
-                font-weight: 500;
-                color: #374151;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-                border-radius: 4px;
-                border: 2px solid #d1d5db;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #667eea;
-                border-color: #667eea;
-            }
-        """)
-        self.symbol_checkbox.stateChanged.connect(self.update_export_options)
-        layout.addWidget(self.symbol_checkbox)
+        # 创建现代化导出选项组件
+        self.export_options_widget = ModernExportOptionsWidget()
+        self.export_options_widget.exportOptionsChanged.connect(self.on_export_options_changed)
         
-        # 封装导出选项
-        self.footprint_checkbox = QCheckBox("导出PCB封装 (.kicad_mod)")
-        self.footprint_checkbox.setChecked(True)
-        self.footprint_checkbox.setStyleSheet("""
-            QCheckBox {
-                font-size: 15px;
-                font-weight: 500;
-                color: #374151;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-                border-radius: 4px;
-                border: 2px solid #d1d5db;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #667eea;
-                border-color: #667eea;
-            }
-        """)
-        self.footprint_checkbox.stateChanged.connect(self.update_export_options)
-        layout.addWidget(self.footprint_checkbox)
+        # 添加到卡片布局
+        card.content_layout.addWidget(self.export_options_widget)
         
-        # 3D模型导出选项
-        self.model3d_checkbox = QCheckBox("导出3D模型 (.step/.wrl)")
-        self.model3d_checkbox.setChecked(True)
-        self.model3d_checkbox.setStyleSheet("""
-            QCheckBox {
-                font-size: 15px;
-                font-weight: 500;
-                color: #374151;
-                spacing: 8px;
-            }
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-                border-radius: 4px;
-                border: 2px solid #d1d5db;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #667eea;
-                border-color: #667eea;
-            }
-        """)
-        self.model3d_checkbox.stateChanged.connect(self.update_export_options)
-        layout.addWidget(self.model3d_checkbox)
-        
-        layout.addStretch()
-        
-        card.content_layout.addLayout(layout)
         return card
         
     def create_output_card(self) -> ModernCard:
@@ -909,11 +841,19 @@ class ModernMainWindow(QMainWindow):
     def update_export_options(self):
         """更新导出选项"""
         # 确保至少选择一个选项
-        if not any([self.symbol_checkbox.isChecked(), 
-                   self.footprint_checkbox.isChecked(), 
-                   self.model3d_checkbox.isChecked()]):
-            self.symbol_checkbox.setChecked(True)
+        if hasattr(self, 'export_options_widget'):
+            options = self.export_options_widget.get_export_options()
+            if not any(options.values()):
+                # 如果都没有选中，至少选中一个（这里选中符号）
+                new_options = options.copy()
+                new_options['symbol'] = True
+                self.export_options_widget.set_export_options(new_options)
             
+    def on_export_options_changed(self, options):
+        """导出选项改变处理"""
+        # 可以在这里添加选项改变的处理逻辑
+        pass
+        
     def request_export(self):
         """请求导出 - 移除重复检查，由主程序处理"""
         # 显示进度条
@@ -939,12 +879,15 @@ class ModernMainWindow(QMainWindow):
                 
             # 加载导出选项
             export_options = config.get("export_options", {})
-            if export_options:
-                if "symbol" in export_options:
+            if export_options and hasattr(self, 'export_options_widget'):
+                self.export_options_widget.set_export_options(export_options)
+            elif export_options:
+                # 兼容旧版本
+                if "symbol" in export_options and hasattr(self, 'symbol_checkbox'):
                     self.symbol_checkbox.setChecked(export_options["symbol"])
-                if "footprint" in export_options:
+                if "footprint" in export_options and hasattr(self, 'footprint_checkbox'):
                     self.footprint_checkbox.setChecked(export_options["footprint"])
-                if "model3d" in export_options:
+                if "model3d" in export_options and hasattr(self, 'model3d_checkbox'):
                     self.model3d_checkbox.setChecked(export_options["model3d"])
                     
         except Exception as e:
@@ -956,11 +899,17 @@ class ModernMainWindow(QMainWindow):
             # 获取当前设置
             export_path = self.output_path_input.text().strip()
             file_prefix = self.lib_name_input.text().strip()
-            export_options = {
-                "symbol": self.symbol_checkbox.isChecked(),
-                "footprint": self.footprint_checkbox.isChecked(),
-                "model3d": self.model3d_checkbox.isChecked()
-            }
+            
+            # 获取导出选项
+            if hasattr(self, 'export_options_widget'):
+                export_options = self.export_options_widget.get_export_options()
+            else:
+                # 兼容旧版本
+                export_options = {
+                    "symbol": self.symbol_checkbox.isChecked() if hasattr(self, 'symbol_checkbox') else True,
+                    "footprint": self.footprint_checkbox.isChecked() if hasattr(self, 'footprint_checkbox') else True,
+                    "model3d": self.model3d_checkbox.isChecked() if hasattr(self, 'model3d_checkbox') else True
+                }
             
             # 保存到配置管理器
             self.config_manager.update_last_settings(

@@ -192,11 +192,15 @@ class EasyKiConverterApp(ModernMainWindow):
             components.append(self.component_list.item(i).text())
         
         # 获取导出选项
-        export_options = {
-            'symbol': self.symbol_checkbox.isChecked(),
-            'footprint': self.footprint_checkbox.isChecked(),
-            'model3d': self.model3d_checkbox.isChecked()
-        }
+        if hasattr(self, 'export_options_widget'):
+            export_options = self.export_options_widget.get_export_options()
+        else:
+            # 兼容旧版本
+            export_options = {
+                'symbol': self.symbol_checkbox.isChecked() if hasattr(self, 'symbol_checkbox') else True,
+                'footprint': self.footprint_checkbox.isChecked() if hasattr(self, 'footprint_checkbox') else True,
+                'model3d': self.model3d_checkbox.isChecked() if hasattr(self, 'model3d_checkbox') else True
+            }
         
         # 确保至少选择一个选项
         if not any(export_options.values()):
