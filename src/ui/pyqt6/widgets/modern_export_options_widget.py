@@ -465,12 +465,14 @@ class ModernExportOptionsWidget(QFrame):
         self.options = {
             'symbol': True,
             'footprint': True,
-            'model3d': True
+            'model3d': True,
+            'manual': False  # 手册下载选项（暂时禁用）
         }
         
         self.symbol_option = None
         self.footprint_option = None
         self.model3d_option = None
+        self.manual_option = None  # 手册选项
         
         self.setup_ui()
         self.setup_connections()
@@ -488,16 +490,6 @@ class ModernExportOptionsWidget(QFrame):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(20)
-        
-        # 标题
-        title_label = QLabel("⚙️ 导出选项")
-        title_label.setStyleSheet("""
-            font-size: 20px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 10px;
-        """)
-        layout.addWidget(title_label)
         
         # 选项容器
         options_layout = QHBoxLayout()
@@ -531,6 +523,16 @@ class ModernExportOptionsWidget(QFrame):
         self.model3d_option.setChecked(True)
         options_layout.addWidget(self.model3d_option)
         
+        # 手册下载选项（暂时禁用）
+        self.manual_option = AnimatedExportOption(
+            title="手册下载",
+            description="下载元件技术手册（即将推出）",
+            icon="📖"
+        )
+        self.manual_option.setChecked(False)
+        self.manual_option.setEnabled(False)  # 暂时禁用
+        options_layout.addWidget(self.manual_option)
+        
         options_layout.addStretch()
         layout.addLayout(options_layout)
         
@@ -542,9 +544,14 @@ class ModernExportOptionsWidget(QFrame):
             lambda checked: self.on_option_changed('footprint', checked))
         self.model3d_option.stateChanged.connect(
             lambda checked: self.on_option_changed('model3d', checked))
+        # 手册选项暂时不连接信号，因为功能未实现
             
     def on_option_changed(self, option_name, checked):
         """选项改变处理"""
+        # 手册选项暂时不处理
+        if option_name == 'manual':
+            return
+            
         self.options[option_name] = checked
         self.exportOptionsChanged.emit(self.options.copy())
         
@@ -562,6 +569,7 @@ class ModernExportOptionsWidget(QFrame):
             self.footprint_option.setChecked(self.options.get('footprint', True))
         if self.model3d_option:
             self.model3d_option.setChecked(self.options.get('model3d', True))
+        # 手册选项暂时不设置
             
     def setEnabled(self, enabled):
         """设置启用状态"""
@@ -572,3 +580,6 @@ class ModernExportOptionsWidget(QFrame):
             self.footprint_option.setEnabled(enabled)
         if self.model3d_option:
             self.model3d_option.setEnabled(enabled)
+        # 手册选项保持禁用状态
+        if self.manual_option:
+            self.manual_option.setEnabled(False)

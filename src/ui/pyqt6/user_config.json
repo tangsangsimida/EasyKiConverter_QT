@@ -4,7 +4,8 @@
   "export_options": {
     "symbol": true,
     "footprint": true,
-    "model3d": true
+    "model3d": true,
+    "manual": false
   },
   "component_ids": [],
   "window_geometry": null,
