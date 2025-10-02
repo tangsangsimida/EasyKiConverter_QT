@@ -56,7 +56,7 @@ def parse_svg_path(svg_path: str) -> list:
             parsed_path.extend(
                 cmd_class(
                     **dict(
-                        zip(cmd_class.__fields__, arguments[i : i + cmd_nb_arguments])
+                        zip(cmd_class.model_fields.keys(), arguments[i : i + cmd_nb_arguments])
                     )
                 )
                 for i in range(0, len(arguments), cmd_nb_arguments or 1)

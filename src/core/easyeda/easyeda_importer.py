@@ -10,14 +10,14 @@ def add_easyeda_pin(pin_data: str, ee_symbol: EeSymbol):
     ee_segments = [seg.split("~") for seg in segments]
 
     pin_settings = EeSymbolPinSettings(
-        **dict(zip(EeSymbolPinSettings.__fields__, ee_segments[0][1:]))
+        **dict(zip(EeSymbolPinSettings.model_fields.keys(), ee_segments[0][1:]))
     )
     pin_dot = EeSymbolPinDot(
         dot_x=float(ee_segments[1][0]), dot_y=float(ee_segments[1][1])
     )
     pin_path = EeSymbolPinPath(path=ee_segments[2][0], color=ee_segments[2][1])
     pin_name = EeSymbolPinName(
-        **dict(zip(EeSymbolPinName.__fields__, ee_segments[3][:]))
+        **dict(zip(EeSymbolPinName.model_fields.keys(), ee_segments[3][:]))
     )
 
     pin_dot_bis = EeSymbolPinDotBis(
@@ -42,7 +42,7 @@ def add_easyeda_pin(pin_data: str, ee_symbol: EeSymbol):
 def add_easyeda_rectangle(rectangle_data: str, ee_symbol: EeSymbol):
     ee_symbol.rectangles.append(
         EeSymbolRectangle(
-            **dict(zip(EeSymbolRectangle.__fields__, rectangle_data.split("~")[1:]))
+            **dict(zip(EeSymbolRectangle.model_fields.keys(), rectangle_data.split("~")[1:]))
         )
     )
 
@@ -50,7 +50,7 @@ def add_easyeda_rectangle(rectangle_data: str, ee_symbol: EeSymbol):
 def add_easyeda_polyline(polyline_data: str, ee_symbol: EeSymbol):
     ee_symbol.polylines.append(
         EeSymbolPolyline(
-            **dict(zip(EeSymbolPolyline.__fields__, polyline_data.split("~")[1:]))
+            **dict(zip(EeSymbolPolyline.model_fields.keys(), polyline_data.split("~")[1:]))
         )
     )
 
@@ -58,21 +58,21 @@ def add_easyeda_polyline(polyline_data: str, ee_symbol: EeSymbol):
 def add_easyeda_polygon(polygon_data: str, ee_symbol: EeSymbol):
     ee_symbol.polygons.append(
         EeSymbolPolygon(
-            **dict(zip(EeSymbolPolygon.__fields__, polygon_data.split("~")[1:]))
+            **dict(zip(EeSymbolPolygon.model_fields.keys(), polygon_data.split("~")[1:]))
         )
     )
 
 
 def add_easyeda_path(path_data: str, ee_symbol: EeSymbol):
     ee_symbol.paths.append(
-        EeSymbolPath(**dict(zip(EeSymbolPath.__fields__, path_data.split("~")[1:])))
+        EeSymbolPath(**dict(zip(EeSymbolPath.model_fields.keys(), path_data.split("~")[1:])))
     )
 
 
 def add_easyeda_circle(circle_data: str, ee_symbol: EeSymbol):
     ee_symbol.circles.append(
         EeSymbolCircle(
-            **dict(zip(EeSymbolCircle.__fields__, circle_data.split("~")[1:]))
+            **dict(zip(EeSymbolCircle.model_fields.keys(), circle_data.split("~")[1:]))
         )
     )
 
@@ -92,7 +92,7 @@ def add_easyeda_ellipse(ellipse_data: str, ee_symbol: EeSymbol):
     """
     ee_symbol.ellipses.append(
         EeSymbolEllipse(
-            **dict(zip(EeSymbolEllipse.__fields__, ellipse_data.split("~")[1:]))
+            **dict(zip(EeSymbolEllipse.model_fields.keys(), ellipse_data.split("~")[1:]))
         )
     )
 
@@ -105,7 +105,7 @@ def add_easyeda_arc(arc_data: str, ee_symbol: EeSymbol):
         ee_symbol: EasyEDA符号对象
     """
     ee_symbol.arcs.append(
-        EeSymbolArc(**dict(zip(EeSymbolArc.__fields__, arc_data.split("~")[1:])))
+        EeSymbolArc(**dict(zip(EeSymbolArc.model_fields.keys(), arc_data.split("~")[1:])))
     )
 
 
@@ -205,42 +205,42 @@ class EasyedaFootprintImporter:
 
             if ee_designator == "PAD":
                 ee_pad = EeFootprintPad(
-                    **dict(zip(EeFootprintPad.__fields__, ee_fields[:18]))
+                    **dict(zip(EeFootprintPad.model_fields.keys(), ee_fields[:18]))
                 )
                 new_ee_footprint.pads.append(ee_pad)
             elif ee_designator == "TRACK":
                 ee_track = EeFootprintTrack(
-                    **dict(zip(EeFootprintTrack.__fields__, ee_fields))
+                    **dict(zip(EeFootprintTrack.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.tracks.append(ee_track)
             elif ee_designator == "HOLE":
                 ee_hole = EeFootprintHole(
-                    **dict(zip(EeFootprintHole.__fields__, ee_fields))
+                    **dict(zip(EeFootprintHole.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.holes.append(ee_hole)
             elif ee_designator == "VIA":
                 ee_via = EeFootprintVia(
-                    **dict(zip(EeFootprintVia.__fields__, ee_fields))
+                    **dict(zip(EeFootprintVia.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.vias.append(ee_via)
             elif ee_designator == "CIRCLE":
                 ee_circle = EeFootprintCircle(
-                    **dict(zip(EeFootprintCircle.__fields__, ee_fields))
+                    **dict(zip(EeFootprintCircle.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.circles.append(ee_circle)
             elif ee_designator == "ARC":
                 ee_arc = EeFootprintArc(
-                    **dict(zip(EeFootprintArc.__fields__, ee_fields))
+                    **dict(zip(EeFootprintArc.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.arcs.append(ee_arc)
             elif ee_designator == "RECT":
                 ee_rectangle = EeFootprintRectangle(
-                    **dict(zip(EeFootprintRectangle.__fields__, ee_fields))
+                    **dict(zip(EeFootprintRectangle.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.rectangles.append(ee_rectangle)
             elif ee_designator == "TEXT":
                 ee_text = EeFootprintText(
-                    **dict(zip(EeFootprintText.__fields__, ee_fields))
+                    **dict(zip(EeFootprintText.model_fields.keys(), ee_fields))
                 )
                 new_ee_footprint.texts.append(ee_text)
             elif ee_designator == "SVGNODE":
@@ -345,6 +345,6 @@ class Easyeda3dModelImporter:
                 z=info["z"],
             ),
             rotation=Ee3dModelBase(
-                **dict(zip(Ee3dModelBase.__fields__, info["c_rotation"].split(",")))
+                **dict(zip(Ee3dModelBase.model_fields.keys(), info["c_rotation"].split(",")))
             ),
         )
