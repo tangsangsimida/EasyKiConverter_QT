@@ -78,6 +78,12 @@ def add_easyeda_circle(circle_data: str, ee_symbol: EeSymbol):
     )
 
 
+def add_easyeda_text(text_data: str, ee_symbol: EeSymbol):
+    # 文本元素的处理逻辑
+    # 目前只是简单记录，避免警告
+    logging.debug(f"Skipping text element: {text_data}")
+
+
 def add_easyeda_ellipse(ellipse_data: str, ee_symbol: EeSymbol):
     ee_symbol.ellipses.append(
         EeSymbolEllipse(
@@ -101,6 +107,7 @@ easyeda_handlers = {
     "PL": add_easyeda_polyline,
     "PG": add_easyeda_polygon,
     "PT": add_easyeda_path,
+    "T": add_easyeda_text,  # 添加对文本元素的处理
     # "PI" : Pie, Elliptical arc seems to be not supported in Kicad
 }
 

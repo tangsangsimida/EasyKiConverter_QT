@@ -1,6 +1,6 @@
 {
-  "export_path": "",
-  "file_prefix": "",
+  "export_path": "/home/dennis/Desktop/test",
+  "file_prefix": "test",
   "export_options": {
     "symbol": true,
     "footprint": true,
