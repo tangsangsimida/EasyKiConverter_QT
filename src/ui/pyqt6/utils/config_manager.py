@@ -33,7 +33,6 @@ class ConfigManager:
                 "model3d": True
             },
             "component_ids": [],  # 最近使用的元件编号
-            "theme": "light",  # 主题
             "window_geometry": None,  # 窗口几何信息
             "window_state": None,  # 窗口状态
             "language": "zh_CN",  # 语言
@@ -47,6 +46,9 @@ class ConfigManager:
             "show_tips": True,  # 显示提示
             "last_used_path": "",  # 最后使用的路径
             "file_dialog_path": "",  # 文件对话框路径
+            "network_timeout": 30,  # 网络请求超时时间（秒）
+            "max_retries": 3,  # 网络请求最大重试次数
+            "retry_delay": 1,  # 重试延迟时间（秒）
         }
         
     def load_config(self) -> Dict[str, Any]:
@@ -344,14 +346,43 @@ class ConfigManager:
         self.config["last_used_path"] = path
         return self.save_config(self.config)
         
-    def get_file_dialog_path(self) -> str:
-        """获取文件对话框路径"""
-        return self.config.get("file_dialog_path", "")
-        
-    def set_file_dialog_path(self, path: str) -> bool:
+    def get_file_dialog_path(self, path: str) -> bool:
         """设置文件对话框路径"""
         self.config["file_dialog_path"] = path
         return self.save_config(self.config)
+        
+    def get_network_timeout(self) -> int:
+        """获取网络请求超时时间"""
+        return self.config.get("network_timeout", 30)
+        
+    def set_network_timeout(self, timeout: int) -> bool:
+        """设置网络请求超时时间"""
+        if timeout > 0:
+            self.config["network_timeout"] = timeout
+            return self.save_config(self.config)
+        return False
+        
+    def get_max_retries(self) -> int:
+        """获取网络请求最大重试次数"""
+        return self.config.get("max_retries", 3)
+        
+    def set_max_retries(self, retries: int) -> bool:
+        """设置网络请求最大重试次数"""
+        if retries >= 0:
+            self.config["max_retries"] = retries
+            return self.save_config(self.config)
+        return False
+        
+    def get_retry_delay(self) -> int:
+        """获取重试延迟时间"""
+        return self.config.get("retry_delay", 1)
+        
+    def set_retry_delay(self, delay: int) -> bool:
+        """设置重试延迟时间"""
+        if delay >= 0:
+            self.config["retry_delay"] = delay
+            return self.save_config(self.config)
+        return False
         
     def reset_to_defaults(self) -> bool:
         """重置为默认配置"""

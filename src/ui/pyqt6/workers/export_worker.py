@@ -33,6 +33,9 @@ try:
     from src.core.kicad.parameters_kicad_symbol import KicadVersion
     from src.core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
     
+    # 导入配置管理器
+    from src.ui.pyqt6.utils.config_manager import ConfigManager
+    
 except ImportError as e:
     print(f"导入EasyKiConverter模块失败: {e}")
     print(f"Python路径: {sys.path}")
@@ -74,6 +77,12 @@ class ExportWorker(QThread):
         self.file_lock = threading.Lock()  # 文件操作锁
         self.symbol_lib_locks = {}  # 符号库文件锁字典
         self.symbol_lib_locks_lock = threading.Lock()  # 符号库锁字典的锁
+        
+        # 网络配置
+        self.config_manager = ConfigManager()
+        self.network_timeout = self.config_manager.get_network_timeout()
+        self.max_retries = self.config_manager.get_max_retries()
+        self.retry_delay = self.config_manager.get_retry_delay()
         
         # 日志配置
         self.logger = logging.getLogger(__name__)
@@ -321,7 +330,7 @@ class ExportWorker(QThread):
                     # 尝试多次获取3D模型数据，以应对网络问题
                     model_3d_importer = None
                     success = False
-                    for attempt in range(3):  # 最多尝试3次
+                    for attempt in range(self.max_retries + 1):  # 使用配置的重试次数
                         model_3d_importer = Easyeda3dModelImporter(
                             easyeda_cp_cad_data=component_data, 
                             download_raw_3d_model=True
@@ -335,10 +344,9 @@ class ExportWorker(QThread):
                             break  # 成功获取到3D模型，跳出循环
                         else:
                             self.logger.warning(f"第{attempt + 1}次尝试获取3D模型数据失败: {lcsc_id}")
-                            if attempt < 2:  # 不是最后一次尝试，等待后重试
-                                import time
-                                # 第一次等待0.5秒，第二次等待1秒
-                                wait_time = 0.5 if attempt == 0 else 1.0
+                            if attempt < self.max_retries:  # 不是最后一次尝试，等待后重试
+                                # 使用配置的重试延迟时间
+                                wait_time = self.retry_delay * (2 ** attempt)  # 指数退避
                                 time.sleep(wait_time)
                     
                     if not success:
@@ -377,7 +385,7 @@ class ExportWorker(QThread):
                 # 尝试多次获取符号数据，以应对网络问题
                 symbol_data = None
                 success = False
-                for attempt in range(3):  # 最多尝试3次
+                for attempt in range(self.max_retries + 1):  # 使用配置的重试次数
                     symbol_importer = EasyedaSymbolImporter(easyeda_cp_cad_data=component_data)
                     symbol_data = symbol_importer.get_symbol()
                     
@@ -388,10 +396,9 @@ class ExportWorker(QThread):
                         break  # 成功获取到符号数据，跳出循环
                     else:
                         self.logger.warning(f"第{attempt + 1}次尝试获取符号数据失败: {lcsc_id}")
-                        if attempt < 2:  # 不是最后一次尝试，等待后重试
-                            import time
-                            # 第一次等待0.5秒，第二次等待1秒
-                            wait_time = 0.5 if attempt == 0 else 1.0
+                        if attempt < self.max_retries:  # 不是最后一次尝试，等待后重试
+                            # 使用配置的重试延迟时间
+                            wait_time = self.retry_delay * (2 ** attempt)  # 指数退避
                             time.sleep(wait_time)
                 
                 if not success:
@@ -432,7 +439,7 @@ class ExportWorker(QThread):
                 # 尝试多次获取封装数据，以应对网络问题
                 footprint_data = None
                 success = False
-                for attempt in range(3):  # 最多尝试3次
+                for attempt in range(self.max_retries + 1):  # 使用配置的重试次数
                     # 移除重试过程中的进度更新调用，避免进度条闪烁
                     # if attempt > 0:
                     #     self.update_progress(f"{lcsc_id} - 封装重试 {attempt}/3...")
@@ -449,10 +456,9 @@ class ExportWorker(QThread):
                         break  # 成功获取到封装数据，跳出循环
                     else:
                         self.logger.warning(f"第{attempt + 1}次尝试获取封装数据失败: {lcsc_id}")
-                        if attempt < 2:  # 不是最后一次尝试，等待后重试
-                            import time
-                            # 第一次等待0.5秒，第二次等待1秒
-                            wait_time = 0.5 if attempt == 0 else 1.0
+                        if attempt < self.max_retries:  # 不是最后一次尝试，等待后重试
+                            # 使用配置的重试延迟时间
+                            wait_time = self.retry_delay * (2 ** attempt)  # 指数退避
                             time.sleep(wait_time)
                 
                 if not success:

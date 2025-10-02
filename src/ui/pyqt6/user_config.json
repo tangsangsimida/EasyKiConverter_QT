@@ -1,15 +1,12 @@
 {
-  "export_path": "/home/dennis/Desktop",
+  "export_path": "",
   "file_prefix": "",
   "export_options": {
     "symbol": true,
     "footprint": true,
     "model3d": true
   },
-  "component_ids": [
-    "C2040"
-  ],
-  "theme": "light",
+  "component_ids": [],
   "window_geometry": null,
   "window_state": null,
   "language": "zh_CN",
@@ -22,5 +19,8 @@
   "confirm_delete": true,
   "show_tips": true,
   "last_used_path": "",
-  "file_dialog_path": ""
+  "file_dialog_path": "",
+  "network_timeout": 30,
+  "max_retries": 3,
+  "retry_delay": 1
 }
