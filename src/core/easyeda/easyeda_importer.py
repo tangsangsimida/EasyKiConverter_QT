@@ -1,4 +1,3 @@
-# Global imports
 import json
 import logging
 
@@ -85,6 +84,12 @@ def add_easyeda_text(text_data: str, ee_symbol: EeSymbol):
 
 
 def add_easyeda_ellipse(ellipse_data: str, ee_symbol: EeSymbol):
+    """处理椭圆元素
+    
+    Args:
+        ellipse_data: 椭圆数据字符串，格式为 "E~参数1~参数2~..."
+        ee_symbol: EasyEDA符号对象
+    """
     ee_symbol.ellipses.append(
         EeSymbolEllipse(
             **dict(zip(EeSymbolEllipse.__fields__, ellipse_data.split("~")[1:]))
@@ -93,22 +98,37 @@ def add_easyeda_ellipse(ellipse_data: str, ee_symbol: EeSymbol):
 
 
 def add_easyeda_arc(arc_data: str, ee_symbol: EeSymbol):
+    """处理弧线元素
+    
+    Args:
+        arc_data: 弧线数据字符串，格式为 "A~参数1~参数2~..."
+        ee_symbol: EasyEDA符号对象
+    """
     ee_symbol.arcs.append(
         EeSymbolArc(**dict(zip(EeSymbolArc.__fields__, arc_data.split("~")[1:])))
     )
 
 
 easyeda_handlers = {
+    # P: 处理引脚元素
     "P": add_easyeda_pin,
+    # R: 处理矩形元素
     "R": add_easyeda_rectangle,
+    # E: 处理椭圆元素
     "E": add_easyeda_ellipse,
+    # C: 处理圆形元素
     "C": add_easyeda_circle,
+    # A: 处理弧线元素
     "A": add_easyeda_arc,
+    # PL: 处理折线元素
     "PL": add_easyeda_polyline,
+    # PG: 处理多边形元素
     "PG": add_easyeda_polygon,
+    # PT: 处理路径元素
     "PT": add_easyeda_path,
-    "T": add_easyeda_text,  # 添加对文本元素的处理
-    # "PI" : Pie, Elliptical arc seems to be not supported in Kicad
+    # T: 处理文本元素
+    "T": add_easyeda_text,
+    # "PI" : 饼图/扇形椭圆弧在KiCad中不支持
 }
 
 
