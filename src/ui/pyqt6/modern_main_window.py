@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-现代化主窗口 - 界面设计
-采用从上至下的清晰布局，现代化UI元素
+主窗口 - 界面设计
+采用从上至下的清晰布局
 """
 
 import os
@@ -17,7 +17,7 @@ from src.ui.pyqt6.utils.modern_ui_components import ModernCard, ModernProgressBa
 
 
 class ModernMainWindow(QMainWindow):
-    """现代化主窗口 - 酷炫界面"""
+    """主窗口"""
     
     def __init__(self, config_manager: ConfigManager, parent=None):
         super().__init__(parent)
@@ -28,8 +28,6 @@ class ModernMainWindow(QMainWindow):
         self.setup_window()
         self.setup_ui()
         self.setup_animations()
-        self.setup_connections()
-        self.load_settings()
         
         # 确保窗口图标正确设置
         self.ensure_window_icon()
@@ -146,7 +144,7 @@ class ModernMainWindow(QMainWindow):
         self.apply_modern_style()
         
     def create_modern_content_area(self) -> QWidget:
-        """创建现代化内容区域"""
+        """创建内容区域"""
         content_area = QWidget()
         content_area.setObjectName("modernContentArea")
         
@@ -342,7 +340,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_bom_card(self) -> ModernCard:
         """创建BOM导入卡片"""
-        card = ModernCard("📊 BOM文件导入")  # 移除副标题
+        card = ModernCard("📊 BOM文件导入")
         
         layout = QVBoxLayout()
         layout.setSpacing(15)
@@ -388,7 +386,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_list_card(self) -> ModernCard:
         """创建元件列表卡片"""
-        card = ModernCard("📋 待转换列表")  # 移除副标题
+        card = ModernCard("📋 待转换列表")
         
         layout = QVBoxLayout()
         layout.setSpacing(15)
@@ -457,7 +455,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_options_card(self) -> ModernCard:
         """创建导出选项卡片"""
-        card = ModernCard("⚙️ 导出选项")  # 移除副标题
+        card = ModernCard("⚙️ 导出选项")
         
         layout = QHBoxLayout()
         layout.setSpacing(30)
@@ -541,7 +539,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_output_card(self) -> ModernCard:
         """创建输出设置卡片"""
-        card = ModernCard("📁 输出设置")  # 移除副标题  # 移除副标题
+        card = ModernCard("📁 输出设置")
         
         layout = QVBoxLayout()
         layout.setSpacing(20)
@@ -628,7 +626,7 @@ class ModernMainWindow(QMainWindow):
         
     def create_export_card(self) -> ModernCard:
         """创建转换执行卡片"""
-        card = ModernCard("🚀 开始转换")  # 移除副标题  # 移除副标题
+        card = ModernCard("🚀 开始转换")
         
         layout = QVBoxLayout()
         layout.setSpacing(20)
@@ -689,7 +687,7 @@ class ModernMainWindow(QMainWindow):
         return card
         
     def apply_modern_style(self):
-        """应用现代化样式（固定浅色主题）"""
+        """应用样式（固定浅色主题）"""
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #f8fafc;
@@ -732,21 +730,6 @@ class ModernMainWindow(QMainWindow):
         self.page_animation = QPropertyAnimation(self, b"windowOpacity")
         self.page_animation.setDuration(300)
         self.page_animation.setEasingCurve(QEasingCurve.Type.OutCubic)
-        
-    def setup_connections(self):
-        """设置信号连接"""
-        # 这里可以连接实际的业务逻辑
-        pass
-        
-    # 主题切换功能已移除
-        
-    def load_settings(self):
-        """加载设置（移除主题相关）"""
-        pass
-            
-    def save_settings(self):
-        """保存设置（移除主题相关）"""
-        pass
         
     # 功能方法
     def add_component(self):
@@ -942,9 +925,3 @@ class ModernMainWindow(QMainWindow):
         self.status_label.setText("正在转换中...")
         self.export_btn.setEnabled(False)
         
-        # 这里需要实现实际的导出逻辑
-        
-    def resizeEvent(self, event):
-        """重写大小改变事件"""
-        super().resizeEvent(event)
-        # 可以在这里添加响应式布局逻辑
