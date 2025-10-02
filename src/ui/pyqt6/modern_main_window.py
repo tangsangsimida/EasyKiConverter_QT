@@ -282,6 +282,27 @@ class ModernMainWindow(QMainWindow):
         """)
         input_layout.addWidget(self.component_input)
         
+        # 从剪贴板粘贴按钮
+        paste_btn = QPushButton("📋 粘贴")
+        paste_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #f8fafc;
+                color: #475569;
+                border: 1px solid #e2e8f0;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                min-height: 50px;
+            }
+            QPushButton:hover {
+                background-color: #f1f5f9;
+                border-color: #cbd5e1;
+            }
+        """)
+        paste_btn.clicked.connect(self.paste_from_clipboard)
+        input_layout.addWidget(paste_btn)
+        
         # 添加按钮 - 简洁的蓝色设计
         add_btn = QPushButton("添加")
         add_btn.setStyleSheet("""
@@ -309,32 +330,6 @@ class ModernMainWindow(QMainWindow):
         self.component_input.returnPressed.connect(self.add_component)
         
         layout.addLayout(input_layout)
-        
-        # 快捷操作
-        quick_actions = QHBoxLayout()
-        quick_actions.setSpacing(10)
-        
-        paste_btn = QPushButton("📋 从剪贴板粘贴")
-        paste_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #f8fafc;
-                color: #475569;
-                border: 1px solid #e2e8f0;
-                padding: 10px 20px;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 500;
-            }
-            QPushButton:hover {
-                background-color: #f1f5f9;
-                border-color: #cbd5e1;
-            }
-        """)
-        paste_btn.clicked.connect(self.paste_from_clipboard)
-        quick_actions.addWidget(paste_btn)
-        
-        quick_actions.addStretch()
-        layout.addLayout(quick_actions)
         
         card.content_layout.addLayout(layout)
         return card
