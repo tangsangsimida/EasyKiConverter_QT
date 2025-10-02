@@ -2,6 +2,9 @@
 
 block_cipher = None
 
+from PyInstaller.building.build_main import Analysis
+from PyInstaller.building.api import PYZ, EXE
+
 import os
 import sys
 
