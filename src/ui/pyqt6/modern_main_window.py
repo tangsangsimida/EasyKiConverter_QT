@@ -28,6 +28,7 @@ class ModernMainWindow(QMainWindow):
         self.setup_window()
         self.setup_ui()
         self.setup_animations()
+        self.load_settings()
         
         # 确保窗口图标正确设置
         self.ensure_window_icon()
@@ -924,4 +925,55 @@ class ModernMainWindow(QMainWindow):
         self.progress_bar.setVisible(True)
         self.status_label.setText("正在转换中...")
         self.export_btn.setEnabled(False)
+        
+    def load_settings(self):
+        """加载设置"""
+        try:
+            # 获取配置
+            config = self.config_manager.get_config()
+            
+            # 加载导出路径
+            export_path = config.get("export_path", "")
+            if export_path:
+                self.output_path_input.setText(export_path)
+                
+            # 加载库名称
+            file_prefix = config.get("file_prefix", "")
+            if file_prefix:
+                self.lib_name_input.setText(file_prefix)
+                
+            # 加载导出选项
+            export_options = config.get("export_options", {})
+            if export_options:
+                if "symbol" in export_options:
+                    self.symbol_checkbox.setChecked(export_options["symbol"])
+                if "footprint" in export_options:
+                    self.footprint_checkbox.setChecked(export_options["footprint"])
+                if "model3d" in export_options:
+                    self.model3d_checkbox.setChecked(export_options["model3d"])
+                    
+        except Exception as e:
+            print(f"加载设置失败: {e}")
+            
+    def save_settings(self):
+        """保存设置"""
+        try:
+            # 获取当前设置
+            export_path = self.output_path_input.text().strip()
+            file_prefix = self.lib_name_input.text().strip()
+            export_options = {
+                "symbol": self.symbol_checkbox.isChecked(),
+                "footprint": self.footprint_checkbox.isChecked(),
+                "model3d": self.model3d_checkbox.isChecked()
+            }
+            
+            # 保存到配置管理器
+            self.config_manager.update_last_settings(
+                export_path=export_path,
+                file_prefix=file_prefix,
+                export_options=export_options
+            )
+            
+        except Exception as e:
+            print(f"保存设置失败: {e}")
         

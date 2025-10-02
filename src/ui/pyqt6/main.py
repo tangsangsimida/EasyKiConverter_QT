@@ -175,6 +175,9 @@ class EasyKiConverterApp(ModernMainWindow):
             
     def start_export(self):
         """开始导出"""
+        # 保存当前设置
+        self.save_settings()
+        
         if self.component_list.count() == 0:
             QMessageBox.warning(self, "警告", "请先添加要转换的元器件编号")
             return

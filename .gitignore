@@ -120,3 +120,4 @@ easyeda2kicad_config.json
 python/
 even/
 IFLOW.md
+src/ui/pyqt6/user_config.json
