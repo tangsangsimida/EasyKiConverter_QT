@@ -64,10 +64,8 @@ class AnimatedExportOption(QWidget):
         self.pulse_animation.setStartValue(0.0)
         self.pulse_animation.setEndValue(1.0)
         
-        # 缩放动画
-        self.scale_animation = QPropertyAnimation(self, b"geometry")
-        self.scale_animation.setDuration(200)
-        self.scale_animation.setEasingCurve(QEasingCurve.Type.OutBack)
+        # 初始化缩放因子
+        self._scale_factor = 1.0
         
     def isChecked(self):
         """获取选中状态"""
@@ -99,36 +97,16 @@ class AnimatedExportOption(QWidget):
         self.add_ripple(event.pos())
         
         # 添加按下缩放效果
-        if self.scale_animation:
-            self.scale_animation.stop()
-            current_geom = self.geometry()
-            pressed_geom = QRect(
-                current_geom.x() + 2, 
-                current_geom.y() + 2, 
-                current_geom.width() - 4, 
-                current_geom.height() - 4
-            )
-            self.scale_animation.setStartValue(current_geom)
-            self.scale_animation.setEndValue(pressed_geom)
-            self.scale_animation.start()
+        self._scale_factor = 0.95
+        self.update()
             
     def mouseReleaseEvent(self, event: QMouseEvent):
         """鼠标释放事件"""
         super().mouseReleaseEvent(event)
         
         # 恢复原始大小
-        if self.scale_animation:
-            self.scale_animation.stop()
-            current_geom = self.geometry()
-            original_geom = QRect(
-                current_geom.x() - 2, 
-                current_geom.y() - 2, 
-                current_geom.width() + 4, 
-                current_geom.height() + 4
-            )
-            self.scale_animation.setStartValue(current_geom)
-            self.scale_animation.setEndValue(original_geom)
-            self.scale_animation.start()
+        self._scale_factor = 1.0
+        self.update()
             
     def enterEvent(self, event):
         """鼠标进入事件"""
@@ -146,18 +124,8 @@ class AnimatedExportOption(QWidget):
             self.pulse_animation.start()
             
         # 添加悬停缩放效果
-        if self.scale_animation:
-            self.scale_animation.stop()
-            current_geom = self.geometry()
-            hover_geom = QRect(
-                current_geom.x() - 1, 
-                current_geom.y() - 1, 
-                current_geom.width() + 2, 
-                current_geom.height() + 2
-            )
-            self.scale_animation.setStartValue(current_geom)
-            self.scale_animation.setEndValue(hover_geom)
-            self.scale_animation.start()
+        self._scale_factor = 1.05
+        self.update()
             
     def leaveEvent(self, event):
         """鼠标离开事件"""
@@ -176,18 +144,8 @@ class AnimatedExportOption(QWidget):
             self.animation_progress = 0.0
             
         # 恢复原始大小
-        if self.scale_animation:
-            self.scale_animation.stop()
-            current_geom = self.geometry()
-            original_geom = QRect(
-                current_geom.x() + 1, 
-                current_geom.y() + 1, 
-                current_geom.width() - 2, 
-                current_geom.height() - 2
-            )
-            self.scale_animation.setStartValue(current_geom)
-            self.scale_animation.setEndValue(original_geom)
-            self.scale_animation.start()
+        self._scale_factor = 1.0
+        self.update()
             
     def add_ripple(self, pos):
         """添加涟漪效果"""
@@ -219,6 +177,14 @@ class AnimatedExportOption(QWidget):
         """绘制事件"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # 应用缩放变换
+        if hasattr(self, '_scale_factor') and self._scale_factor != 1.0:
+            center_x = self.width() / 2
+            center_y = self.height() / 2
+            painter.translate(center_x, center_y)
+            painter.scale(self._scale_factor, self._scale_factor)
+            painter.translate(-center_x, -center_y)
         
         # 绘制背景
         self.draw_background(painter)
@@ -450,6 +416,15 @@ class AnimatedExportOption(QWidget):
     @animation_progress.setter
     def animation_progress(self, value):
         self._animation_progress = value
+        self.update()
+        
+    @pyqtProperty(float)
+    def scale_factor(self):
+        return self._scale_factor if hasattr(self, '_scale_factor') else 1.0
+        
+    @scale_factor.setter
+    def scale_factor(self, value):
+        self._scale_factor = value
         self.update()
 
 
