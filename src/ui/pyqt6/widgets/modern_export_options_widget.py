@@ -33,9 +33,10 @@ class AnimatedExportOption(QWidget):
         self.hover_animation = None
         self.check_animation = None
         self.pulse_animation = None
-        self.scale_animation = None
-        self.ripple_effect = None
-        self.ripples = []
+        # 移除不需要的动画效果
+        # self.scale_animation = None
+        # self.ripple_effect = None
+        # self.ripples = []
         
         self.setup_ui()
         self.setup_animations()
@@ -64,8 +65,8 @@ class AnimatedExportOption(QWidget):
         self.pulse_animation.setStartValue(0.0)
         self.pulse_animation.setEndValue(1.0)
         
-        # 初始化缩放因子
-        self._scale_factor = 1.0
+        # 移除初始化缩放因子
+        # self._scale_factor = 1.0
         
     def isChecked(self):
         """获取选中状态"""
@@ -93,19 +94,19 @@ class AnimatedExportOption(QWidget):
         super().mousePressEvent(event)
         self.setChecked(not self._checked)
         
-        # 添加涟漪效果
-        self.add_ripple(event.pos())
+        # 移除涟漪效果
+        # self.add_ripple(event.pos())
         
-        # 添加按下缩放效果
-        self._scale_factor = 0.95
+        # 移除按下缩放效果
+        # self._scale_factor = 0.95
         self.update()
             
     def mouseReleaseEvent(self, event: QMouseEvent):
         """鼠标释放事件"""
         super().mouseReleaseEvent(event)
         
-        # 恢复原始大小
-        self._scale_factor = 1.0
+        # 移除恢复原始大小
+        # self._scale_factor = 1.0
         self.update()
             
     def enterEvent(self, event):
@@ -123,8 +124,8 @@ class AnimatedExportOption(QWidget):
         if self._checked and self.pulse_animation:
             self.pulse_animation.start()
             
-        # 添加悬停缩放效果
-        self._scale_factor = 1.05
+        # 移除悬停缩放效果
+        # self._scale_factor = 1.05
         self.update()
             
     def leaveEvent(self, event):
@@ -143,54 +144,28 @@ class AnimatedExportOption(QWidget):
             self.pulse_animation.stop()
             self.animation_progress = 0.0
             
-        # 恢复原始大小
-        self._scale_factor = 1.0
+        # 移除恢复原始大小
+        # self._scale_factor = 1.0
         self.update()
             
-    def add_ripple(self, pos):
-        """添加涟漪效果"""
-        ripple = {
-            'pos': pos,
-            'radius': 0,
-            'max_radius': 50,
-            'opacity': 1.0
-        }
-        self.ripples.append(ripple)
-        
-        # 创建动画
-        def update_ripple():
-            if ripple in self.ripples:
-                ripple['radius'] += 2
-                ripple['opacity'] -= 0.05
-                if ripple['opacity'] <= 0:
-                    self.ripples.remove(ripple)
-                self.update()
-                
-        timer = QTimer(self)
-        timer.timeout.connect(update_ripple)
-        timer.start(20)
-        
-        # 1秒后自动清理
-        QTimer.singleShot(1000, lambda: timer.stop() if ripple in self.ripples else None)
-        
     def paintEvent(self, event):
         """绘制事件"""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         
-        # 应用缩放变换
-        if hasattr(self, '_scale_factor') and self._scale_factor != 1.0:
-            center_x = self.width() / 2
-            center_y = self.height() / 2
-            painter.translate(center_x, center_y)
-            painter.scale(self._scale_factor, self._scale_factor)
-            painter.translate(-center_x, -center_y)
+        # 移除缩放变换
+        # if hasattr(self, '_scale_factor') and self._scale_factor != 1.0:
+        #     center_x = self.width() / 2
+        #     center_y = self.height() / 2
+        #     painter.translate(center_x, center_y)
+        #     painter.scale(self._scale_factor, self._scale_factor)
+        #     painter.translate(-center_x, -center_y)
         
         # 绘制背景
         self.draw_background(painter)
         
-        # 绘制涟漪效果
-        self.draw_ripples(painter)
+        # 移除涟漪效果绘制
+        # self.draw_ripples(painter)
         
         # 绘制边框
         self.draw_border(painter)
@@ -237,14 +212,6 @@ class AnimatedExportOption(QWidget):
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawRoundedRect(1, 1, self.width() - 2, self.height() - 2, 16, 16)
         
-    def draw_ripples(self, painter):
-        """绘制涟漪效果"""
-        for ripple in self.ripples:
-            if ripple['radius'] > 0 and ripple['opacity'] > 0:
-                painter.setPen(QPen(QColor(255, 255, 255, int(255 * ripple['opacity'] * 0.3)), 2))
-                painter.setBrush(QBrush(QColor(255, 255, 255, int(255 * ripple['opacity'] * 0.1))))
-                painter.drawEllipse(ripple['pos'], ripple['radius'], ripple['radius'])
-                
     def draw_border(self, painter):
         """绘制边框"""
         # 基础边框
