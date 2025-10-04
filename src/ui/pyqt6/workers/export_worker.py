@@ -365,6 +365,14 @@ class ExportWorker(QThread):
                             my_lib.write("EESchema-LIBRARY Version 2.4\n#encoding utf-8\n")
                     self.logger.info(f"创建符号库文件: {symbol_lib_path}")
             
+            # 跟踪每个导出选项的状态
+            export_status = {
+                'symbol': {'success': False, 'message': ''},
+                'footprint': {'success': False, 'message': ''},
+                'model3d': {'success': False, 'message': ''},
+                'datasheet': {'success': False, 'message': ''}
+            }
+            
             # First, process 3D models if enabled (needed for footprint 3D references)
             model_3d = None
             if export_options.get('model3d', True) and component_data:
@@ -394,7 +402,10 @@ class ExportWorker(QThread):
                                 time.sleep(wait_time)
                     
                     if not success:
-                        self.logger.warning(f"最终失败 - 未找到3D模型数据: {lcsc_id}")
+                        error_msg = f"最终失败 - 未找到3D模型数据: {lcsc_id}"
+                        self.logger.warning(error_msg)
+                        export_status['model3d']['success'] = False
+                        export_status['model3d']['message'] = error_msg
                     elif model_3d:
                         self.logger.info(f"3D模型信息: name={model_3d.name}, uuid={model_3d.uuid}")
                         self.logger.info(f"3D模型数据: raw_obj={'有' if model_3d.raw_obj else '无'}, step={'有' if model_3d.step else '无'}")
@@ -419,8 +430,19 @@ class ExportWorker(QThread):
                         # This ensures consistency between the exported file name and the reference in footprint
                         if model_3d:
                             model_3d.name = sanitized_model_name
+                        
+                        export_status['model3d']['success'] = True
+                        export_status['model3d']['message'] = "3D模型导出成功"
                 except Exception as e:
-                    self.logger.error(f"3D模型导出失败 {lcsc_id}: {e}", exc_info=True)
+                    error_msg = f"3D模型导出失败 {lcsc_id}: {e}"
+                    self.logger.error(error_msg, exc_info=True)
+                    export_status['model3d']['success'] = False
+                    export_status['model3d']['message'] = error_msg
+            elif export_options.get('model3d', True) and not component_data:
+                error_msg = f"3D模型导出失败: 无法获取元件数据 {lcsc_id}"
+                self.logger.error(error_msg)
+                export_status['model3d']['success'] = False
+                export_status['model3d']['message'] = error_msg
             
             # 导出符号
             if export_options.get('symbol', True) and component_data:
@@ -446,9 +468,15 @@ class ExportWorker(QThread):
                             time.sleep(wait_time)
                 
                 if not success:
-                    self.logger.warning(f"最终失败 - 未找到符号数据: {lcsc_id}")
+                    error_msg = f"最终失败 - 未找到符号数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
+                    export_status['symbol']['success'] = False
+                    export_status['symbol']['message'] = error_msg
                 elif not symbol_data:
-                    self.logger.warning(f"未找到符号数据: {lcsc_id}")
+                    error_msg = f"未找到符号数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
+                    export_status['symbol']['success'] = False
+                    export_status['symbol']['message'] = error_msg
                 else:
                     symbol_exporter = ExporterSymbolKicad(
                         symbol=symbol_data, 
@@ -475,6 +503,13 @@ class ExportWorker(QThread):
                             self.logger.info(f"符号已存在，跳过: {symbol_data.info.name}")
                     
                     files_created.append(str(symbol_lib_path.absolute()))
+                    export_status['symbol']['success'] = True
+                    export_status['symbol']['message'] = "符号导出成功"
+            elif export_options.get('symbol', True) and not component_data:
+                error_msg = f"符号导出失败: 无法获取元件数据 {lcsc_id}"
+                self.logger.error(error_msg)
+                export_status['symbol']['success'] = False
+                export_status['symbol']['message'] = error_msg
             
             # 导出封装 (with 3D model reference if available)
             if export_options.get('footprint', True) and component_data:
@@ -506,11 +541,17 @@ class ExportWorker(QThread):
                             time.sleep(wait_time)
                 
                 if not success:
-                    self.logger.warning(f"最终失败 - 未找到封装数据: {lcsc_id}")
+                    error_msg = f"最终失败 - 未找到封装数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
                     # 移除获取失败时的进度更新调用
                     # self.update_progress(f"{lcsc_id} - 封装获取失败")
+                    export_status['footprint']['success'] = False
+                    export_status['footprint']['message'] = error_msg
                 elif not footprint_data:
-                    self.logger.warning(f"未找到封装数据: {lcsc_id}")
+                    error_msg = f"未找到封装数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
+                    export_status['footprint']['success'] = False
+                    export_status['footprint']['message'] = error_msg
                 else:
                     footprint_exporter = ExporterFootprintKicad(footprint=footprint_data)
                     footprint_filename = footprint_dir / f"{footprint_data.info.name}.kicad_mod"
@@ -524,6 +565,13 @@ class ExportWorker(QThread):
                     
                     files_created.append(str(footprint_filename.absolute()))
                     self.logger.info(f"保存封装: {footprint_filename}")
+                    export_status['footprint']['success'] = True
+                    export_status['footprint']['message'] = "封装导出成功"
+            elif export_options.get('footprint', True) and not component_data:
+                error_msg = f"封装导出失败: 无法获取元件数据 {lcsc_id}"
+                self.logger.error(error_msg)
+                export_status['footprint']['success'] = False
+                export_status['footprint']['message'] = error_msg
             
             # 下载数据手册
             if export_options.get('datasheet', False) and JLCDatasheet is not None:
@@ -538,19 +586,77 @@ class ExportWorker(QThread):
                         datasheet_file = datasheet_downloader.pdf_dir / f"{lcsc_id}.pdf"
                         files_created.append(str(datasheet_file.absolute()))
                         self.logger.info(f"数据手册下载成功: {datasheet_file}")
+                        export_status['datasheet']['success'] = True
+                        export_status['datasheet']['message'] = "数据手册下载成功"
                     else:
-                        self.logger.warning(f"数据手册下载失败: {lcsc_id}")
+                        error_msg = f"数据手册下载失败: {lcsc_id}"
+                        self.logger.warning(error_msg)
+                        export_status['datasheet']['success'] = False
+                        export_status['datasheet']['message'] = error_msg
                 except Exception as e:
-                    self.logger.error(f"数据手册下载异常 {lcsc_id}: {e}", exc_info=True)
+                    error_msg = f"数据手册下载异常 {lcsc_id}: {e}"
+                    self.logger.error(error_msg, exc_info=True)
+                    export_status['datasheet']['success'] = False
+                    export_status['datasheet']['message'] = error_msg
             
             # 处理完成，更新最终进度
             self.update_completed_progress(f"{lcsc_id}")
             
+            # 根据导出状态确定整体结果
+            selected_options = [k for k, v in export_options.items() if v]
+            successful_options = [k for k, v in export_status.items() if v['success']]
+            failed_options = [k for k, v in export_status.items() if not v['success'] and export_options.get(k, False)]
+            
+            # 如果没有选择任何导出选项，视为成功
+            if not selected_options:
+                return {
+                    "success": True,
+                    "componentId": lcsc_id,
+                    "message": f"元件 {lcsc_id} 转换成功（未选择任何导出选项）",
+                    "files": files_created,
+                    "export_path": str(base_folder.absolute()),
+                    "export_status": export_status
+                }
+            
+            # 如果所有选择的选项都成功，视为完全成功
+            if len(successful_options) == len(selected_options):
+                return {
+                    "success": True,
+                    "componentId": lcsc_id,
+                    "message": f"元件 {lcsc_id} 转换成功",
+                    "files": files_created,
+                    "export_path": str(base_folder.absolute()),
+                    "export_status": export_status
+                }
+            
+            # 如果没有任何选项成功，视为完全失败
+            if len(successful_options) == 0:
+                error_messages = [export_status[opt]['message'] for opt in selected_options if export_status[opt]['message']]
+                error_msg = "; ".join(error_messages) if error_messages else "所有选择的导出选项都失败了"
+                return {
+                    "success": False,
+                    "componentId": lcsc_id,
+                    "message": error_msg,
+                    "files": files_created,
+                    "export_path": str(base_folder.absolute()),
+                    "export_status": export_status
+                }
+            
+            # 如果部分选项成功，视为部分成功
+            success_msg = f"部分成功: {', '.join(successful_options)} 导出成功"
+            if failed_options:
+                failed_msg = f"{', '.join(failed_options)} 导出失败"
+                message = f"{success_msg}; {failed_msg}"
+            else:
+                message = success_msg
+                
             return {
-                "success": True,
-                "message": f"元件 {lcsc_id} 转换成功",
+                "success": "partial",  # 使用特殊值表示部分成功
+                "componentId": lcsc_id,
+                "message": message,
                 "files": files_created,
-                "export_path": str(base_folder.absolute())
+                "export_path": str(base_folder.absolute()),
+                "export_status": export_status
             }
             
         except Exception as e:

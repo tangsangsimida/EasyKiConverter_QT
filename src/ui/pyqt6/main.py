@@ -235,11 +235,33 @@ class EasyKiConverterApp(ModernMainWindow):
         """单个元件转换完成"""
         # 存储转换结果
         component_id = result.get('componentId', result.get('message', 'Unknown'))
-        if result['success']:
+        
+        # 处理不同的成功状态
+        if result['success'] == True:
+            # 完全成功
             self.conversion_results["success"].append(component_id)
+        elif result['success'] == "partial":
+            # 部分成功
+            message = result.get('message', '部分导出成功')
+            export_status = result.get('export_status', {})
+            
+            # 构建详细的失败信息
+            failed_details = []
+            for option, status in export_status.items():
+                if not status['success']:
+                    failed_details.append(f"{option}: {status['message']}")
+            
+            detailed_message = message
+            if failed_details:
+                detailed_message += f"\n失败详情:\n" + "\n".join(failed_details)
+                
+            self.conversion_results["partial"].append({
+                "id": component_id,
+                "message": detailed_message
+            })
         else:
-            # 提取错误信息中的元件ID
-            error_msg = result.get('error', 'Unknown error')
+            # 完全失败
+            error_msg = result.get('message', 'Unknown error')
             # 如果componentId是Unknown，尝试从result中获取原始输入
             if component_id == 'Unknown':
                 # 优先使用message字段作为元件ID
@@ -249,7 +271,7 @@ class EasyKiConverterApp(ModernMainWindow):
                 if component_id == 'Unknown':
                     import re
                     # 尝试从错误信息中提取元件ID
-                    match = re.search(r'[C]\d+', error_msg)
+                    match = re.search(r'[C]\d+', str(error_msg))
                     if match:
                         component_id = match.group(0)
                 # 如果仍然无法获取，使用current_component作为备选

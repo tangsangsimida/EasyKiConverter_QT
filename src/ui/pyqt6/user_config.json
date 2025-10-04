@@ -2,10 +2,10 @@
   "export_path": "/home/dennis/Desktop/test",
   "file_prefix": "test",
   "export_options": {
-    "symbol": false,
+    "symbol": true,
     "footprint": true,
-    "model3d": false,
-    "datasheet": false
+    "model3d": true,
+    "datasheet": true
   },
   "component_ids": [],
   "window_geometry": null,
