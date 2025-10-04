@@ -205,6 +205,8 @@ class EasyKiConverterApp(ModernMainWindow):
         # 确保至少选择一个选项
         if not any(export_options.values()):
             QMessageBox.warning(self, "警告", "请至少选择一种导出类型")
+            # 修复：确保导出按钮在警告后保持启用状态
+            self.export_btn.setEnabled(True)
             return
         
         # 禁用导出按钮，显示进度条，并重置进度

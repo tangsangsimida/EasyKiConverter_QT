@@ -157,7 +157,7 @@ class ModernMainWindow(QMainWindow):
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll_area.setStyleSheet("""
             QScrollArea {
                 border: none;
@@ -165,16 +165,13 @@ class ModernMainWindow(QMainWindow):
             }
             QScrollBar:vertical {
                 background-color: #f8fafc;
-                width: 8px;
-                border-radius: 4px;
+                width: 0px;
+                border-radius: 0px;
             }
             QScrollBar::handle:vertical {
-                background-color: #cbd5e1;
-                border-radius: 4px;
-                min-height: 20px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background-color: #94a3b8;
+                background-color: transparent;
+                border-radius: 0px;
+                min-height: 0px;
             }
         """)
         
@@ -856,10 +853,10 @@ class ModernMainWindow(QMainWindow):
         
     def request_export(self):
         """请求导出 - 移除重复检查，由主程序处理"""
+        # 不再在这里禁用按钮，由start_export方法处理
         # 显示进度条
         self.progress_bar.setVisible(True)
         self.status_label.setText("正在转换中...")
-        self.export_btn.setEnabled(False)
         
     def load_settings(self):
         """加载设置"""
