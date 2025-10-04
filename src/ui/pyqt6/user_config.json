@@ -3,8 +3,8 @@
   "file_prefix": "test",
   "export_options": {
     "symbol": false,
-    "footprint": false,
-    "model3d": true,
+    "footprint": true,
+    "model3d": false,
     "datasheet": false
   },
   "component_ids": [],

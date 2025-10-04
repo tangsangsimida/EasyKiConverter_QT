@@ -258,6 +258,9 @@ class ExportWorker(QThread):
                     'exportPath': None
                 }
             
+            # 更新进度，显示正在处理当前元件
+            self.update_progress(f"{component_input}")
+            
             # 调用真实的转换函数
             result = self.export_component_real(lcsc_id, self.export_path, self.options, self.file_prefix)
             
@@ -286,23 +289,34 @@ class ExportWorker(QThread):
             files_created = []
             kicad_version = KicadVersion.v6
             
-            # 初始化EasyEDA API
-            easyeda_api = EasyedaApi()
+            # 检查是否需要获取元件数据
+            # 只有在需要导出符号、封装、3D模型时才获取元件数据
+            # 数据手册下载不依赖于EasyEDA API数据
+            need_component_data = (
+                export_options.get('symbol', True) or 
+                export_options.get('footprint', True) or 
+                export_options.get('model3d', True)
+            )
             
-            # 获取元器件数据
-            self.logger.info(f"获取元件数据: {lcsc_id}")
-            component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
-            
-            if not component_data:
-                error_msg = f"无法获取元件数据: {lcsc_id}。可能是元件ID无效或网络连接问题。"
-                self.logger.error(error_msg)
-                return {
-                    "success": False,
-                    "componentId": lcsc_id,
-                    "message": error_msg,
-                    "files": [],
-                    "export_path": None
-                }
+            component_data = None
+            if need_component_data:
+                # 初始化EasyEDA API
+                easyeda_api = EasyedaApi()
+                
+                # 获取元器件数据
+                self.logger.info(f"获取元件数据: {lcsc_id}")
+                component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
+                
+                if not component_data:
+                    error_msg = f"无法获取元件数据: {lcsc_id}。可能是元件ID无效或网络连接问题。"
+                    self.logger.error(error_msg)
+                    return {
+                        "success": False,
+                        "componentId": lcsc_id,
+                        "message": error_msg,
+                        "files": [],
+                        "export_path": None
+                    }
             
             # 处理导出路径
             if not export_path or export_path.strip() == "":
@@ -353,7 +367,7 @@ class ExportWorker(QThread):
             
             # First, process 3D models if enabled (needed for footprint 3D references)
             model_3d = None
-            if export_options.get('model3d', True):
+            if export_options.get('model3d', True) and component_data:
                 self.logger.info(f"转换3D模型: {lcsc_id}")
                 # 不在重试过程中更新进度，只在最终完成或失败时更新
                 try:
@@ -409,7 +423,7 @@ class ExportWorker(QThread):
                     self.logger.error(f"3D模型导出失败 {lcsc_id}: {e}", exc_info=True)
             
             # 导出符号
-            if export_options.get('symbol', True):
+            if export_options.get('symbol', True) and component_data:
                 self.logger.info(f"转换符号: {lcsc_id}")
                 # 不在重试过程中更新进度，只在最终完成或失败时更新
                 # 尝试多次获取符号数据，以应对网络问题
@@ -463,7 +477,7 @@ class ExportWorker(QThread):
                     files_created.append(str(symbol_lib_path.absolute()))
             
             # 导出封装 (with 3D model reference if available)
-            if export_options.get('footprint', True):
+            if export_options.get('footprint', True) and component_data:
                 self.logger.info(f"转换封装: {lcsc_id}")
                 # 不在开始时立即更新进度，而是在重试过程中更新
                 # 尝试多次获取封装数据，以应对网络问题
