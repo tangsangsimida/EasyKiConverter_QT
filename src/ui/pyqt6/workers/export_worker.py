@@ -279,12 +279,12 @@ class ExportWorker(QThread):
     
     def export_component_real(self, lcsc_id: str, export_path: str, export_options: Dict[str, bool], file_prefix: str = None) -> Dict[str, Any]:
         """使用EasyKiConverter工具链导出元器件 - 线程安全版本"""
+        # 保存lcsc_id以便在错误处理中使用
+        self.current_lcsc_id = lcsc_id
+        
         try:
             files_created = []
             kicad_version = KicadVersion.v6
-            
-            # 保存lcsc_id以便在错误处理中使用
-            self.current_lcsc_id = lcsc_id
             
             # 初始化EasyEDA API
             easyeda_api = EasyedaApi()

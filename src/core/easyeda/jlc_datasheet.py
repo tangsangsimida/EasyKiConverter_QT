@@ -76,9 +76,34 @@ class JLCDatasheet:
         try:
             # 使用BeautifulSoup解析HTML
             soup = BeautifulSoup(html_content, 'html.parser')
-            # 查找具有data-spm="n"属性的a标签
+            
+            # 优先查找具有data-spm="n"属性的a标签，这是产品链接的标识
             target_element = soup.find('a', {'data-spm': 'n'})
-            print(target_element)
+            
+            # 如果没找到，尝试其他方法
+            if not target_element:
+                # 查找具有data-spm属性的任意a标签
+                target_element = soup.find('a', {'data-spm': True})
+            
+            # 如果仍然没找到，使用XPath路径查找
+            if not target_element:
+                target_element = soup.select_one('#__next main div div div div div:nth-child(6) div:nth-child(2) div section div div div div:nth-child(2) dl dd a')
+            
+            # 如果仍然没找到，尝试更宽松的选择器
+            if not target_element:
+                target_element = soup.select_one('#__next section div dl dd a')
+            
+            # 最后的备选方案：查找页面中第一个dl dd a结构
+            if not target_element:
+                dl_elements = soup.find_all('dl')
+                for dl in dl_elements:
+                    dd = dl.find('dd')
+                    if dd:
+                        a_tag = dd.find('a')
+                        if a_tag and a_tag.get('href'):
+                            target_element = a_tag
+                            break
+            
             # 如果找到了目标元素，提取href属性
             if target_element:
                 href = target_element.get('href')
@@ -97,28 +122,6 @@ class JLCDatasheet:
                         href = 'https://item.szlcsc.com' + href
                     return href
             
-            # 保持向后兼容性，如果新方法失败，使用旧方法
-            print("使用XPath方法未找到产品链接，尝试使用旧方法")
-            # 查找所有<script>标签
-            scripts = soup.find_all('script')
-            
-            # 查找包含JSON-LD数据的<script>标签
-            for script in scripts:
-                if script.get('type') == 'application/ld+json' and script.string:
-                    # 解析JSON内容
-                    json_data = json.loads(script.string)
-                    
-                    # 检查是否包含itemListElement
-                    if 'itemListElement' in json_data:
-                        # 遍历itemListElement查找position为1的项目
-                        for item in json_data['itemListElement']:
-                            if item.get('position') == 1:
-                                # 提取offers中的url
-                                offers = item.get('item', {}).get('offers', {})
-                                url = offers.get('url')
-                                if url:
-                                    return url
-                    
             print("未找到产品链接")
             return None
         except Exception as e:

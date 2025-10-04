@@ -2,8 +2,8 @@
   "export_path": "/home/dennis/Desktop/test",
   "file_prefix": "test",
   "export_options": {
-    "symbol": true,
-    "footprint": true,
+    "symbol": false,
+    "footprint": false,
     "model3d": true,
     "datasheet": false
   },

@@ -252,6 +252,9 @@ class EasyKiConverterApp(ModernMainWindow):
                     match = re.search(r'[C]\d+', error_msg)
                     if match:
                         component_id = match.group(0)
+                # 如果仍然无法获取，使用current_component作为备选
+                if component_id == 'Unknown' and hasattr(self, 'export_worker'):
+                    component_id = getattr(self.export_worker, 'current_component', 'Unknown')
             self.conversion_results["failed"].append({
                 "id": component_id,
                 "error": error_msg
