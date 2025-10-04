@@ -30,7 +30,8 @@ class ConfigManager:
             "export_options": {  # 导出选项
                 "symbol": True,
                 "footprint": True,
-                "model3d": True
+                "model3d": True,
+                "datasheet": False
             },
             "component_ids": [],  # 最近使用的元件编号
             "window_geometry": None,  # 窗口几何信息
@@ -123,7 +124,7 @@ class ConfigManager:
             # 确保导出选项是有效的
             export_options = config['export_options']
             if isinstance(export_options, dict):
-                for option in ['symbol', 'footprint', 'model3d']:
+                for option in ['symbol', 'footprint', 'model3d', 'datasheet']:
                     if option in export_options:
                         validated_config['export_options'][option] = bool(export_options[option])
                         

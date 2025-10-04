@@ -5,7 +5,7 @@
     "symbol": true,
     "footprint": true,
     "model3d": true,
-    "manual": false
+    "datasheet": true
   },
   "component_ids": [],
   "window_geometry": null,

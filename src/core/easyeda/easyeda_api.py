@@ -91,6 +91,12 @@ class EasyedaApi:
             print(f"API响应结构: {type(api_response)}")
             print(f"响应键: {list(api_response.keys()) if isinstance(api_response, dict) else '不是字典'}")
             
+            if not api_response or (
+                "code" in api_response and api_response["success"] is False
+            ):
+                logging.debug(f"{api_response}")
+                return {}
+
             return api_response
             
         except requests.exceptions.RequestException as e:
@@ -106,14 +112,6 @@ class EasyedaApi:
             print(f"未知错误: {e}")
             logging.error(f"未知错误 (LCSC ID: {lcsc_id}): {e}")
             return {}
-
-        if not api_response or (
-            "code" in api_response and api_response["success"] is False
-        ):
-            logging.debug(f"{api_response}")
-            return {}
-
-        return r.json()
 
     def get_cad_data_of_component(self, lcsc_id: str) -> dict:
         """
@@ -131,6 +129,13 @@ class EasyedaApi:
         cp_cad_info = self.get_info_from_easyeda_api(lcsc_id=lcsc_id)
         if cp_cad_info == {}:
             return {}
+        
+        # 检查响应是否包含result键
+        if "result" not in cp_cad_info:
+            logging.error(f"API响应中缺少'result'键. 响应键: {list(cp_cad_info.keys())}")
+            print(f"API响应中缺少'result'键. 响应键: {list(cp_cad_info.keys())}")
+            return {}
+            
         return cp_cad_info["result"]
 
     def get_raw_3d_model_obj(self, uuid: str) -> str:
