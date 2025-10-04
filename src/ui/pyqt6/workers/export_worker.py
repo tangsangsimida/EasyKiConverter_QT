@@ -294,10 +294,12 @@ class ExportWorker(QThread):
             component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
             
             if not component_data:
+                error_msg = f"无法获取元件数据: {lcsc_id}。可能是元件ID无效或网络连接问题。"
+                self.logger.error(error_msg)
                 return {
                     "success": False,
                     "componentId": lcsc_id,
-                    "message": f"无法获取元件数据: {lcsc_id}",
+                    "message": error_msg,
                     "files": [],
                     "export_path": None
                 }

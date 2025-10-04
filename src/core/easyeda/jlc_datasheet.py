@@ -12,9 +12,24 @@ class JLCDatasheet:
         Args:
             export_path: 导出路径，数据手册将保存在该路径的datasheet子目录中
         """
-        # 设置简单的请求头
+        # 设置更完整的请求头，模拟真实浏览器访问
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Sec-Ch-Ua': '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Linux"',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'same-site',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
+            'Referer': 'https://www.szlcsc.com/',
+            'Priority': 'u=0, i'
         }
         
         # 设置导出路径
@@ -61,7 +76,29 @@ class JLCDatasheet:
         try:
             # 使用BeautifulSoup解析HTML
             soup = BeautifulSoup(html_content, 'html.parser')
+            # 查找具有data-spm="n"属性的a标签
+            target_element = soup.find('a', {'data-spm': 'n'})
+            print(target_element)
+            # 如果找到了目标元素，提取href属性
+            if target_element:
+                href = target_element.get('href')
+                if href:
+                    # 只保留问号之前的部分作为完整的产品链接
+                    if '?' in href:
+                        href = href.split('?')[0]
+                        print(f"找到第一个产品的购买链接: {href}")
+                    # 如果是相对路径，转换为绝对路径
+                    if href.startswith('//'):
+                        href = 'https:' + href
+                    elif href.startswith('/'):
+                        href = 'https://item.szlcsc.com' + href
+                    elif not href.startswith('http'):
+                        # 处理其他相对路径情况
+                        href = 'https://item.szlcsc.com' + href
+                    return href
             
+            # 保持向后兼容性，如果新方法失败，使用旧方法
+            print("使用XPath方法未找到产品链接，尝试使用旧方法")
             # 查找所有<script>标签
             scripts = soup.find_all('script')
             
@@ -82,7 +119,7 @@ class JLCDatasheet:
                                 if url:
                                     return url
                     
-            print("未找到position为1的产品链接")
+            print("未找到产品链接")
             return None
         except Exception as e:
             print(f"解析产品链接时出错: {e}")
@@ -179,7 +216,6 @@ class JLCDatasheet:
                     # 只保留问号之前的部分
                     if '?' in href:
                         href = href.split('?')[0]
-                    
                     return href
             
             print("未找到PDF下载链接")
