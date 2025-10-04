@@ -254,7 +254,7 @@ class ExportWorker(QThread):
                     'success': False,
                     'error': '无法从输入中提取有效的LCSC ID',
                     'files': [],
-                    'message': '无法从输入中提取有效的LCSC ID',
+                    'message': f'无法从输入中提取有效的LCSC ID: {component_input}',
                     'exportPath': None
                 }
             
@@ -283,6 +283,9 @@ class ExportWorker(QThread):
             files_created = []
             kicad_version = KicadVersion.v6
             
+            # 保存lcsc_id以便在错误处理中使用
+            self.current_lcsc_id = lcsc_id
+            
             # 初始化EasyEDA API
             easyeda_api = EasyedaApi()
             
@@ -293,6 +296,7 @@ class ExportWorker(QThread):
             if not component_data:
                 return {
                     "success": False,
+                    "componentId": lcsc_id,
                     "message": f"无法获取元件数据: {lcsc_id}",
                     "files": [],
                     "export_path": None
@@ -536,8 +540,16 @@ class ExportWorker(QThread):
         except Exception as e:
             error_msg = f"转换失败: {str(e)}"
             self.logger.error(error_msg, exc_info=True)
+            # 确保返回componentId字段，以便在UI中正确显示
+            component_id = getattr(self, 'current_lcsc_id', None)
+            if not component_id and 'lcsc_id' in locals():
+                component_id = lcsc_id
+            if not component_id:
+                component_id = self.current_component if hasattr(self, 'current_component') else "Unknown"
+                
             return {
                 "success": False,
+                "componentId": component_id,
                 "message": error_msg,
                 "files": [],
                 "export_path": None

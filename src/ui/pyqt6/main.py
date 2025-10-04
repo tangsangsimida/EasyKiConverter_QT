@@ -14,10 +14,7 @@ from src.ui.pyqt6.modern_main_window import ModernMainWindow
 from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.bom_parser import BOMParser
 from src.ui.pyqt6.utils.component_validator import ComponentValidator
-
-# 从workers目录导入新的ExportWorker类
 from src.ui.pyqt6.workers.export_worker import ExportWorker
-# 导入转换结果详情组件
 from src.ui.pyqt6.widgets.conversion_results_widget import ConversionResultsWidget
 
 class EasyKiConverterApp(ModernMainWindow):
@@ -243,12 +240,18 @@ class EasyKiConverterApp(ModernMainWindow):
         else:
             # 提取错误信息中的元件ID
             error_msg = result.get('error', 'Unknown error')
-            if component_id == 'Unknown' and 'Unknown' in error_msg:
-                # 尝试从错误信息中提取元件ID
-                import re
-                match = re.search(r'[C]\d+', error_msg)
-                if match:
-                    component_id = match.group(0)
+            # 如果componentId是Unknown，尝试从result中获取原始输入
+            if component_id == 'Unknown':
+                # 优先使用message字段作为元件ID
+                if 'message' in result and result['message'] != 'Unknown':
+                    component_id = result['message']
+                # 如果仍然无法获取，尝试从错误信息中提取元件ID
+                if component_id == 'Unknown':
+                    import re
+                    # 尝试从错误信息中提取元件ID
+                    match = re.search(r'[C]\d+', error_msg)
+                    if match:
+                        component_id = match.group(0)
             self.conversion_results["failed"].append({
                 "id": component_id,
                 "error": error_msg
