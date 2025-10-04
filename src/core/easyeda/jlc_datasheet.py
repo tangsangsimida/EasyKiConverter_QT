@@ -118,7 +118,7 @@ class JLCDatasheet:
             # 使用BeautifulSoup解析HTML
             soup = BeautifulSoup(html_content, 'html.parser')
             
-            # 查找id为"item-pdf-down"的元素
+            # 方法1: 查找id为"item-pdf-down"的元素（保持向后兼容）
             pdf_link_element = soup.find(id="item-pdf-down")
             
             if pdf_link_element:
@@ -137,7 +137,52 @@ class JLCDatasheet:
                     
                     return pdf_href
             
-            print("未找到id为'item-pdf-down'的元素")
+            # 方法2: 查找包含PDF下载链接的script标签
+            # 查找所有script标签
+            scripts = soup.find_all('script')
+            
+            # 在script标签中查找PDF链接
+            for script in scripts:
+                if script.string:
+                    # 查找包含pdfUrl或PDF链接的JavaScript代码
+                    import re
+                    pdf_match = re.search(r'pdfUrl["\']?\s*[:=]\s*["\']([^"\']+)"\']', script.string, re.IGNORECASE)
+                    if pdf_match:
+                        pdf_href = pdf_match.group(1)
+                        # 如果是相对路径，需要转换为绝对路径
+                        if pdf_href.startswith('//'):
+                            pdf_href = 'https:' + pdf_href
+                        elif pdf_href.startswith('/'):
+                            pdf_href = 'https://item.szlcsc.com' + pdf_href
+                        
+                        # 只保留问号之前的部分
+                        if '?' in pdf_href:
+                            pdf_href = pdf_href.split('?')[0]
+                        
+                        return pdf_href
+            
+            # 方法3: 查找页面中其他可能的PDF链接
+            # 查找所有a标签，寻找包含.pdf的链接
+            links = soup.find_all('a', href=True)
+            for link in links:
+                href = link['href']
+                if '.pdf' in href.lower():
+                    # 如果是相对路径，需要转换为绝对路径
+                    if href.startswith('//'):
+                        href = 'https:' + href
+                    elif href.startswith('/'):
+                        href = 'https://item.szlcsc.com' + href
+                    elif not href.startswith('http'):
+                        # 处理相对路径
+                        continue
+                    
+                    # 只保留问号之前的部分
+                    if '?' in href:
+                        href = href.split('?')[0]
+                    
+                    return href
+            
+            print("未找到PDF下载链接")
             return None
         except Exception as e:
             print(f"解析PDF下载链接时出错: {e}")
