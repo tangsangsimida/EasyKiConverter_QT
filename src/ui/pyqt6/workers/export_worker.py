@@ -19,6 +19,20 @@ src_dir = current_dir.parent.parent
 if str(src_dir) not in sys.path:
     sys.path.insert(0, str(src_dir))
 
+# 初始化模块引用
+EasyedaApi = None
+Easyeda3dModelImporter = None
+EasyedaFootprintImporter = None
+EasyedaSymbolImporter = None
+Exporter3dModelKicad = None
+ExporterFootprintKicad = None
+ExporterSymbolKicad = None
+KicadVersion = None
+add_component_in_symbol_lib_file = None
+id_already_in_symbol_lib = None
+JLCDatasheet = None
+ConfigManager = None
+
 try:
     # 导入EasyKiConverter核心模块
     from src.core.easyeda.easyeda_api import EasyedaApi
@@ -32,6 +46,9 @@ try:
     from src.core.kicad.export_kicad_symbol import ExporterSymbolKicad
     from src.core.kicad.parameters_kicad_symbol import KicadVersion
     from src.core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+    
+    # 导入数据手册下载模块
+    from src.core.easyeda.jlc_datasheet import JLCDatasheet
     
     # 导入配置管理器
     from src.ui.pyqt6.utils.config_manager import ConfigManager
@@ -79,10 +96,17 @@ class ExportWorker(QThread):
         self.symbol_lib_locks_lock = threading.Lock()  # 符号库锁字典的锁
         
         # 网络配置
-        self.config_manager = ConfigManager()
-        self.network_timeout = self.config_manager.get_network_timeout()
-        self.max_retries = self.config_manager.get_max_retries()
-        self.retry_delay = self.config_manager.get_retry_delay()
+        if ConfigManager is not None:
+            self.config_manager = ConfigManager()
+            self.network_timeout = self.config_manager.get_network_timeout()
+            self.max_retries = self.config_manager.get_max_retries()
+            self.retry_delay = self.config_manager.get_retry_delay()
+        else:
+            # 使用默认配置
+            self.config_manager = None
+            self.network_timeout = 30
+            self.max_retries = 3
+            self.retry_delay = 1
         
         # 日志配置
         self.logger = logging.getLogger(__name__)
@@ -480,6 +504,24 @@ class ExportWorker(QThread):
                     
                     files_created.append(str(footprint_filename.absolute()))
                     self.logger.info(f"保存封装: {footprint_filename}")
+            
+            # 下载数据手册
+            if export_options.get('datasheet', False) and JLCDatasheet is not None:
+                self.logger.info(f"下载数据手册: {lcsc_id}")
+                try:
+                    # 创建数据手册下载器实例
+                    datasheet_downloader = JLCDatasheet(export_path=str(base_folder))
+                    # 下载数据手册
+                    success = datasheet_downloader.download_datasheet(lcsc_id, f"{lcsc_id}.pdf")
+                    if success:
+                        # 添加数据手册文件路径到已创建文件列表
+                        datasheet_file = datasheet_downloader.pdf_dir / f"{lcsc_id}.pdf"
+                        files_created.append(str(datasheet_file.absolute()))
+                        self.logger.info(f"数据手册下载成功: {datasheet_file}")
+                    else:
+                        self.logger.warning(f"数据手册下载失败: {lcsc_id}")
+                except Exception as e:
+                    self.logger.error(f"数据手册下载异常 {lcsc_id}: {e}", exc_info=True)
             
             # 处理完成，更新最终进度
             self.update_completed_progress(f"{lcsc_id}")
