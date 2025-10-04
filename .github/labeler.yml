@@ -1,0 +1,92 @@
+# 核心转换引擎标签
+core:
+  - src/core/**/*
+
+# EasyEDA模块标签
+easyeda:
+  - src/core/easyeda/**/*
+
+# KiCad模块标签
+kicad:
+  - src/core/kicad/**/*
+
+# 工具函数标签
+utils:
+  - src/core/utils/**/*
+
+# UI相关标签
+ui:
+  - src/ui/**/*
+
+# PyQt6 UI标签
+pyqt6:
+  - src/ui/pyqt6/**/*
+
+# UI工具函数标签
+ui-utils:
+  - src/ui/pyqt6/utils/**/*
+
+# UI组件标签
+widgets:
+  - src/ui/pyqt6/widgets/**/*
+
+# 工作线程标签
+workers:
+  - src/ui/pyqt6/workers/**/*
+
+# 构建配置标签
+build:
+  - build_conf/**/*
+
+# 文档标签
+documentation:
+  - docs/**/*
+  - README.md
+  - README_en.md
+  - IFLOW.md
+  - LICENSE
+  - .gitignore
+
+# 测试标签
+tests:
+  - tests/**/*
+
+# GitHub工作流标签
+github-actions:
+  - .github/workflows/**/*
+
+# 功能性标签
+# 新功能
+feature:
+  - any: ['src/**/*', 'docs/**/*']
+    all: ['**/*.py', '!tests/**/*']
+
+# Bug修复
+bug:
+  - any: ['src/**/*', 'tests/**/*']
+    all: ['**/*.py']
+
+# 性能优化
+performance:
+  - any: ['src/core/**/*', 'src/ui/pyqt6/workers/**/*']
+    all: ['**/*.py']
+
+# UI/UX改进
+ui-improvement:
+  - any: ['src/ui/pyqt6/**/*']
+    all: ['**/*.py', '**/*.ui']
+
+# 重构
+refactor:
+  - any: ['src/**/*']
+    all: ['**/*.py', '!tests/**/*']
+
+# 依赖更新
+dependencies:
+  - any: ['build_conf/requirements_app.txt', 'build_conf/build.spec']
+    all: ['build_conf/*']
+
+# 测试增强
+test-enhancement:
+  - any: ['tests/**/*']
+    all: ['**/*.py']
