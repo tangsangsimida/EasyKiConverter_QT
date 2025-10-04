@@ -258,9 +258,6 @@ class ExportWorker(QThread):
                     'exportPath': None
                 }
             
-            # 更新进度，显示正在处理当前元件
-            self.update_progress(f"{component_input}")
-            
             # 调用真实的转换函数
             result = self.export_component_real(lcsc_id, self.export_path, self.options, self.file_prefix)
             
