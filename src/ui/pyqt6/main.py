@@ -286,6 +286,9 @@ class EasyKiConverterApp(ModernMainWindow):
         """导出完成"""
         self.export_btn.setEnabled(True)
         
+        # 设置进度条为100%
+        self.progress_bar.set_progress(100)
+        
         # 计算详细统计信息
         failed_count = total - success_count
         success_rate = f"{(success_count / total * 100):.1f}%" if total > 0 else "0%"
