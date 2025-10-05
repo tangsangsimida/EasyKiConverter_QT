@@ -308,13 +308,23 @@ class JLCDatasheet:
         
         print("成功获取搜索结果，正在提取产品链接:")
         
-        # 2. 提取产品链接
-        product_url = self.extract_product_url(search_result)
-        if not product_url:
+        # 2. 提取产品链接和产品名称
+        product_info = self.extract_product_url(search_result)
+        if not product_info:
             print("提取产品链接失败")
             return False
         
+        # 处理product_info可能是字典或字符串的情况
+        if isinstance(product_info, dict):
+            product_url = product_info.get('url')
+            product_name = product_info.get('name')
+        else:
+            product_url = product_info
+            product_name = None
+        
         print(f"成功提取到产品链接: {product_url}")
+        if product_name:
+            print(f"产品名称: {product_name}")
         
         # 3. 获取产品页面
         product_page = self.fetch_product_page(product_url)
@@ -334,7 +344,17 @@ class JLCDatasheet:
         
         # 5. 下载PDF
         if not filename:
-            filename = f"{keyword}.pdf"
+            # 如果有产品名称，使用产品名称作为文件名；否则使用元器件编号
+            if product_name:
+                # 清理产品名称，确保适合用作文件名
+                clean_name = re.sub(r'[<>:"/\\|?*]', '_', product_name)
+                clean_name = re.sub(r'\s+', ' ', clean_name).strip()
+                # 限制文件名长度
+                if len(clean_name) > 100:
+                    clean_name = clean_name[:100]
+                filename = f"{clean_name}.pdf"
+            else:
+                filename = f"{keyword}.pdf"
         
         print(f"正在下载PDF文件并保存为: {filename}")
         success = self.download_pdf(pdf_url, filename)
