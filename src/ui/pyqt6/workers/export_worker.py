@@ -4,10 +4,11 @@
 """
 
 import sys
+import os
 import time
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 
@@ -576,15 +577,28 @@ class ExportWorker(QThread):
                 try:
                     # 创建数据手册下载器实例
                     datasheet_downloader = JLCDatasheet(export_path=str(base_folder))
-                    # 下载数据手册
-                    success = datasheet_downloader.download_datasheet(lcsc_id, f"{lcsc_id}.pdf")
+                    # 下载数据手册（不指定文件名，让系统自动使用产品名称）
+                    success = datasheet_downloader.download_datasheet(lcsc_id)
                     if success:
-                        # 添加数据手册文件路径到已创建文件列表
-                        datasheet_file = datasheet_downloader.pdf_dir / f"{lcsc_id}.pdf"
-                        files_created.append(str(datasheet_file.absolute()))
-                        self.logger.info(f"数据手册下载成功: {datasheet_file}")
-                        export_status['datasheet']['success'] = True
-                        export_status['datasheet']['message'] = "数据手册下载成功"
+                        # 获取实际下载的文件名（可能是产品名称而不是元器件编号）
+                        # 由于文件名现在可能使用产品名称，我们需要查找最新创建的PDF文件
+                        
+                        # 查找datasheet目录中所有PDF文件
+                        pdf_files = list(datasheet_downloader.pdf_dir.glob("*.pdf"))
+                        if pdf_files:
+                            # 按修改时间排序，获取最新的文件
+                            latest_pdf = max(pdf_files, key=os.path.getmtime)
+                            files_created.append(str(latest_pdf.absolute()))
+                            self.logger.info(f"数据手册下载成功: {latest_pdf}")
+                            export_status['datasheet']['success'] = True
+                            export_status['datasheet']['message'] = f"数据手册下载成功: {latest_pdf.name}"
+                        else:
+                            # 如果找不到PDF文件，使用默认名称
+                            datasheet_file = datasheet_downloader.pdf_dir / f"{lcsc_id}.pdf"
+                            files_created.append(str(datasheet_file.absolute()))
+                            self.logger.info(f"数据手册下载成功: {datasheet_file}")
+                            export_status['datasheet']['success'] = True
+                            export_status['datasheet']['message'] = "数据手册下载成功"
                     else:
                         error_msg = f"数据手册下载失败: {lcsc_id}"
                         self.logger.warning(error_msg)

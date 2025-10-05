@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import json
+import re
 from pathlib import Path
 
 
@@ -66,9 +66,9 @@ class JLCDatasheet:
 
     def extract_product_url(self, html_content):
         """
-        从搜索结果中提取第一个产品的购买链接
+        从搜索结果中提取第一个产品的购买链接和产品名称
         :param html_content: 搜索结果页面HTML内容
-        :return: 第一个产品的购买链接
+        :return: 包含产品链接和产品名称的字典 {'url': 产品链接, 'name': 产品名称}
         """
         if not html_content:
             return None
@@ -104,9 +104,33 @@ class JLCDatasheet:
                             target_element = a_tag
                             break
             
-            # 如果找到了目标元素，提取href属性
+            # 如果找到了目标元素，提取href属性和产品名称
             if target_element:
                 href = target_element.get('href')
+                product_name = None
+                
+                # 尝试从目标元素的title属性获取产品名称
+                if target_element.get('title'):
+                    product_name = target_element.get('title').strip()
+                
+                # 如果没有title属性，尝试从span子元素获取
+                if not product_name:
+                    span_element = target_element.find('span')
+                    if span_element and span_element.get('title'):
+                        product_name = span_element.get('title').strip()
+                
+                # 如果仍然没有产品名称，尝试使用XPath路径查找
+                if not product_name:
+                    name_element = soup.select_one('/html/body/div[1]/main/div/div/div/div/div/div[2]/div/div/section/div/div[1]/div[1]/div[2]/dl[1]/dd/a/span')
+                    if name_element and name_element.get('title'):
+                        product_name = name_element.get('title').strip()
+                
+                # 如果仍然没有产品名称，尝试使用文本内容
+                if not product_name:
+                    text_content = target_element.get_text().strip()
+                    if text_content:
+                        product_name = text_content
+                
                 if href:
                     # 只保留问号之前的部分作为完整的产品链接
                     if '?' in href:
@@ -120,7 +144,19 @@ class JLCDatasheet:
                     elif not href.startswith('http'):
                         # 处理其他相对路径情况
                         href = 'https://item.szlcsc.com' + href
-                    return href
+                    
+                    # 清理产品名称，移除不适合文件名的字符
+                    if product_name:
+                        # 移除或替换不适合文件名的字符
+                        product_name = re.sub(r'[<>:"/\\|?*]', '_', product_name)
+                        # 移除多余的空格
+                        product_name = re.sub(r'\s+', ' ', product_name).strip()
+                        print(f"找到产品名称: {product_name}")
+                    
+                    return {
+                        'url': href,
+                        'name': product_name
+                    }
             
             print("未找到产品链接")
             return None
@@ -185,7 +221,6 @@ class JLCDatasheet:
             for script in scripts:
                 if script.string:
                     # 查找包含pdfUrl或PDF链接的JavaScript代码
-                    import re
                     pdf_match = re.search(r'pdfUrl["\']?\s*[:=]\s*["\']([^"\']+)"\']', script.string, re.IGNORECASE)
                     if pdf_match:
                         pdf_href = pdf_match.group(1)
