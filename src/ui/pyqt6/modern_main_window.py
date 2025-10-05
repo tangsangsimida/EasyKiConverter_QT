@@ -227,7 +227,7 @@ class ModernMainWindow(QMainWindow):
         welcome_layout.setContentsMargins(0, 0, 0, 20)
         welcome_layout.setSpacing(10)
         
-        title = QLabel("🚀 开始您的EDA转换之旅")
+        title = QLabel("✌️✌️✌️✌️✌️")
         title.setStyleSheet("""
             font-size: 32px;
             font-weight: 700;

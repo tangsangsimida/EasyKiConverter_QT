@@ -4,10 +4,11 @@
 """
 
 import sys
+import os
 import time
 import logging
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 
@@ -18,6 +19,20 @@ current_dir = Path(__file__).parent
 src_dir = current_dir.parent.parent
 if str(src_dir) not in sys.path:
     sys.path.insert(0, str(src_dir))
+
+# 初始化模块引用
+EasyedaApi = None
+Easyeda3dModelImporter = None
+EasyedaFootprintImporter = None
+EasyedaSymbolImporter = None
+Exporter3dModelKicad = None
+ExporterFootprintKicad = None
+ExporterSymbolKicad = None
+KicadVersion = None
+add_component_in_symbol_lib_file = None
+id_already_in_symbol_lib = None
+JLCDatasheet = None
+ConfigManager = None
 
 try:
     # 导入EasyKiConverter核心模块
@@ -32,6 +47,9 @@ try:
     from src.core.kicad.export_kicad_symbol import ExporterSymbolKicad
     from src.core.kicad.parameters_kicad_symbol import KicadVersion
     from src.core.utils.symbol_lib_utils import add_component_in_symbol_lib_file, id_already_in_symbol_lib
+    
+    # 导入数据手册下载模块
+    from src.core.easyeda.jlc_datasheet import JLCDatasheet
     
     # 导入配置管理器
     from src.ui.pyqt6.utils.config_manager import ConfigManager
@@ -79,10 +97,17 @@ class ExportWorker(QThread):
         self.symbol_lib_locks_lock = threading.Lock()  # 符号库锁字典的锁
         
         # 网络配置
-        self.config_manager = ConfigManager()
-        self.network_timeout = self.config_manager.get_network_timeout()
-        self.max_retries = self.config_manager.get_max_retries()
-        self.retry_delay = self.config_manager.get_retry_delay()
+        if ConfigManager is not None:
+            self.config_manager = ConfigManager()
+            self.network_timeout = self.config_manager.get_network_timeout()
+            self.max_retries = self.config_manager.get_max_retries()
+            self.retry_delay = self.config_manager.get_retry_delay()
+        else:
+            # 使用默认配置
+            self.config_manager = None
+            self.network_timeout = 30
+            self.max_retries = 3
+            self.retry_delay = 1
         
         # 日志配置
         self.logger = logging.getLogger(__name__)
@@ -230,7 +255,7 @@ class ExportWorker(QThread):
                     'success': False,
                     'error': '无法从输入中提取有效的LCSC ID',
                     'files': [],
-                    'message': '无法从输入中提取有效的LCSC ID',
+                    'message': f'无法从输入中提取有效的LCSC ID: {component_input}',
                     'exportPath': None
                 }
             
@@ -255,24 +280,41 @@ class ExportWorker(QThread):
     
     def export_component_real(self, lcsc_id: str, export_path: str, export_options: Dict[str, bool], file_prefix: str = None) -> Dict[str, Any]:
         """使用EasyKiConverter工具链导出元器件 - 线程安全版本"""
+        # 保存lcsc_id以便在错误处理中使用
+        self.current_lcsc_id = lcsc_id
+        
         try:
             files_created = []
             kicad_version = KicadVersion.v6
             
-            # 初始化EasyEDA API
-            easyeda_api = EasyedaApi()
+            # 检查是否需要获取元件数据
+            # 只有在需要导出符号、封装、3D模型时才获取元件数据
+            # 数据手册下载不依赖于EasyEDA API数据
+            need_component_data = (
+                export_options.get('symbol', True) or 
+                export_options.get('footprint', True) or 
+                export_options.get('model3d', True)
+            )
             
-            # 获取元器件数据
-            self.logger.info(f"获取元件数据: {lcsc_id}")
-            component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
-            
-            if not component_data:
-                return {
-                    "success": False,
-                    "message": f"无法获取元件数据: {lcsc_id}",
-                    "files": [],
-                    "export_path": None
-                }
+            component_data = None
+            if need_component_data:
+                # 初始化EasyEDA API
+                easyeda_api = EasyedaApi()
+                
+                # 获取元器件数据
+                self.logger.info(f"获取元件数据: {lcsc_id}")
+                component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
+                
+                if not component_data:
+                    error_msg = f"无法获取元件数据: {lcsc_id}。可能是元件ID无效或网络连接问题。"
+                    self.logger.error(error_msg)
+                    return {
+                        "success": False,
+                        "componentId": lcsc_id,
+                        "message": error_msg,
+                        "files": [],
+                        "export_path": None
+                    }
             
             # 处理导出路径
             if not export_path or export_path.strip() == "":
@@ -321,9 +363,17 @@ class ExportWorker(QThread):
                             my_lib.write("EESchema-LIBRARY Version 2.4\n#encoding utf-8\n")
                     self.logger.info(f"创建符号库文件: {symbol_lib_path}")
             
+            # 跟踪每个导出选项的状态
+            export_status = {
+                'symbol': {'success': False, 'message': ''},
+                'footprint': {'success': False, 'message': ''},
+                'model3d': {'success': False, 'message': ''},
+                'datasheet': {'success': False, 'message': ''}
+            }
+            
             # First, process 3D models if enabled (needed for footprint 3D references)
             model_3d = None
-            if export_options.get('model3d', True):
+            if export_options.get('model3d', True) and component_data:
                 self.logger.info(f"转换3D模型: {lcsc_id}")
                 # 不在重试过程中更新进度，只在最终完成或失败时更新
                 try:
@@ -350,7 +400,10 @@ class ExportWorker(QThread):
                                 time.sleep(wait_time)
                     
                     if not success:
-                        self.logger.warning(f"最终失败 - 未找到3D模型数据: {lcsc_id}")
+                        error_msg = f"最终失败 - 未找到3D模型数据: {lcsc_id}"
+                        self.logger.warning(error_msg)
+                        export_status['model3d']['success'] = False
+                        export_status['model3d']['message'] = error_msg
                     elif model_3d:
                         self.logger.info(f"3D模型信息: name={model_3d.name}, uuid={model_3d.uuid}")
                         self.logger.info(f"3D模型数据: raw_obj={'有' if model_3d.raw_obj else '无'}, step={'有' if model_3d.step else '无'}")
@@ -375,11 +428,22 @@ class ExportWorker(QThread):
                         # This ensures consistency between the exported file name and the reference in footprint
                         if model_3d:
                             model_3d.name = sanitized_model_name
+                        
+                        export_status['model3d']['success'] = True
+                        export_status['model3d']['message'] = "3D模型导出成功"
                 except Exception as e:
-                    self.logger.error(f"3D模型导出失败 {lcsc_id}: {e}", exc_info=True)
+                    error_msg = f"3D模型导出失败 {lcsc_id}: {e}"
+                    self.logger.error(error_msg, exc_info=True)
+                    export_status['model3d']['success'] = False
+                    export_status['model3d']['message'] = error_msg
+            elif export_options.get('model3d', True) and not component_data:
+                error_msg = f"3D模型导出失败: 无法获取元件数据 {lcsc_id}"
+                self.logger.error(error_msg)
+                export_status['model3d']['success'] = False
+                export_status['model3d']['message'] = error_msg
             
             # 导出符号
-            if export_options.get('symbol', True):
+            if export_options.get('symbol', True) and component_data:
                 self.logger.info(f"转换符号: {lcsc_id}")
                 # 不在重试过程中更新进度，只在最终完成或失败时更新
                 # 尝试多次获取符号数据，以应对网络问题
@@ -402,9 +466,15 @@ class ExportWorker(QThread):
                             time.sleep(wait_time)
                 
                 if not success:
-                    self.logger.warning(f"最终失败 - 未找到符号数据: {lcsc_id}")
+                    error_msg = f"最终失败 - 未找到符号数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
+                    export_status['symbol']['success'] = False
+                    export_status['symbol']['message'] = error_msg
                 elif not symbol_data:
-                    self.logger.warning(f"未找到符号数据: {lcsc_id}")
+                    error_msg = f"未找到符号数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
+                    export_status['symbol']['success'] = False
+                    export_status['symbol']['message'] = error_msg
                 else:
                     symbol_exporter = ExporterSymbolKicad(
                         symbol=symbol_data, 
@@ -431,9 +501,16 @@ class ExportWorker(QThread):
                             self.logger.info(f"符号已存在，跳过: {symbol_data.info.name}")
                     
                     files_created.append(str(symbol_lib_path.absolute()))
+                    export_status['symbol']['success'] = True
+                    export_status['symbol']['message'] = "符号导出成功"
+            elif export_options.get('symbol', True) and not component_data:
+                error_msg = f"符号导出失败: 无法获取元件数据 {lcsc_id}"
+                self.logger.error(error_msg)
+                export_status['symbol']['success'] = False
+                export_status['symbol']['message'] = error_msg
             
             # 导出封装 (with 3D model reference if available)
-            if export_options.get('footprint', True):
+            if export_options.get('footprint', True) and component_data:
                 self.logger.info(f"转换封装: {lcsc_id}")
                 # 不在开始时立即更新进度，而是在重试过程中更新
                 # 尝试多次获取封装数据，以应对网络问题
@@ -462,11 +539,17 @@ class ExportWorker(QThread):
                             time.sleep(wait_time)
                 
                 if not success:
-                    self.logger.warning(f"最终失败 - 未找到封装数据: {lcsc_id}")
+                    error_msg = f"最终失败 - 未找到封装数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
                     # 移除获取失败时的进度更新调用
                     # self.update_progress(f"{lcsc_id} - 封装获取失败")
+                    export_status['footprint']['success'] = False
+                    export_status['footprint']['message'] = error_msg
                 elif not footprint_data:
-                    self.logger.warning(f"未找到封装数据: {lcsc_id}")
+                    error_msg = f"未找到封装数据: {lcsc_id}"
+                    self.logger.warning(error_msg)
+                    export_status['footprint']['success'] = False
+                    export_status['footprint']['message'] = error_msg
                 else:
                     footprint_exporter = ExporterFootprintKicad(footprint=footprint_data)
                     footprint_filename = footprint_dir / f"{footprint_data.info.name}.kicad_mod"
@@ -480,22 +563,126 @@ class ExportWorker(QThread):
                     
                     files_created.append(str(footprint_filename.absolute()))
                     self.logger.info(f"保存封装: {footprint_filename}")
+                    export_status['footprint']['success'] = True
+                    export_status['footprint']['message'] = "封装导出成功"
+            elif export_options.get('footprint', True) and not component_data:
+                error_msg = f"封装导出失败: 无法获取元件数据 {lcsc_id}"
+                self.logger.error(error_msg)
+                export_status['footprint']['success'] = False
+                export_status['footprint']['message'] = error_msg
+            
+            # 下载数据手册
+            if export_options.get('datasheet', False) and JLCDatasheet is not None:
+                self.logger.info(f"下载数据手册: {lcsc_id}")
+                try:
+                    # 创建数据手册下载器实例
+                    datasheet_downloader = JLCDatasheet(export_path=str(base_folder))
+                    # 下载数据手册（不指定文件名，让系统自动使用产品名称）
+                    success = datasheet_downloader.download_datasheet(lcsc_id)
+                    if success:
+                        # 获取实际下载的文件名（可能是产品名称而不是元器件编号）
+                        # 由于文件名现在可能使用产品名称，我们需要查找最新创建的PDF文件
+                        
+                        # 查找datasheet目录中所有PDF文件
+                        pdf_files = list(datasheet_downloader.pdf_dir.glob("*.pdf"))
+                        if pdf_files:
+                            # 按修改时间排序，获取最新的文件
+                            latest_pdf = max(pdf_files, key=os.path.getmtime)
+                            files_created.append(str(latest_pdf.absolute()))
+                            self.logger.info(f"数据手册下载成功: {latest_pdf}")
+                            export_status['datasheet']['success'] = True
+                            export_status['datasheet']['message'] = f"数据手册下载成功: {latest_pdf.name}"
+                        else:
+                            # 如果找不到PDF文件，使用默认名称
+                            datasheet_file = datasheet_downloader.pdf_dir / f"{lcsc_id}.pdf"
+                            files_created.append(str(datasheet_file.absolute()))
+                            self.logger.info(f"数据手册下载成功: {datasheet_file}")
+                            export_status['datasheet']['success'] = True
+                            export_status['datasheet']['message'] = "数据手册下载成功"
+                    else:
+                        error_msg = f"数据手册下载失败: {lcsc_id}"
+                        self.logger.warning(error_msg)
+                        export_status['datasheet']['success'] = False
+                        export_status['datasheet']['message'] = error_msg
+                except Exception as e:
+                    error_msg = f"数据手册下载异常 {lcsc_id}: {e}"
+                    self.logger.error(error_msg, exc_info=True)
+                    export_status['datasheet']['success'] = False
+                    export_status['datasheet']['message'] = error_msg
             
             # 处理完成，更新最终进度
             self.update_completed_progress(f"{lcsc_id}")
             
+            # 根据导出状态确定整体结果
+            selected_options = [k for k, v in export_options.items() if v]
+            successful_options = [k for k, v in export_status.items() if v['success']]
+            failed_options = [k for k, v in export_status.items() if not v['success'] and export_options.get(k, False)]
+            
+            # 如果没有选择任何导出选项，视为成功
+            if not selected_options:
+                return {
+                    "success": True,
+                    "componentId": lcsc_id,
+                    "message": f"元件 {lcsc_id} 转换成功（未选择任何导出选项）",
+                    "files": files_created,
+                    "export_path": str(base_folder.absolute()),
+                    "export_status": export_status
+                }
+            
+            # 如果所有选择的选项都成功，视为完全成功
+            if len(successful_options) == len(selected_options):
+                return {
+                    "success": True,
+                    "componentId": lcsc_id,
+                    "message": f"元件 {lcsc_id} 转换成功",
+                    "files": files_created,
+                    "export_path": str(base_folder.absolute()),
+                    "export_status": export_status
+                }
+            
+            # 如果没有任何选项成功，视为完全失败
+            if len(successful_options) == 0:
+                error_messages = [export_status[opt]['message'] for opt in selected_options if export_status[opt]['message']]
+                error_msg = "; ".join(error_messages) if error_messages else "所有选择的导出选项都失败了"
+                return {
+                    "success": False,
+                    "componentId": lcsc_id,
+                    "message": error_msg,
+                    "files": files_created,
+                    "export_path": str(base_folder.absolute()),
+                    "export_status": export_status
+                }
+            
+            # 如果部分选项成功，视为部分成功
+            success_msg = f"部分成功: {', '.join(successful_options)} 导出成功"
+            if failed_options:
+                failed_msg = f"{', '.join(failed_options)} 导出失败"
+                message = f"{success_msg}; {failed_msg}"
+            else:
+                message = success_msg
+                
             return {
-                "success": True,
-                "message": f"元件 {lcsc_id} 转换成功",
+                "success": "partial",  # 使用特殊值表示部分成功
+                "componentId": lcsc_id,
+                "message": message,
                 "files": files_created,
-                "export_path": str(base_folder.absolute())
+                "export_path": str(base_folder.absolute()),
+                "export_status": export_status
             }
             
         except Exception as e:
             error_msg = f"转换失败: {str(e)}"
             self.logger.error(error_msg, exc_info=True)
+            # 确保返回componentId字段，以便在UI中正确显示
+            component_id = getattr(self, 'current_lcsc_id', None)
+            if not component_id and 'lcsc_id' in locals():
+                component_id = lcsc_id
+            if not component_id:
+                component_id = self.current_component if hasattr(self, 'current_component') else "Unknown"
+                
             return {
                 "success": False,
+                "componentId": component_id,
                 "message": error_msg,
                 "files": [],
                 "export_path": None
