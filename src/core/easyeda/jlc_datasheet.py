@@ -167,10 +167,14 @@ class JLCDatasheet:
     def fetch_product_page(self, url):
         """
         获取产品页面内容
-        :param url: 产品页面URL
+        :param url: 产品页面URL或包含URL的字典
         :return: 网页内容
         """
         try:
+            # 如果url是字典，提取其中的URL
+            if isinstance(url, dict) and 'url' in url:
+                url = url['url']
+            
             # 发送GET请求
             response = requests.get(url, headers=self.headers, timeout=10)
             response.raise_for_status()
