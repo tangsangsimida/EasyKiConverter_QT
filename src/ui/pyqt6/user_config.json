@@ -1,11 +1,11 @@
 {
-  "export_path": "/home/dennis/Desktop/test",
-  "file_prefix": "test",
+  "export_path": "",
+  "file_prefix": "",
   "export_options": {
     "symbol": true,
     "footprint": true,
     "model3d": true,
-    "datasheet": true
+    "datasheet": false
   },
   "component_ids": [],
   "window_geometry": null,
