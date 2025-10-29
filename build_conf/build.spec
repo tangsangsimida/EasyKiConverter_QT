@@ -18,9 +18,10 @@ if getattr(sys, 'frozen', False):
     current_dir = os.path.dirname(sys.executable)
 else:
     # 如果是正常Python环境
-    current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
+    # 获取当前工作目录作为基准
+    current_dir = os.getcwd()
 
-resources_dir = os.path.join(current_dir, '..', 'src', 'ui', 'pyqt6', 'resources')
+resources_dir = os.path.join(current_dir, 'src', 'ui', 'pyqt6', 'resources')
 
 # 构建资源文件列表
 icon_files = []
@@ -31,22 +32,18 @@ for ext in icon_extensions:
         # 确保在Windows上使用正确的路径分隔符
         icon_files.append((icon_path, 'resources/'))
 
-# 确定图标文件路径用于EXE构建
-icon_path = None
-if sys.platform.startswith('win'):
-    icon_path = os.path.join(resources_dir, 'app_icon.ico')
-    # 确保路径在Windows上正确格式化
-    icon_path = os.path.normpath(icon_path)
-elif sys.platform.startswith('darwin'):
-    icon_path = os.path.join(resources_dir, 'app_icon.icns')
-    icon_path = os.path.normpath(icon_path)
-else:
-    # Linux平台通常不使用图标文件，或者使用PNG格式
-    icon_path = os.path.join(resources_dir, 'app_icon.png')
-    icon_path = os.path.normpath(icon_path)
+import os
 
-# 最后检查图标文件是否存在，如果不存在则设置为None
-if icon_path and not os.path.exists(icon_path):
+# 确定图标文件路径用于EXE构建
+# 使用绝对路径确保PyInstaller能找到图标文件
+current_dir = os.getcwd()
+icon_path = os.path.join(current_dir, 'src', 'ui', 'pyqt6', 'resources', 'app_icon.ico')
+
+# 检查图标文件是否存在
+if os.path.exists(icon_path):
+    print(f"使用图标文件: {icon_path}")
+else:
+    print(f"警告: 图标文件不存在 {icon_path}")
     icon_path = None
 
 a = Analysis(
