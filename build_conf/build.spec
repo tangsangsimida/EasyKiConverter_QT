@@ -41,9 +41,15 @@ icon_path = os.path.join(current_dir, 'src', 'ui', 'pyqt6', 'resources', 'app_ic
 
 # 检查图标文件是否存在
 if os.path.exists(icon_path):
-    print(f"使用图标文件: {icon_path}")
+    try:
+        print(f"Using icon file: {icon_path}")
+    except UnicodeEncodeError:
+        print("Using icon file: app_icon.ico")
 else:
-    print(f"警告: 图标文件不存在 {icon_path}")
+    try:
+        print(f"Warning: Icon file not found {icon_path}")
+    except UnicodeEncodeError:
+        print("Warning: Icon file not found")
     icon_path = None
 
 a = Analysis(
