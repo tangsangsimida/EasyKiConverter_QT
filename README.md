@@ -43,8 +43,8 @@
 
 我们要向所有贡献者表示诚挚的感谢。
 
-<a href="https://github.com/tangsangsimida/EasyKiConverter/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=tangsangsimida/EasyKiConverter" />
+<a href="https://github.com/tangsangsimida/EasyKiConverter_QT/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=tangsangsimida/EasyKiConverter_QT" />
 </a>
 
 感谢 [EasyEDA](https://easyeda.com/) 和 [嘉立创](https://www.szlcsc.com/) 提供的开放 API。
