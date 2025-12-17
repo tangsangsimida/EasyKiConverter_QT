@@ -43,8 +43,8 @@ EasyKiConverter/
 │       ├── __init__.py             # Python package initialization file
 │       └── pyqt6/                  # PyQt6 desktop application
 │           ├── __init__.py        # Python package initialization file
-│           ├── main.py            # PyQt6 UI main entry
-│           ├── modern_main_window.py # Modern main window
+│           ├── app_main.py        # PyQt6 UI main entry
+│           ├── base_main_window.py # Base main window
 │           ├── user_config.json   # User configuration file
 │           ├── utils/             # UI utility functions
 │           │   ├── __init__.py    # Python package initialization file
@@ -83,8 +83,8 @@ EasyKiConverter/
 ### 🖥️ PyQt6 UI Interface
 | File | Function Description |
 |------|----------------------|
-| **src/ui/pyqt6/main.py** | PyQt6 UI main entry, contains main business logic |
-| **src/ui/pyqt6/modern_main_window.py** | Modern main window interface |
+| **src/ui/pyqt6/app_main.py** | PyQt6 UI main entry, contains main business logic |
+| **src/ui/pyqt6/base_main_window.py** | Base main window interface |
 | **src/ui/pyqt6/widgets/** | Various UI components |
 | **src/ui/pyqt6/utils/** | UI utility functions and style management |
 

@@ -43,8 +43,8 @@ EasyKiConverter/
 │       ├── __init__.py             # Python包初始化文件
 │       └── pyqt6/                  # PyQt6 桌面应用
 │           ├── __init__.py        # Python包初始化文件
-│           ├── main.py            # PyQt6 UI主程序入口
-│           ├── modern_main_window.py # 现代化主窗口
+│           ├── app_main.py        # PyQt6 UI主程序入口
+│           ├── base_main_window.py # 基础主窗口
 │           ├── user_config.json   # 用户配置文件
 │           ├── utils/             # UI工具函数
 │           │   ├── __init__.py    # Python包初始化文件
@@ -83,8 +83,8 @@ EasyKiConverter/
 ### 🖥️ PyQt6 UI 界面
 | 文件 | 功能描述 |
 |------|----------|
-| **src/ui/pyqt6/main.py** | PyQt6 UI主程序入口，包含主要业务逻辑 |
-| **src/ui/pyqt6/modern_main_window.py** | 现代化主窗口界面 |
+| **src/ui/pyqt6/app_main.py** | PyQt6 UI主程序入口，包含主要业务逻辑 |
+| **src/ui/pyqt6/base_main_window.py** | 基础主窗口界面 |
 | **src/ui/pyqt6/widgets/** | 各种UI组件 |
 | **src/ui/pyqt6/utils/** | UI工具函数和样式管理 |
 

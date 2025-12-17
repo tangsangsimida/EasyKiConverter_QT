@@ -21,12 +21,12 @@ pip install -r build_conf/requirements_app.txt
 ```bash
 # Start PyQt6 UI
 cd src/ui/pyqt6
-python main.py
+python app_main.py
 ```
 
 **UI Development:**
-- Modify `main.py` - Main program entry and business logic
-- Modify `modern_main_window.py` - Main window interface
+- Modify `app_main.py` - Main program entry and business logic
+- Modify `base_main_window.py` - Base window interface
 - Modify various UI components in the `widgets/` directory
 - Modify utility classes and style management in the `utils/` directory
 
@@ -40,11 +40,11 @@ python main.py
 ```bash
 # Run basic conversion test
 cd src
-python main.py --lcsc_id C13377 --symbol --debug
+python app_main.py --lcsc_id C13377 --symbol --debug
 
 # Test different component types
-python main.py --lcsc_id C25804 --footprint --debug  # Test footprints
-python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
+python app_main.py --lcsc_id C25804 --footprint --debug  # Test footprints
+python app_main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
 ```
 
 ## 🔧 Code Structure
@@ -59,7 +59,7 @@ python main.py --lcsc_id C13377 --model3d --debug    # Test 3D models
 ## 🔧 Command Line Options
 
 ```bash
-python main.py [options]
+python app_main.py [options]
 
 Required parameters:
   --lcsc_id TEXT         LCSC part number to convert (e.g., C13377)
@@ -82,14 +82,14 @@ Optional parameters:
 
 ```bash
 # Export all content to default directory
-python main.py --lcsc_id C13377 --symbol --footprint --model3d
+python app_main.py --lcsc_id C13377 --symbol --footprint --model3d
 
 # Export symbols only to specified directory
-python main.py --lcsc_id C13377 --symbol --output_dir ./my_symbols
+python app_main.py --lcsc_id C13377 --symbol --output_dir ./my_symbols
 
 # Export to custom library name
-python main.py --lcsc_id C13377 --symbol --footprint --lib_name MyComponents
+python app_main.py --lcsc_id C13377 --symbol --footprint --lib_name MyComponents
 
 # Enable debug mode
-python main.py --lcsc_id C13377 --symbol --debug
+python app_main.py --lcsc_id C13377 --symbol --debug
 ```

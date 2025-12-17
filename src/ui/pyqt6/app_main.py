@@ -10,14 +10,14 @@ import traceback
 from PyQt6.QtWidgets import QApplication, QMessageBox, QListWidgetItem, QFileDialog
 from PyQt6.QtGui import QIcon
 
-from src.ui.pyqt6.modern_main_window import ModernMainWindow
+from src.ui.pyqt6.base_main_window import BaseMainWindow
 from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.bom_parser import BOMParser
 from src.ui.pyqt6.utils.component_validator import ComponentValidator
 from src.ui.pyqt6.workers.export_worker import ExportWorker
 from src.ui.pyqt6.widgets.conversion_results_widget import ConversionResultsWidget
 
-class EasyKiConverterApp(ModernMainWindow):
+class EasyKiConverterApp(BaseMainWindow):
     """EasyKiConverter应用主窗口"""
     
     def __init__(self, config_manager: ConfigManager, parent=None):
