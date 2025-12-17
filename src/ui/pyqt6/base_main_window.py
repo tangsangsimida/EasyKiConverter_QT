@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-主窗口 - 界面设计
+基础主窗口 - 界面设计
 采用从上至下的清晰布局
 """
 
@@ -16,8 +16,8 @@ from src.ui.pyqt6.utils.config_manager import ConfigManager
 from src.ui.pyqt6.utils.modern_ui_components import ModernCard, ModernProgressBar
 
 
-class ModernMainWindow(QMainWindow):
-    """主窗口"""
+class BaseMainWindow(QMainWindow):
+    """基础主窗口"""
     
     def __init__(self, config_manager: ConfigManager, parent=None):
         super().__init__(parent)

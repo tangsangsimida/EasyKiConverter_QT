@@ -27,12 +27,12 @@ pip install -r build_conf/requirements_app.txt
 
 ```bash
 # 启动PyQt6 UI
-python -m src.ui.pyqt6.main
+python app_main.py
 ```
 
 **UI开发：**
-- 修改 `main.py` - 主程序入口和业务逻辑
-- 修改 `modern_main_window.py` - 主窗口界面
+- 修改 `app_main.py` - 主程序入口和业务逻辑
+- 修改 `base_main_window.py` - 基础窗口界面
 - 修改 `widgets/` 目录下的各种UI组件
 - 修改 `utils/` 目录下的工具类和样式管理
 

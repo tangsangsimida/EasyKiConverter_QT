@@ -53,7 +53,7 @@ else:
     icon_path = None
 
 a = Analysis(
-    ['../src/ui/pyqt6/main.py'],
+    ['../src/ui/pyqt6/app_main.py'],
     pathex=['.', '../src'],
     binaries=[],
     datas=icon_files,
