@@ -318,21 +318,22 @@ class ExporterFootprintKicad:
                 logging.info("")
                 
                 # 边界检查：即使bbox可靠，计算结果也可能异常
-                MAX_REASONABLE_OFFSET = 100.0
+                MAX_REASONABLE_OFFSET_XY = 100.0  # XY平面偏移的合理范围
+                MAX_REASONABLE_OFFSET_Z = 50.0     # Z轴高度的合理范围（大多数元器件高度不超过50mm）
                 
                 needs_correction = False
-                if abs(translation_x) > MAX_REASONABLE_OFFSET:
-                    logging.warning(f"offset_x ({translation_x:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET}mm)")
+                if abs(translation_x) > MAX_REASONABLE_OFFSET_XY:
+                    logging.warning(f"offset_x ({translation_x:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET_XY}mm)")
                     translation_x = 0.0
                     needs_correction = True
                     
-                if abs(translation_y) > MAX_REASONABLE_OFFSET:
-                    logging.warning(f"offset_y ({translation_y:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET}mm)")
+                if abs(translation_y) > MAX_REASONABLE_OFFSET_XY:
+                    logging.warning(f"offset_y ({translation_y:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET_XY}mm)")
                     translation_y = 0.0
                     needs_correction = True
                     
-                if abs(translation_z) > MAX_REASONABLE_OFFSET:
-                    logging.warning(f"offset_z ({translation_z:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET}mm)")
+                if abs(translation_z) > MAX_REASONABLE_OFFSET_Z:
+                    logging.warning(f"offset_z ({translation_z:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET_Z}mm)")
                     translation_z = 0.0
                     needs_correction = True
                 
