@@ -6,6 +6,11 @@ from typing import Tuple, Union
 from ..easyeda.parameters_easyeda import ee_footprint
 from .parameters_kicad_footprint import *
 
+# 确保日志级别正确
+logger = logging.getLogger(__name__)
+if logger.level == 0:
+    logger.setLevel(logging.INFO)
+
 # ---------------------------------------
 
 
@@ -212,7 +217,40 @@ class ExporterFootprintKicad:
         )
 
         if self.input.model_3d is not None:
+            # 记录转换前的原始值
+            logging.info("=" * 60)
+            logging.info(f"3D模型位置计算")
+            logging.info("=" * 60)
+            logging.info(f"模型名称: {self.input.model_3d.name}")
+            logging.info(f"🆔 模型UUID: {self.input.model_3d.uuid}")
+            logging.info("")
+            logging.info(f"原始数据 (EasyEDA单位，转换前):")
+            logging.info(f"   Translation:")
+            logging.info(f"     - X: {self.input.model_3d.translation.x:.4f}")
+            logging.info(f"     - Y: {self.input.model_3d.translation.y:.4f}")
+            logging.info(f"     - Z: {self.input.model_3d.translation.z:.4f}")
+            logging.info(f"   Rotation:")
+            logging.info(f"     - X: {self.input.model_3d.rotation.x:.2f}°")
+            logging.info(f"     - Y: {self.input.model_3d.rotation.y:.2f}°")
+            logging.info(f"     - Z: {self.input.model_3d.rotation.z:.2f}°")
+            logging.info(f"   BBox (封装边界):")
+            logging.info(f"     - X: {self.input.bbox.x:.4f}")
+            logging.info(f"     - Y: {self.input.bbox.y:.4f}")
+            logging.info("")
+            
+            # 单位转换
             self.input.model_3d.convert_to_mm()
+            
+            logging.info(f"单位转换后 (毫米 mm):")
+            logging.info(f"   Translation:")
+            logging.info(f"     - X: {self.input.model_3d.translation.x:.4f} mm")
+            logging.info(f"     - Y: {self.input.model_3d.translation.y:.4f} mm")
+            logging.info(f"     - Z: {self.input.model_3d.translation.z:.4f} mm")
+            logging.info(f"   Rotation (不变):")
+            logging.info(f"     - X: {self.input.model_3d.rotation.x:.2f}°")
+            logging.info(f"     - Y: {self.input.model_3d.rotation.y:.2f}°")
+            logging.info(f"     - Z: {self.input.model_3d.rotation.z:.2f}°")
+            logging.info("")
 
             # 3D模型偏移计算策略：
             # 
@@ -231,66 +269,117 @@ class ExporterFootprintKicad:
             bbox_x = self.input.bbox.x if self.input.bbox.x is not None and not isnan(self.input.bbox.x) else 0.0
             bbox_y = self.input.bbox.y if self.input.bbox.y is not None and not isnan(self.input.bbox.y) else 0.0
             
+            logging.info(f"BBox (转换后):")
+            logging.info(f"     - X: {bbox_x:.4f} mm")
+            logging.info(f"     - Y: {bbox_y:.4f} mm")
+            logging.info("")
+            
+            # 获取Z轴值（Z轴不受bbox影响，始终使用原始值）
+            trans_z = self.input.model_3d.translation.z if not isnan(self.input.model_3d.translation.z) else 0.0
+            
             # 检查bbox是否可靠
-            # 合理的封装位置应该在 ±100mm 以内（大多数PCB不会超过100mm）
-            MAX_REASONABLE_BBOX = 100.0
+            # 合理的封装位置应该在 ±500mm 以内（大多数PCB不会超过500mm）
+            MAX_REASONABLE_BBOX = 500.0
             bbox_is_reliable = (abs(bbox_x) <= MAX_REASONABLE_BBOX and abs(bbox_y) <= MAX_REASONABLE_BBOX)
             
+            logging.info(f"BBox可靠性检查:")
+            logging.info(f"   - 阈值: ±{MAX_REASONABLE_BBOX} mm")
+            logging.info(f"   - BBox X: {bbox_x:.2f} mm {'✓ 可靠' if abs(bbox_x) <= MAX_REASONABLE_BBOX else '✗ 超出范围'}")
+            logging.info(f"   - BBox Y: {bbox_y:.2f} mm {'✓ 可靠' if abs(bbox_y) <= MAX_REASONABLE_BBOX else '✗ 超出范围'}")
+            logging.info(f"   - 结论: {'✓ BBox数据可靠' if bbox_is_reliable else '✗ BBox数据不可靠'}")
+            logging.info("")
+            
             if not bbox_is_reliable:
-                # bbox数据不可靠，直接使用0偏移
-                logging.info(f"3D model '{self.input.model_3d.name}' - bbox values ({bbox_x:.2f}, {bbox_y:.2f}) "
-                           f"are unreliable (exceed ±{MAX_REASONABLE_BBOX}mm), using zero offset. "
-                           f"3D model file contains correct position.")
+                # bbox数据不可靠，XY使用0偏移，Z轴保留原始值
+                logging.info(f"偏移计算策略 (BBox不可靠):")
+                logging.info(f"   - X偏移: 0.0 mm (使用零偏移)")
+                logging.info(f"   - Y偏移: 0.0 mm (使用零偏移)")
+                logging.info(f"   - Z偏移: {trans_z:.4f} mm (保留EasyEDA原始值)")
                 translation_x = 0.0
                 translation_y = 0.0
-                translation_z = 0.0
+                translation_z = trans_z  # Z轴保留原始值
             else:
                 # bbox数据可靠，进行正常计算
                 trans_x = self.input.model_3d.translation.x if not isnan(self.input.model_3d.translation.x) else 0.0
                 trans_y = self.input.model_3d.translation.y if not isnan(self.input.model_3d.translation.y) else 0.0
-                trans_z = self.input.model_3d.translation.z if not isnan(self.input.model_3d.translation.z) else 0.0
                 
-                # 计算相对偏移
+                # 计算相对偏移（Z轴不需要减去bbox，因为bbox只包含XY）
                 translation_x = trans_x - bbox_x
                 translation_y = trans_y - bbox_y
-                translation_z = trans_z
+                translation_z = trans_z  # Z轴直接使用原始值
+                
+                logging.info(f"偏移计算 (BBox可靠):")
+                logging.info(f"   X偏移计算:")
+                logging.info(f"     {trans_x:.4f} (translation.x) - {bbox_x:.4f} (bbox.x) = {translation_x:.4f} mm")
+                logging.info(f"   Y偏移计算:")
+                logging.info(f"     {trans_y:.4f} (translation.y) - {bbox_y:.4f} (bbox.y) = {translation_y:.4f} mm")
+                logging.info(f"   Z偏移:")
+                logging.info(f"     {trans_z:.4f} mm (直接使用translation.z，不减去bbox)")
+                logging.info("")
                 
                 # 边界检查：即使bbox可靠，计算结果也可能异常
                 MAX_REASONABLE_OFFSET = 100.0
                 
+                needs_correction = False
                 if abs(translation_x) > MAX_REASONABLE_OFFSET:
-                    logging.warning(f"3D model '{self.input.model_3d.name}' - Calculated offset.x ({translation_x:.2f}mm) "
-                                  f"exceeds reasonable range, using zero offset instead.")
+                    logging.warning(f"offset_x ({translation_x:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET}mm)")
                     translation_x = 0.0
+                    needs_correction = True
                     
                 if abs(translation_y) > MAX_REASONABLE_OFFSET:
-                    logging.warning(f"3D model '{self.input.model_3d.name}' - Calculated offset.y ({translation_y:.2f}mm) "
-                                  f"exceeds reasonable range, using zero offset instead.")
+                    logging.warning(f"offset_y ({translation_y:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET}mm)")
                     translation_y = 0.0
+                    needs_correction = True
                     
                 if abs(translation_z) > MAX_REASONABLE_OFFSET:
-                    logging.warning(f"3D model '{self.input.model_3d.name}' - Calculated offset.z ({translation_z:.2f}mm) "
-                                  f"exceeds reasonable range, using zero offset instead.")
+                    logging.warning(f"offset_z ({translation_z:.2f}mm) 超出合理范围 (±{MAX_REASONABLE_OFFSET}mm)")
                     translation_z = 0.0
+                    needs_correction = True
+                
+                if needs_correction:
+                    logging.info(f"   ✓ 已修正为零偏移")
 
+            # 坐标系转换（Y轴和Z轴需要反转）
+            final_x = round(translation_x, 2)
+            final_y = -round(translation_y, 2)  # Y轴反转
+            final_z = -round(translation_z, 2) if self.input.info.fp_type == "smd" else 0  # SMD元件Z轴反转
+            
+            final_rot_x = (360 - self.input.model_3d.rotation.x) % 360
+            final_rot_y = (360 - self.input.model_3d.rotation.y) % 360
+            final_rot_z = (360 - self.input.model_3d.rotation.z) % 360
+            
             ki_3d_model_info = Ki3dModel(
                 name=self.input.model_3d.name,
                 translation=Ki3dModelBase(
-                    x=round(translation_x, 2),
-                    y=-round(translation_y, 2),
-                    z=-round(translation_z, 2) if self.input.info.fp_type == "smd" else 0,
+                    x=final_x,
+                    y=final_y,
+                    z=final_z,
                 ),
                 rotation=Ki3dModelBase(
-                    x=(360 - self.input.model_3d.rotation.x) % 360,
-                    y=(360 - self.input.model_3d.rotation.y) % 360,
-                    z=(360 - self.input.model_3d.rotation.z) % 360,
+                    x=final_rot_x,
+                    y=final_rot_y,
+                    z=final_rot_z,
                 ),
                 raw_wrl=None,
             )
             
-            logging.debug(f"3D model '{self.input.model_3d.name}' - Final offset: "
-                         f"({ki_3d_model_info.translation.x}, {ki_3d_model_info.translation.y}, "
-                         f"({ki_3d_model_info.translation.z})")
+            logging.info(f"最终输出 (KiCad格式):")
+            logging.info(f"   封装类型: {self.input.info.fp_type.upper()}")
+            logging.info("")
+            logging.info(f"   Offset (偏移):")
+            logging.info(f"     - X: {translation_x:.4f} → {final_x:.2f} mm")
+            logging.info(f"     - Y: {translation_y:.4f} → {final_y:.2f} mm (Y轴反转)")
+            logging.info(f"     - Z: {translation_z:.4f} → {final_z:.2f} mm {'(SMD反转)' if self.input.info.fp_type == 'smd' else '(THT保持)'}")
+            logging.info("")
+            logging.info(f"   Rotation (旋转):")
+            logging.info(f"     - X: {self.input.model_3d.rotation.x:.2f}° → {final_rot_x:.2f}°")
+            logging.info(f"     - Y: {self.input.model_3d.rotation.y:.2f}° → {final_rot_y:.2f}°")
+            logging.info(f"     - Z: {self.input.model_3d.rotation.z:.2f}° → {final_rot_z:.2f}°")
+            logging.info("")
+            logging.info(f"   KiCad文件中的值:")
+            logging.info(f"     (offset (xyz {final_x} {final_y} {final_z}))")
+            logging.info(f"     (rotate (xyz {final_rot_x} {final_rot_y} {final_rot_z}))")
+            logging.info("=" * 60)
         else:
             ki_3d_model_info = None
 

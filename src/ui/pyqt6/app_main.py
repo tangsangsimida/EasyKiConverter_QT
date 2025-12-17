@@ -385,6 +385,20 @@ def main():
     """主函数"""
     print("🚀 正在启动 EasyKiConverter PyQt6 UI...")
     
+    # 配置日志系统
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,  # 显示INFO及以上级别的日志
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout),  # 输出到控制台
+            # 可以添加文件输出
+            # logging.FileHandler('easykiconverter.log', encoding='utf-8')
+        ]
+    )
+    logger = logging.getLogger(__name__)
+    logger.info("日志系统初始化完成")
+    
     # 创建QApplication实例
     app = QApplication(sys.argv)
     print("✅ QApplication 创建成功")
