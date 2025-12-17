@@ -112,6 +112,16 @@ class ExportWorker(QThread):
         # 日志配置
         self.logger = logging.getLogger(__name__)
         
+        # 确保日志级别正确设置
+        if self.logger.level == 0:  # 默认级别是0 (NOTSET)
+            self.logger.setLevel(logging.INFO)
+        
+        # 添加调试信息
+        self.logger.info(f"ExportWorker初始化完成，准备处理 {len(component_ids)} 个元器件")
+        self.logger.info(f"导出选项: {options}")
+        self.logger.info(f"导出路径: {export_path}")
+        self.logger.info(f"文件前缀: {file_prefix}")
+        
     def get_symbol_lib_lock(self, symbol_lib_path: str) -> threading.Lock:
         """获取符号库文件的专用锁"""
         with self.symbol_lib_locks_lock:
@@ -283,6 +293,21 @@ class ExportWorker(QThread):
         # 保存lcsc_id以便在错误处理中使用
         self.current_lcsc_id = lcsc_id
         
+        # ============================================================
+        # 开始转换元器件
+        # ============================================================
+        self.logger.info("=" * 80)
+        self.logger.info(f"开始转换元器件: {lcsc_id}")
+        self.logger.info("=" * 80)
+        self.logger.info(f"导出选项:")
+        self.logger.info(f"   - 符号 (Symbol): {'✓' if export_options.get('symbol', True) else '✗'}")
+        self.logger.info(f"   - 封装 (Footprint): {'✓' if export_options.get('footprint', True) else '✗'}")
+        self.logger.info(f"   - 3D模型 (3D Model): {'✓' if export_options.get('model3d', True) else '✗'}")
+        self.logger.info(f"   - 数据手册 (Datasheet): {'✓' if export_options.get('datasheet', False) else '✗'}")
+        self.logger.info(f"导出路径: {export_path if export_path else '(使用默认路径)'}")
+        self.logger.info(f"文件前缀: {file_prefix if file_prefix else '(使用默认前缀)'}")
+        self.logger.info("-" * 80)
+        
         try:
             files_created = []
             kicad_version = KicadVersion.v6
@@ -302,7 +327,7 @@ class ExportWorker(QThread):
                 easyeda_api = EasyedaApi()
                 
                 # 获取元器件数据
-                self.logger.info(f"获取元件数据: {lcsc_id}")
+                self.logger.info(f"正在从EasyEDA API获取元件数据...")
                 component_data = easyeda_api.get_cad_data_of_component(lcsc_id=lcsc_id)
                 
                 if not component_data:
@@ -315,6 +340,22 @@ class ExportWorker(QThread):
                         "files": [],
                         "export_path": None
                     }
+                
+                # 记录原始数据信息
+                self.logger.info(f"成功获取元件数据")
+                self.logger.info(f"原始数据概览:")
+                if isinstance(component_data, dict):
+                    self.logger.info(f"   - 数据类型: 字典 (Dict)")
+                    self.logger.info(f"   - 键数量: {len(component_data)} 个")
+                    self.logger.info(f"   - 主要键: {list(component_data.keys())[:5]}")
+                elif isinstance(component_data, list):
+                    self.logger.info(f"   - 数据类型: 列表 (List)")
+                    self.logger.info(f"   - 元素数量: {len(component_data)} 个")
+                    if len(component_data) > 0:
+                        self.logger.info(f"   - 第一个元素类型: {type(component_data[0])}")
+                else:
+                    self.logger.info(f"   - 数据类型: {type(component_data)}")
+                self.logger.info("-" * 80)
             
             # 处理导出路径
             if not export_path or export_path.strip() == "":
@@ -374,13 +415,16 @@ class ExportWorker(QThread):
             # First, process 3D models if enabled (needed for footprint 3D references)
             model_3d = None
             if export_options.get('model3d', True) and component_data:
-                self.logger.info(f"转换3D模型: {lcsc_id}")
+                self.logger.info(f"开始处理3D模型...")
                 # 不在重试过程中更新进度，只在最终完成或失败时更新
                 try:
                     # 尝试多次获取3D模型数据，以应对网络问题
                     model_3d_importer = None
                     success = False
                     for attempt in range(self.max_retries + 1):  # 使用配置的重试次数
+                        if attempt > 0:
+                            self.logger.info(f"第 {attempt + 1} 次尝试获取3D模型数据...")
+                        
                         model_3d_importer = Easyeda3dModelImporter(
                             easyeda_cp_cad_data=component_data, 
                             download_raw_3d_model=True
@@ -390,23 +434,30 @@ class ExportWorker(QThread):
                         if model_3d:
                             success = True
                             if attempt > 0:  # 如果不是第一次就成功，记录重试成功
-                                self.logger.info(f"第{attempt + 1}次尝试成功获取3D模型数据: {lcsc_id}")
+                                self.logger.info(f"第 {attempt + 1} 次尝试成功！")
                             break  # 成功获取到3D模型，跳出循环
                         else:
-                            self.logger.warning(f"第{attempt + 1}次尝试获取3D模型数据失败: {lcsc_id}")
+                            self.logger.warning(f"第 {attempt + 1} 次尝试失败")
                             if attempt < self.max_retries:  # 不是最后一次尝试，等待后重试
                                 # 使用配置的重试延迟时间
                                 wait_time = self.retry_delay * (2 ** attempt)  # 指数退避
+                                self.logger.info(f"等待 {wait_time:.1f} 秒后重试...")
                                 time.sleep(wait_time)
                     
                     if not success:
-                        error_msg = f"最终失败 - 未找到3D模型数据: {lcsc_id}"
+                        error_msg = f"最终失败 - 未找到3D模型数据"
                         self.logger.warning(error_msg)
                         export_status['model3d']['success'] = False
                         export_status['model3d']['message'] = error_msg
                     elif model_3d:
-                        self.logger.info(f"3D模型信息: name={model_3d.name}, uuid={model_3d.uuid}")
-                        self.logger.info(f"3D模型数据: raw_obj={'有' if model_3d.raw_obj else '无'}, step={'有' if model_3d.step else '无'}")
+                        self.logger.info(f"成功获取3D模型数据")
+                        self.logger.info(f"3D模型详细信息:")
+                        self.logger.info(f"   - 模型名称: {model_3d.name}")
+                        self.logger.info(f"   - 模型UUID: {model_3d.uuid}")
+                        self.logger.info(f"   - OBJ数据: {'✓ 有' if model_3d.raw_obj else '✗ 无'} {f'({len(model_3d.raw_obj)} 字节)' if model_3d.raw_obj else ''}")
+                        self.logger.info(f"   - STEP数据: {'✓ 有' if model_3d.step else '✗ 无'} {f'({len(model_3d.step)} 字节)' if model_3d.step else ''}")
+                        self.logger.info(f"   - 位置偏移 (translation): x={model_3d.translation.x:.2f}, y={model_3d.translation.y:.2f}, z={model_3d.translation.z:.2f}")
+                        self.logger.info(f"   - 旋转角度 (rotation): x={model_3d.rotation.x:.2f}°, y={model_3d.rotation.y:.2f}°, z={model_3d.rotation.z:.2f}°")
                         
                         model_3d_exporter = Exporter3dModelKicad(model_3d=model_3d)
                         model_3d_exporter.export(lib_path=str(base_folder / lib_name))
@@ -617,6 +668,27 @@ class ExportWorker(QThread):
             selected_options = [k for k, v in export_options.items() if v]
             successful_options = [k for k, v in export_status.items() if v['success']]
             failed_options = [k for k, v in export_status.items() if not v['success'] and export_options.get(k, False)]
+            
+            # 打印转换总结
+            self.logger.info("=" * 80)
+            self.logger.info(f"转换总结 - {lcsc_id}")
+            self.logger.info("=" * 80)
+            self.logger.info(f"成功的选项 ({len(successful_options)}/{len(selected_options)}):")
+            option_names = {'symbol': '符号', 'footprint': '封装', 'model3d': '3D模型', 'datasheet': '数据手册'}
+            for opt in successful_options:
+                self.logger.info(f"   ✓ {option_names.get(opt, opt)}")
+            
+            if failed_options:
+                self.logger.info(f"失败的选项 ({len(failed_options)}/{len(selected_options)}):")
+                for opt in failed_options:
+                    self.logger.info(f"   ✗ {option_names.get(opt, opt)}: {export_status[opt]['message']}")
+            
+            self.logger.info(f"生成的文件 ({len(files_created)} 个):")
+            for file_path in files_created:
+                self.logger.info(f"   - {Path(file_path).name}")
+            
+            self.logger.info(f"导出路径: {base_folder.absolute()}")
+            self.logger.info("=" * 80)
             
             # 如果没有选择任何导出选项，视为成功
             if not selected_options:

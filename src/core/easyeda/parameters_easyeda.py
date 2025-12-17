@@ -310,7 +310,66 @@ class EeSymbol:
 
 
 def convert_to_mm(dim: float) -> float:
-    return float(dim) * 10 * 0.0254
+    """
+    将EasyEDA单位转换为毫米（mm）
+    EasyEDA使用的单位是 mil 的 10 倍，需要转换为 mm
+    
+    潜在问题：
+    1. dim 可能为 None
+    2. dim 可能为 NaN
+    3. dim 可能为空字符串
+    4. dim 可能为非数值类型
+    5. 转换后的值可能异常大
+    """
+    import math
+    import logging
+    
+    # 创建专用logger
+    logger = logging.getLogger("convert_to_mm")
+    
+    # 处理 None 值
+    if dim is None:
+        logger.debug(f"convert_to_mm: Input is None, returning 0.0")
+        return 0.0
+    
+    # 处理空字符串
+    if isinstance(dim, str) and dim.strip() == "":
+        logger.debug(f"convert_to_mm: Input is empty string, returning 0.0")
+        return 0.0
+    
+    try:
+        # 尝试转换为浮点数
+        value = float(dim)
+        logger.debug(f"convert_to_mm: Converting '{dim}' (type: {type(dim).__name__}) → {value}")
+        
+        # 检查 NaN
+        if math.isnan(value):
+            logger.warning(f"convert_to_mm: Input {dim} is NaN, returning 0.0")
+            return 0.0
+        
+        # 检查无穷大
+        if math.isinf(value):
+            logger.warning(f"convert_to_mm: Input {dim} is infinite, returning 0.0")
+            return 0.0
+        
+        # 执行单位转换
+        result = value * 10 * 0.0254
+        logger.debug(f"convert_to_mm: Unit conversion: {value} × 10 × 0.0254 = {result:.6f} mm")
+        
+        # 检查转换结果是否合理（大多数元器件尺寸不会超过1米）
+        MAX_REASONABLE_SIZE = 1000.0  # 1米 = 1000mm
+        if abs(result) > MAX_REASONABLE_SIZE:
+            logger.warning(f"convert_to_mm: Converted value ({result:.2f}mm) exceeds reasonable range, "
+                          f"original value: {dim}")
+            # 不直接返回0，而是返回转换结果，让上层逻辑决定如何处理
+            
+        logger.debug(f"convert_to_mm: Final result: {result:.6f} mm")
+        return result
+        
+    except (ValueError, TypeError) as e:
+        # 转换失败，返回默认值
+        logger.error(f"convert_to_mm: Failed to convert '{dim}' (type: {type(dim).__name__}) to float: {e}")
+        return 0.0
 
 
 @dataclass
@@ -531,9 +590,23 @@ class Ee3dModelBase(BaseModel):
     z: float = 0.0
 
     def convert_to_mm(self) -> None:
+        import logging
+        logger = logging.getLogger("Ee3dModelBase")
+        
+        logger.debug(f"Ee3dModelBase.convert_to_mm: Before conversion - x={self.x}, y={self.y}, z={self.z}")
+        
+        old_x, old_y, old_z = self.x, self.y, self.z
         self.x = convert_to_mm(self.x)
         self.y = convert_to_mm(self.y)
         self.z = convert_to_mm(self.z)
+        
+        logger.debug(f"Ee3dModelBase.convert_to_mm: After conversion - x={old_x}→{self.x}, y={old_y}→{self.y}, z={old_z}→{self.z}")
+        
+        # 特别关注Z轴的转换
+        if old_z != 0.0 and self.z == 0.0:
+            logger.warning(f"Ee3dModelBase: Z-axis conversion suspicious! {old_z} → 0.0")
+        elif old_z != self.z:
+            logger.info(f"Ee3dModelBase: Z-axis converted: {old_z} → {self.z}")
 
 
 @dataclass
