@@ -214,18 +214,71 @@ class ExporterFootprintKicad:
         if self.input.model_3d is not None:
             self.input.model_3d.convert_to_mm()
 
-            # if self.input.model_3d.translation.z != 0:
-            #     self.input.model_3d.translation.z -= 1
+            # 3D模型偏移计算策略：
+            # 
+            # 问题分析：
+            # 1. EasyEDA的bbox数据有时不可靠（可能是画布坐标而非封装坐标）
+            # 2. 当bbox值异常大（如1000mm）时，计算出的偏移也会异常
+            # 3. 实际上，3D模型文件本身已经包含了正确的位置信息
+            # 4. 用户反馈：在KiCad中将偏移设置为0就能正常显示
+            #
+            # 解决方案：
+            # - 检查bbox是否可靠（是否在合理范围内）
+            # - 如果bbox不可靠，直接使用0偏移
+            # - 如果bbox可靠，进行计算但仍需边界检查
+            
+            # 安全获取bbox值
+            bbox_x = self.input.bbox.x if self.input.bbox.x is not None and not isnan(self.input.bbox.x) else 0.0
+            bbox_y = self.input.bbox.y if self.input.bbox.y is not None and not isnan(self.input.bbox.y) else 0.0
+            
+            # 检查bbox是否可靠
+            # 合理的封装位置应该在 ±100mm 以内（大多数PCB不会超过100mm）
+            MAX_REASONABLE_BBOX = 100.0
+            bbox_is_reliable = (abs(bbox_x) <= MAX_REASONABLE_BBOX and abs(bbox_y) <= MAX_REASONABLE_BBOX)
+            
+            if not bbox_is_reliable:
+                # bbox数据不可靠，直接使用0偏移
+                logging.info(f"3D model '{self.input.model_3d.name}' - bbox values ({bbox_x:.2f}, {bbox_y:.2f}) "
+                           f"are unreliable (exceed ±{MAX_REASONABLE_BBOX}mm), using zero offset. "
+                           f"3D model file contains correct position.")
+                translation_x = 0.0
+                translation_y = 0.0
+                translation_z = 0.0
+            else:
+                # bbox数据可靠，进行正常计算
+                trans_x = self.input.model_3d.translation.x if not isnan(self.input.model_3d.translation.x) else 0.0
+                trans_y = self.input.model_3d.translation.y if not isnan(self.input.model_3d.translation.y) else 0.0
+                trans_z = self.input.model_3d.translation.z if not isnan(self.input.model_3d.translation.z) else 0.0
+                
+                # 计算相对偏移
+                translation_x = trans_x - bbox_x
+                translation_y = trans_y - bbox_y
+                translation_z = trans_z
+                
+                # 边界检查：即使bbox可靠，计算结果也可能异常
+                MAX_REASONABLE_OFFSET = 100.0
+                
+                if abs(translation_x) > MAX_REASONABLE_OFFSET:
+                    logging.warning(f"3D model '{self.input.model_3d.name}' - Calculated offset.x ({translation_x:.2f}mm) "
+                                  f"exceeds reasonable range, using zero offset instead.")
+                    translation_x = 0.0
+                    
+                if abs(translation_y) > MAX_REASONABLE_OFFSET:
+                    logging.warning(f"3D model '{self.input.model_3d.name}' - Calculated offset.y ({translation_y:.2f}mm) "
+                                  f"exceeds reasonable range, using zero offset instead.")
+                    translation_y = 0.0
+                    
+                if abs(translation_z) > MAX_REASONABLE_OFFSET:
+                    logging.warning(f"3D model '{self.input.model_3d.name}' - Calculated offset.z ({translation_z:.2f}mm) "
+                                  f"exceeds reasonable range, using zero offset instead.")
+                    translation_z = 0.0
+
             ki_3d_model_info = Ki3dModel(
                 name=self.input.model_3d.name,
                 translation=Ki3dModelBase(
-                    x=round((self.input.model_3d.translation.x - self.input.bbox.x), 2),
-                    y=-round(
-                        (self.input.model_3d.translation.y - self.input.bbox.y), 2
-                    ),
-                    z=-round(self.input.model_3d.translation.z, 2)
-                    if self.input.info.fp_type == "smd"
-                    else 0,
+                    x=round(translation_x, 2),
+                    y=-round(translation_y, 2),
+                    z=-round(translation_z, 2) if self.input.info.fp_type == "smd" else 0,
                 ),
                 rotation=Ki3dModelBase(
                     x=(360 - self.input.model_3d.rotation.x) % 360,
@@ -234,7 +287,10 @@ class ExporterFootprintKicad:
                 ),
                 raw_wrl=None,
             )
-            # print(ki_3d_model_info)
+            
+            logging.debug(f"3D model '{self.input.model_3d.name}' - Final offset: "
+                         f"({ki_3d_model_info.translation.x}, {ki_3d_model_info.translation.y}, "
+                         f"({ki_3d_model_info.translation.z})")
         else:
             ki_3d_model_info = None
 

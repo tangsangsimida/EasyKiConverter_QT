@@ -310,7 +310,57 @@ class EeSymbol:
 
 
 def convert_to_mm(dim: float) -> float:
-    return float(dim) * 10 * 0.0254
+    """
+    将EasyEDA单位转换为毫米（mm）
+    EasyEDA使用的单位是 mil 的 10 倍，需要转换为 mm
+    
+    潜在问题：
+    1. dim 可能为 None
+    2. dim 可能为 NaN
+    3. dim 可能为空字符串
+    4. dim 可能为非数值类型
+    5. 转换后的值可能异常大
+    """
+    import math
+    
+    # 处理 None 值
+    if dim is None:
+        return 0.0
+    
+    # 处理空字符串
+    if isinstance(dim, str) and dim.strip() == "":
+        return 0.0
+    
+    try:
+        # 尝试转换为浮点数
+        value = float(dim)
+        
+        # 检查 NaN
+        if math.isnan(value):
+            return 0.0
+        
+        # 检查无穷大
+        if math.isinf(value):
+            return 0.0
+        
+        # 执行单位转换
+        result = value * 10 * 0.0254
+        
+        # 检查转换结果是否合理（大多数元器件尺寸不会超过1米）
+        MAX_REASONABLE_SIZE = 1000.0  # 1米 = 1000mm
+        if abs(result) > MAX_REASONABLE_SIZE:
+            import logging
+            logging.warning(f"convert_to_mm: Converted value ({result:.2f}mm) exceeds reasonable range, "
+                          f"original value: {dim}")
+            # 不直接返回0，而是返回转换结果，让上层逻辑决定如何处理
+            
+        return result
+        
+    except (ValueError, TypeError) as e:
+        # 转换失败，返回默认值
+        import logging
+        logging.warning(f"convert_to_mm: Failed to convert '{dim}' to float: {e}")
+        return 0.0
 
 
 @dataclass
