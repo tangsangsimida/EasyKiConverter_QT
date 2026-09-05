@@ -64,6 +64,21 @@ private slots:
         QVERIFY(output.contains(QStringLiteral("(gr_poly")));
     }
 
+    void generateArcUsesModernThreePointSyntax() {
+        IR::FootprintArcIR arc;
+        arc.center = QPointF(0.0, 0.0);
+        arc.radius = 1.0;
+        arc.startAngle = 0.0;
+        arc.endAngle = 90.0;
+        arc.width = 0.2;
+        arc.layer = IR::LayerType::TopSilk;
+
+        const QString output = FootprintGraphicsGenerator().generateArc(arc, 0, 0);
+        QVERIFY(output.contains(QStringLiteral("(fp_arc (start 1.00 0.00) (mid 0.70 0.70) (end 0.00 1.00)")));
+        QVERIFY(output.contains(QStringLiteral("(stroke (width 0.20) (type default))")));
+        QVERIFY(!output.contains(QStringLiteral("(angle ")));
+    }
+
     void generatePinMapsTypesAndDirections() {
         SymbolGraphicsGenerator generator;
         generator.setCurrentOrigin(0.0, 0.0);

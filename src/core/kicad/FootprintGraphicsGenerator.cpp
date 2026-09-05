@@ -213,41 +213,43 @@ QString FootprintGraphicsGenerator::generateArc(const IR::FootprintArcIR& arc, d
         double cy = roundTo2(arc.center.y() - originY);
 
         double startAngle = arc.startAngle;
-        double deltaAngle = arc.endAngle - arc.startAngle;
-        double step = 180.0;
-
-        if (deltaAngle < 0) {
-            startAngle = startAngle + deltaAngle;
-            deltaAngle = -deltaAngle;
+        double sweepAngle = arc.endAngle - arc.startAngle;
+        if (sweepAngle < 0) {
+            startAngle += sweepAngle;
+            sweepAngle = -sweepAngle;
         }
 
-        while (deltaAngle > 0.1) {
-            if (deltaAngle < step) {
-                step = deltaAngle;
-            }
+        const QString layer = layerTypeToKicad(arc.layer);
+        const double strokeWidth = roundTo2(arc.width);
+        while (sweepAngle > 0.1) {
+            const double step = qMin(180.0, sweepAngle);
+            const double midAngle = startAngle + step / 2.0;
+            const double endAngle = startAngle + step;
+            const double startRad = startAngle * M_PI / 180.0;
+            const double midRad = midAngle * M_PI / 180.0;
+            const double endRad = endAngle * M_PI / 180.0;
+            const double startX = roundTo2(arc.center.x() + arc.radius * std::cos(startRad) - originX);
+            const double startY = roundTo2(arc.center.y() + arc.radius * std::sin(startRad) - originY);
+            const double midX = roundTo2(arc.center.x() + arc.radius * std::cos(midRad) - originX);
+            const double midY = roundTo2(arc.center.y() + arc.radius * std::sin(midRad) - originY);
+            const double endX = roundTo2(arc.center.x() + arc.radius * std::cos(endRad) - originX);
+            const double endY = roundTo2(arc.center.y() + arc.radius * std::sin(endRad) - originY);
 
-            // 计算圆弧段的起点和终点
-            double radStart = startAngle * M_PI / 180.0;
-            double radEnd = (startAngle + step) * M_PI / 180.0;
+            // KiCad 8/9 的封装弧线使用三点语法，不再接受旧的 angle 字段。
+            content +=
+                QString(
+                    "  (fp_arc (start %1 %2) (mid %3 %4) (end %5 %6) (stroke (width %7) (type default)) (layer %8))\n")
+                    .arg(startX, 0, 'f', 2)
+                    .arg(startY, 0, 'f', 2)
+                    .arg(midX, 0, 'f', 2)
+                    .arg(midY, 0, 'f', 2)
+                    .arg(endX, 0, 'f', 2)
+                    .arg(endY, 0, 'f', 2)
+                    .arg(strokeWidth, 0, 'f', 2)
+                    .arg(layer);
 
-            double endX = roundTo2(arc.center.x() + arc.radius * std::cos(radEnd) - originX);
-            double endY = roundTo2(arc.center.y() + arc.radius * std::sin(radEnd) - originY);
-
-            double kiEndAngle = startAngle;
-            if (step == 180.0)
-                kiEndAngle += 0.1;
-
-            content += QString("  (fp_arc (start %1 %2) (end %3 %4) (angle %5) (layer %6) (width %7))\n")
-                           .arg(cx, 0, 'f', 2)
-                           .arg(cy, 0, 'f', 2)
-                           .arg(endX, 0, 'f', 2)
-                           .arg(endY, 0, 'f', 2)
-                           .arg(-kiEndAngle, 0, 'f', 2)
-                           .arg(layerTypeToKicad(arc.layer))
-                           .arg(roundTo2(arc.width), 0, 'f', 2);
-
-            deltaAngle -= step;
-            startAngle += step;
+            sweepAngle -= step;
+            startAngle = endAngle;
         }
     } else {
         qWarning() << "Warning: Arc has zero radius, skipping";
