@@ -169,6 +169,29 @@ Item {
         return decodeURIComponent(s);
     }
 
+    // 将本地路径转换为 FolderDialog 所需的 file URL。
+    function localPathToFileUrl(path) {
+        if (!path)
+            return "";
+        var normalized = path.toString().replace(/\\/g, "/");
+        if (normalized.indexOf("file://") === 0)
+            return normalized;
+        if (Qt.platform.os === "windows") {
+            // UNC 路径：//server/share/path -> file://server/share/path
+            if (normalized.indexOf("//") === 0)
+                return encodeURI("file:" + normalized);
+            // 本地盘符：C:/path -> file:///C:/path
+            if (!/^[A-Za-z]:\//.test(normalized))
+                return "";
+            normalized = normalized.replace(/^\/+/, "");
+            return encodeURI("file:///" + normalized);
+        }
+        // Unix 路径：/home/user/path -> file:///home/user/path
+        if (normalized.indexOf("/") === 0)
+            return encodeURI("file://" + normalized);
+        return "";
+    }
+
     // BOM 文件选择对话框
     FileDialog {
         id: bomFileDialog
@@ -184,7 +207,7 @@ Item {
         title: qsTr("选择输出目录")
         currentFolder: {
             var p = exportSettingsController ? exportSettingsController.outputPath : "";
-            return p ? "file://" + p : "";
+            return localPathToFileUrl(p);
         }
         onAccepted: {
             var localPath = urlToLocalPath(selectedFolder);
@@ -200,7 +223,7 @@ Item {
         title: qsTr("选择缓存目录")
         currentFolder: {
             var p = exportSettingsController ? exportSettingsController.cacheDir : "";
-            return p ? "file://" + p : "";
+            return localPathToFileUrl(p);
         }
         onAccepted: {
             var localPath = urlToLocalPath(selectedFolder);
