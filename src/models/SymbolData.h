@@ -78,10 +78,13 @@ struct SymbolInfo {
  * @brief 边界
  */
 struct SymbolBBox {
-    double x;
-    double y;
-    double width;
-    double height;
+    double x = 0.0;
+    double y = 0.0;
+    double width = 0.0;
+    double height = 0.0;
+    double headX = 0.0;
+    double headY = 0.0;
+    bool hasHeadCenter = false;
 };
 
 // ==================== 引脚相关数据结构 ====================

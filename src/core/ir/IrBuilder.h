@@ -68,6 +68,9 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
             pir.name = pin.name.text;
             pir.designator = pin.settings.spicePinNumber;
             pir.position = GeometryNormalizer::transformPoint(pin.settings.posX, pin.settings.posY, originX, originY);
+            pir.namePosition = GeometryNormalizer::transformPoint(pin.name.posX, pin.name.posY, originX, originY);
+            pir.nameRotation = pin.name.rotation;
+            pir.nameAnchor = pin.name.textAnchor;
 
             // 从 pinPath SVG 解析引脚长度
             const QString pathStr = pin.pinPath.path;
@@ -321,8 +324,8 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
             ++partIdx;
         }
     } else {
-        const double ox = data.bbox().x;
-        const double oy = data.bbox().y;
+        const double ox = data.bbox().hasHeadCenter ? data.bbox().headX : data.bbox().x;
+        const double oy = data.bbox().hasHeadCenter ? data.bbox().headY : data.bbox().y;
         convertPins(data.pins(), ox, oy);
         convertRectangles(data.rectangles(), ox, oy);
         convertCircles(data.circles(), ox, oy);

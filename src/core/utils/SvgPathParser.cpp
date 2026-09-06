@@ -154,7 +154,12 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
 
             QList<QPointF> arcPoints =
                 parseArc(startPoint, rx, ry, xRotation, largeArcFlag != 0, sweepFlag != 0, endPoint);
-            points.append(arcPoints);
+            for (const QPointF& point : arcPoints) {
+                if (points.isEmpty() || point != points.last())
+                    points.append(point);
+            }
+            currentX = endPoint.x();
+            currentY = endPoint.y();
         }
         // 处理C/c（Bezier Curve）命
         else if (command == 'C') {
@@ -203,7 +208,53 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
 
             QList<QPointF> bezierPoints =
                 bezierToPolyline(startPoint.x(), startPoint.y(), cp1x, cp1y, cp2x, cp2y, endX, endY);
-            points.append(bezierPoints);
+            for (const QPointF& point : bezierPoints) {
+                if (points.isEmpty() || point != points.last())
+                    points.append(point);
+            }
+            currentX = endX;
+            currentY = endY;
+        }
+        // 处理Q/q（二次贝塞尔曲线）命令
+        else if (command == 'Q') {
+            const bool relative = (cmd[0] == 'q');
+            if (points.isEmpty() || i + 4 >= tokens.size()) {
+                qWarning() << "Quadratic bezier param length error";
+                i++;
+                continue;
+            }
+
+            const QPointF startPoint = points.last();
+            bool ok = true;
+            i++;
+            double cpX = tokens[i].toDouble(&ok);
+            i++;
+            double cpY = tokens[i].toDouble(&ok);
+            i++;
+            double endX = tokens[i].toDouble(&ok);
+            i++;
+            double endY = tokens[i].toDouble(&ok);
+            if (!ok) {
+                qWarning() << "Quadratic bezier param parse error";
+                continue;
+            }
+            if (relative) {
+                cpX += startPoint.x();
+                cpY += startPoint.y();
+                endX += startPoint.x();
+                endY += startPoint.y();
+            }
+            const QPointF cp2(endX + (endX - cpX) / 3.0, endY + (endY - cpY) / 3.0);
+            const QPointF cp1(startPoint.x() + 2.0 * (cpX - startPoint.x()) / 3.0,
+                              startPoint.y() + 2.0 * (cpY - startPoint.y()) / 3.0);
+            const QList<QPointF> bezierPoints =
+                bezierToPolyline(startPoint.x(), startPoint.y(), cp1.x(), cp1.y(), cp2.x(), cp2.y(), endX, endY);
+            for (const QPointF& point : bezierPoints) {
+                if (points.isEmpty() || point != points.last())
+                    points.append(point);
+            }
+            currentX = endX;
+            currentY = endY;
         }
         // 处理Z/z（ClosePath）命
         else if (command == 'Z') {

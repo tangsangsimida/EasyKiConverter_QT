@@ -74,6 +74,12 @@ struct SymbolPinIR {
     QString name;  ///< 引脚名称（如 "VCC", "A0"）
     QString designator;  ///< 引脚编号（如 "1", "2"）
     QPointF position;  ///< 引脚位置（已解析，单位 mm）
+    QPointF namePosition;  ///< 引脚名称原始位置（已解析，单位 mm）
+    double nameRotation = 0.0;  ///< 引脚名称旋转角度
+    QString nameAnchor;  ///< 引脚名称原始文本锚点
+    QPointF numberPosition;  ///< 引脚编号原始位置（已解析，单位 mm）
+    double numberRotation = 0.0;  ///< 引脚编号旋转角度
+    QString numberAnchor;  ///< 引脚编号原始文本锚点
     double length = 0.0;  ///< 引脚长度（mm，替代 SVG path 解析）
     PinDirection direction = PinDirection::Right;  ///< 引脚方向
 

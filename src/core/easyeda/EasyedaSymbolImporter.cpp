@@ -80,13 +80,19 @@ QSharedPointer<SymbolData> EasyedaSymbolImporter::importSymbolData(const QJsonOb
             symbolBbox.y = bbox["y"].toDouble();
             symbolBbox.width = bbox["width"].toDouble();
             symbolBbox.height = bbox["height"].toDouble();
-        } else if (dataStr.contains("head")) {
+        }
+        if (dataStr.contains("head")) {
             QJsonObject head = dataStr["head"].toObject();
-            symbolBbox.x = head["x"].toDouble();
-            symbolBbox.y = head["y"].toDouble();
-            symbolBbox.width = 0;
-            symbolBbox.height = 0;
-            qWarning() << "Symbol BBox not found in dataStr, using head.x/y as center point";
+            if (head.contains("x") && head.contains("y")) {
+                symbolBbox.headX = head["x"].toDouble();
+                symbolBbox.headY = head["y"].toDouble();
+                symbolBbox.hasHeadCenter = true;
+            }
+            if (symbolBbox.width <= 0.0 || symbolBbox.height <= 0.0) {
+                symbolBbox.x = symbolBbox.headX;
+                symbolBbox.y = symbolBbox.headY;
+                qWarning() << "Symbol BBox not found in dataStr, using head.x/y as center point";
+            }
         }
         symbolData->setBbox(symbolBbox);
     }

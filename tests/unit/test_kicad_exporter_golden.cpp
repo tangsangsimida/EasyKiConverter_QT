@@ -108,6 +108,42 @@ private slots:
                  qPrintable(error));
     }
 
+    void testSinglePartSymbolUsesHeadCenterAndPinNameMetadata() {
+        SymbolData symbol;
+        SymbolInfo info;
+        info.name = QStringLiteral("MT2492");
+        symbol.setInfo(info);
+
+        SymbolBBox bbox;
+        bbox.x = 349.0;
+        bbox.y = 279.6;
+        bbox.width = 102.0;
+        bbox.height = 40.4;
+        bbox.headX = 400.0;
+        bbox.headY = 300.0;
+        bbox.hasHeadCenter = true;
+        symbol.setBbox(bbox);
+
+        SymbolPin pin;
+        pin.settings.posX = 350.0;
+        pin.settings.posY = 290.0;
+        pin.settings.rotation = 0;
+        pin.settings.spicePinNumber = QStringLiteral("1");
+        pin.name.posX = 372.0;
+        pin.name.posY = 290.0;
+        pin.name.text = QStringLiteral("IN");
+        pin.name.textAnchor = QStringLiteral("start");
+        symbol.setPins({pin});
+
+        const IR::SymbolComponentIR ir = IR::toSymbolIR(symbol);
+        QCOMPARE(ir.pins.size(), 1);
+        QVERIFY(qAbs(ir.pins.first().position.x() + 12.7) < 1e-9);
+        QVERIFY(qAbs(ir.pins.first().position.y() - 2.54) < 1e-9);
+        QVERIFY(qAbs(ir.pins.first().namePosition.x() + 7.112) < 1e-9);
+        QVERIFY(qAbs(ir.pins.first().namePosition.y() - 2.54) < 1e-9);
+        QCOMPARE(ir.pins.first().nameAnchor, QStringLiteral("start"));
+    }
+
     void testMultiPartSymbolMatchesGolden() {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());

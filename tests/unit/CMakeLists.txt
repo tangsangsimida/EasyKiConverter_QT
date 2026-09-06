@@ -218,6 +218,7 @@ add_test(NAME test_kicad_graphics_generators COMMAND test_kicad_graphics_generat
 add_executable(test_svg_path_parser test_svg_path_parser.cpp)
 target_link_libraries(test_svg_path_parser PRIVATE
     Qt6::Test
+    Qt6::Gui
     EasyKiConverterLib
 )
 target_include_directories(test_svg_path_parser PRIVATE

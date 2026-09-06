@@ -15,6 +15,7 @@
  */
 
 #include "IRTypes.h"
+#include "core/utils/SvgPathParser.h"
 
 #include <QPointF>
 #include <QString>
@@ -76,29 +77,16 @@ inline QList<QPointF> parseCommaSeparatedPoints(const QString& pointsStr, double
 /**
  * @brief 解析 SVG 路径字符串为点序列
  *
- * 简化解析：提取 M/L 命令后的坐标对，忽略 C/Z 等复杂命令。
- * 适用于 EasyEDA 的简单 SVG 路径。
+ * 使用完整 SVG 路径解析器，将圆弧和曲线离散为点序列。
  *
  * @param pathStr SVG 路径字符串（如 "M 0 0 L 100 0 L 100 100 Z"）
  * @param scaleFactor 缩放因子
  * @return 解析后的点列表
  */
 inline QList<QPointF> parseSimpleSvgPath(const QString& pathStr, double scaleFactor = EASYEDA_PX_TO_MM) {
-    QList<QPointF> points;
-    QString cleaned = pathStr;
-    // 将命令字母替换为空格，只保留数字和分隔符
-    for (const QChar& ch : QString("MmLlHhVvCcSsQqTtAaZz")) {
-        cleaned.replace(ch, ' ');
-    }
-    const QStringList parts = cleaned.trimmed().split(' ', Qt::SkipEmptyParts);
-    for (int i = 0; i + 1 < parts.size(); i += 2) {
-        bool ok1 = false, ok2 = false;
-        const double x = parts[i].toDouble(&ok1);
-        const double y = parts[i + 1].toDouble(&ok2);
-        if (ok1 && ok2) {
-            points.append(QPointF(x * scaleFactor, y * scaleFactor));
-        }
-    }
+    QList<QPointF> points = SvgPathParser::parsePath(pathStr);
+    for (QPointF& point : points)
+        point *= scaleFactor;
     return points;
 }
 

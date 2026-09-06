@@ -1,3 +1,4 @@
+#include "core/ir/GeometryNormalizer.h"
 #include "core/utils/SvgPathParser.h"
 
 #include <QTest>
@@ -44,6 +45,26 @@ private slots:
         QVERIFY(points.size() > 3);
         QCOMPARE(points.first(), QPointF(0, 0));
         QCOMPARE(points.last(), QPointF(10, 10));
+    }
+
+    void normalizedArcUsesOnlyGeometryCoordinates() {
+        const QList<QPointF> points = IR::GeometryNormalizer::parseSimpleSvgPath(
+            QStringLiteral("M 0 0 A 10 10 0 0 1 10 10 A 10 10 0 0 1 20 0 Z"));
+
+        QVERIFY(points.size() > 10);
+        for (const QPointF& point : points) {
+            QVERIFY2(qAbs(point.x()) < 10.0, "arc parser produced an implausibly large X coordinate");
+            QVERIFY2(qAbs(point.y()) < 10.0, "arc parser produced an implausibly large Y coordinate");
+        }
+        QCOMPARE(points.first(), points.last());
+    }
+
+    void normalizedQuadraticProducesEndpoint() {
+        const QList<QPointF> points = IR::GeometryNormalizer::parseSimpleSvgPath(QStringLiteral("M 0 0 Q 10 20 20 0"));
+
+        QVERIFY(points.size() > 3);
+        QCOMPARE(points.first(), QPointF(0, 0));
+        QCOMPARE(points.last(), QPointF(5.08, 0));
     }
 
     void invalidOrEmptyPathsReturnNoPoints() {
