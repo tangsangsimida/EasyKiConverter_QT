@@ -25,6 +25,8 @@ runs:
     - name: 'Extract Version'
       id: get_version
       shell: bash
+      env:
+        INPUT_TAG_NAME: ${{ inputs.tag_name }}
       run: |
         set -euo pipefail
 
@@ -32,7 +34,6 @@ runs:
         git config --global --add safe.directory $GITHUB_WORKSPACE
 
         # 1. VERSION (from Tag or default)
-        INPUT_TAG_NAME="${{ inputs.tag_name }}"
         if [[ -n "$INPUT_TAG_NAME" ]]; then
           TAG_NAME="$INPUT_TAG_NAME"
           VERSION="${TAG_NAME#[vV]}"
