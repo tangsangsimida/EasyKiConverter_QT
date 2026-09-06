@@ -1,10 +1,6 @@
 name: Packaging (Linux)
 
 on:
-  push:
-    tags:
-      - 'v*'
-      - 'V*'
   workflow_dispatch:
     inputs:
       tag_name:
