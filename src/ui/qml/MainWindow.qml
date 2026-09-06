@@ -316,6 +316,7 @@ Item {
             id: titleBar
             windowRadius: window.windowRadius
             windowController: Window.window ? Window.window.windowController : null
+            appVersion: window.updateChecker ? window.updateChecker.currentVersion : ""
         }
 
         // 主布局：侧边栏 + 工作区

@@ -200,6 +200,18 @@ Card {
                 componentListCard.editingDescriptionComponentId = "";
             }
             onRejected: componentListCard.editingDescriptionComponentId = ""
+        },
+        // 窗口尺寸变化时重新定位预览弹窗；Connections 必须放入 resources，避免被 Card 的默认内容属性接收。
+        Connections {
+            target: componentListCard.Window.window
+            function onWidthChanged() {
+                if (_previewPopup.visible)
+                    Qt.callLater(positionPreviewPopup);
+            }
+            function onHeightChanged() {
+                if (_previewPopup.visible)
+                    Qt.callLater(positionPreviewPopup);
+            }
         }
     ]
     overlayContent: [
@@ -984,18 +996,6 @@ Card {
     }
     // === 全局单例预览弹窗 ===
     property alias previewPopup: _previewPopup
-    Connections {
-        target: componentListCard.Window.window
-        function onWidthChanged() {
-            if (_previewPopup.visible)
-                Qt.callLater(positionPreviewPopup);
-        }
-        function onHeightChanged() {
-            if (_previewPopup.visible)
-                Qt.callLater(positionPreviewPopup);
-        }
-    }
-
     function clampPopupCoordinate(value, size, boundary) {
         var margin = AppStyle.spacing.xs;
         var maxValue = Math.max(margin, boundary - size - margin);

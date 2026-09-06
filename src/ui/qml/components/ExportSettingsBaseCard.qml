@@ -384,7 +384,6 @@ Card {
                         item.y = 20;
                         item.scale = 0.97;
                         // 启动入场动画
-                        enterAnimation.target = item;
                         enterAnimation.start();
                     }
                 }
@@ -401,6 +400,7 @@ Card {
             ParallelAnimation {
                 id: enterAnimation
                 NumberAnimation {
+                    target: targetOptionsLoader.item
                     property: "opacity"
                     from: 0
                     to: 1
@@ -408,6 +408,7 @@ Card {
                     easing.type: Easing.OutCubic
                 }
                 NumberAnimation {
+                    target: targetOptionsLoader.item
                     property: "y"
                     from: 20
                     to: 0
@@ -415,6 +416,7 @@ Card {
                     easing.type: Easing.OutQuart
                 }
                 NumberAnimation {
+                    target: targetOptionsLoader.item
                     property: "scale"
                     from: 0.97
                     to: 1.0
