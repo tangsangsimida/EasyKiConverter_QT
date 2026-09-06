@@ -187,6 +187,9 @@ jobs:
           TAG_NAME: ${{ needs.resolve-target.outputs.tag_name }}
           VERSION: ${{ needs.resolve-target.outputs.version }}
           TARGET_SHA: ${{ needs.resolve-target.outputs.target_sha }}
+          LINUX_RESULT: ${{ needs.package-linux.result }}
+          WINDOWS_RESULT: ${{ needs.package-windows.result }}
+          MACOS_RESULT: ${{ needs.package-macos.result }}
         shell: bash
         run: |
           set -euo pipefail
@@ -207,7 +210,13 @@ jobs:
               filename="$(basename "$asset")"
               [[ "$filename" == *.sha256sum ]] && continue
               descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+-//; s/\.[^.]+$//')"
-              echo "| 自动构建 | $descriptor | [$filename](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${filename}) |"
+              case "$filename" in
+                *win64*|*-setup.exe|*.msix) platform="Windows" ;;
+                *.AppImage|*.deb|*.rpm|*.pkg.tar.zst) platform="Linux" ;;
+                *.dmg) platform="macOS" ;;
+                *) platform="其他" ;;
+              esac
+              echo "| $platform | $descriptor | [$filename](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${filename}) |"
             done < <(find release_assets -maxdepth 1 -type f -print | sort)
             echo
             echo "## 重要变化"
@@ -240,7 +249,14 @@ jobs:
             echo
             echo "## 构建与验证"
             echo
-            echo "- Linux、Windows、macOS 构建任务均已完成。"
+            for platform_status in \
+              "Linux:${LINUX_RESULT}" \
+              "Windows:${WINDOWS_RESULT}" \
+              "macOS:${MACOS_RESULT}"; do
+              platform="${platform_status%%:*}"
+              result="${platform_status##*:}"
+              echo "- $platform 构建任务：$result。"
+            done
             echo "- 发布前已验证全部制品及 SHA256 校验和。"
             echo
             echo "## 校验和"
@@ -271,9 +287,9 @@ jobs:
               echo "A published release already exists for $TAG_NAME"
               exit 1
             fi
-            gh release edit "$TAG_NAME" --title "EasyKiConverter ${TAG_NAME#?}" --notes-file release_notes.md
+            gh release edit "$TAG_NAME" --title "EasyKiConverter ${TAG_NAME#[vV]}" --notes-file release_notes.md
           else
-            gh release create "$TAG_NAME" --draft --title "EasyKiConverter ${TAG_NAME#?}" --notes-file release_notes.md
+            gh release create "$TAG_NAME" --draft --title "EasyKiConverter ${TAG_NAME#[vV]}" --notes-file release_notes.md
           fi
 
       - name: Upload release assets

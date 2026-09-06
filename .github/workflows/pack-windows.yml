@@ -262,7 +262,7 @@ jobs:
 
           # Rename output to standard format
           $setupExe = Get-ChildItem -Path $outputDir -Filter "EasyKiConverter_*_Setup.exe" | Select-Object -First 1
-          $newContentName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-setup.exe"
+          $newContentName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-x64-setup.exe"
           Rename-Item -Path $setupExe.FullName -NewName $newContentName
 
           Write-Host "Installer created at: $outputDir\$newContentName"
@@ -282,7 +282,7 @@ jobs:
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-setup.exe"
+          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-x64-setup.exe"
           $filePath = "$env:GITHUB_WORKSPACE\build\Package\installer\$fileName"
           $hash = Get-FileHash -Path $filePath -Algorithm SHA256
           $hashString = $hash.Hash.ToLower() + " *" + $fileName
@@ -397,8 +397,8 @@ jobs:
         with:
           name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup
           path: |
-            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-setup.exe
-            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-setup.exe.sha256sum
+            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup.exe
+            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup.exe.sha256sum
           overwrite: true
 
       - name: 'Artifact Upload (MSIX)'
@@ -410,4 +410,4 @@ jobs:
             ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}.msix
             ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}.msix.sha256sum
           overwrite: true
-          if-no-files-found: warn
+          if-no-files-found: error
