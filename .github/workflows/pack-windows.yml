@@ -6,6 +6,17 @@ on:
       - 'v*'
       - 'V*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -43,6 +54,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag_name || github.ref }}
 
       - name: 'Record Start Time'
         shell: pwsh
@@ -56,6 +68,8 @@ jobs:
       - name: 'Get Version Info'
         id: version
         uses: ./.github/actions/get-version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: 'Export Version to Env'
         shell: bash
