@@ -552,8 +552,12 @@ void AltiumSchLibWriter::writeTextRecord(AltiumBinaryWriter& writer, const Altiu
     addColorParam(params, "Color", text.color);
     params["FontID"] = QString::number(text.fontId);
     params["Text"] = text.text;
-    if (text.isHidden)
+    if (text.isHidden || !text.isDisplayed)
         params["IsHidden"] = "T";
+    if (!text.anchor.isEmpty())
+        params["TextAnchor"] = text.anchor;
+    if (text.fontSizeMm > 0.0)
+        params["FontSize"] = QString::number(text.fontSizeMm, 'f', 4);
 
     addUniqueID(params);
     writer.writeCStringParameterBlockUtf8(params);

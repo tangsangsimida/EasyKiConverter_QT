@@ -95,8 +95,10 @@ private slots:
         pin.hasNamePosition = true;
         pin.namePosition = QPointF(-5.08, 2.54);
         pin.nameRotation = 90.0;
+        pin.nameAnchor = QStringLiteral("start");
         pin.hasNumberPosition = true;
         pin.numberPosition = QPointF(5.08, -2.54);
+        pin.numberAnchor = QStringLiteral("end");
 
         const QString output = generator.generatePin(pin);
 
@@ -104,6 +106,8 @@ private slots:
         QVERIFY(output.contains(QStringLiteral("(number \"1\" (effects (font (size 1.27 1.27) (thickness 0)) hide))")));
         QVERIFY(output.contains(QStringLiteral("(at -5.08 2.54 270)")));
         QVERIFY(output.contains(QStringLiteral("(at 5.08 -2.54 0)")));
+        QVERIFY(output.contains(QStringLiteral("(justify left)")));
+        QVERIFY(output.contains(QStringLiteral("(justify right)")));
     }
 
     void generatePolylineAndPathReturnKiCadPolylines() {

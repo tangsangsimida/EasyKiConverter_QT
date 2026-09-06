@@ -78,6 +78,7 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
                                    : pir.position;
             pir.nameRotation = pin.name.rotation;
             pir.nameAnchor = pin.name.textAnchor;
+            pir.nameFontSizeMm = pin.name.fontSize * EASYEDA_PX_TO_MM;
             pir.hasNamePosition = hasNamePosition;
             const bool hasNumberPosition = pin.number.isDisplayed && !pin.number.text.isEmpty() &&
                                            std::isfinite(pin.number.posX) && std::isfinite(pin.number.posY);
@@ -86,6 +87,7 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
                                                    : pir.position;
             pir.numberRotation = pin.number.rotation;
             pir.numberAnchor = pin.number.textAnchor;
+            pir.numberFontSizeMm = pin.number.fontSize * EASYEDA_PX_TO_MM;
             pir.hasNumberPosition = hasNumberPosition;
 
             // 从 pinPath SVG 解析引脚长度
@@ -343,9 +345,11 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
         const SymbolBBox bbox = data.bbox();
         double ox = bbox.x;
         double oy = bbox.y;
-        const bool headInsideBbox = bbox.width > 0.0 && bbox.height > 0.0 && bbox.headX >= bbox.x - bbox.width &&
-                                    bbox.headX <= bbox.x + 2.0 * bbox.width && bbox.headY >= bbox.y - bbox.height &&
-                                    bbox.headY <= bbox.y + 2.0 * bbox.height;
+        const double bboxCenterX = bbox.x + bbox.width / 2.0;
+        const double bboxCenterY = bbox.y + bbox.height / 2.0;
+        const double headTolerance = 0.75 * qMax(bbox.width, bbox.height);
+        const bool headInsideBbox = bbox.width > 0.0 && bbox.height > 0.0 &&
+                                    std::hypot(bbox.headX - bboxCenterX, bbox.headY - bboxCenterY) <= headTolerance;
         if (bbox.hasHeadCenter && std::isfinite(bbox.headX) && std::isfinite(bbox.headY) && headInsideBbox) {
             ox = bbox.headX;
             oy = bbox.headY;

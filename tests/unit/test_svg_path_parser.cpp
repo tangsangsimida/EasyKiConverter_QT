@@ -31,6 +31,31 @@ private slots:
         QCOMPARE(points.at(3), QPointF(20, 15));
     }
 
+    void parsesRepeatedParameterGroups() {
+        const QList<QPointF> linePoints = SvgPathParser::parsePath(QStringLiteral("M 0 0 L 10 0 10 10 0 10 Z"));
+        QCOMPARE(linePoints.size(), 5);
+        QCOMPARE(linePoints.last(), QPointF(0, 0));
+
+        const QList<QPointF> curvePoints = SvgPathParser::parsePath(QStringLiteral("M 0 0 Q 10 20 20 0 30 -20 40 0"));
+        QVERIFY(curvePoints.size() > 25);
+        QCOMPARE(curvePoints.at(8), QPointF(10, 10));
+        QCOMPARE(curvePoints.last(), QPointF(40, 0));
+
+        const QList<QPointF> arcPoints =
+            SvgPathParser::parsePath(QStringLiteral("M 0 0 A 10 10 0 0 1 10 10 10 10 0 0 1 20 0"));
+        QVERIFY(arcPoints.size() > 60);
+        QCOMPARE(arcPoints.last(), QPointF(20, 0));
+    }
+
+    void smoothCurvesPreserveReflectedControlPoints() {
+        const QList<QPointF> cubicPoints =
+            SvgPathParser::parsePath(QStringLiteral("M 0 0 C 0 10 10 10 10 0 S 20 -10 20 0"));
+        QCOMPARE(cubicPoints.at(24), QPointF(15, -7.5));
+
+        const QList<QPointF> quadraticPoints = SvgPathParser::parsePath(QStringLiteral("M 0 0 Q 10 20 20 0 T 40 0"));
+        QCOMPARE(quadraticPoints.at(24), QPointF(30, -10));
+    }
+
     void cubicBezierProducesPolylineIncludingEndpoint() {
         const QList<QPointF> points = SvgPathParser::parsePath(QStringLiteral("M 0 0 C 0 10 10 10 10 0"));
 

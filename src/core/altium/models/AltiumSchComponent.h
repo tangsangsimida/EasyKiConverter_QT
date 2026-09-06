@@ -116,11 +116,14 @@ struct AltiumSchPath {
  * @brief Altium 符号文本
  */
 struct AltiumSchText {
-    int locationX = 0, locationY = 0;
-    QString text;
-    int fontId = 1;
-    uint32_t color = 0x000000;
-    bool isHidden = false;
+    int locationX = 0, locationY = 0;  ///< 文本锚点位置（原始单位）
+    QString text;  ///< 文本内容
+    int fontId = 1;  ///< Altium 字体编号
+    double fontSizeMm = 0.0;  ///< 原始字体大小（mm，0 表示使用字体编号默认值）
+    QString anchor = QStringLiteral("middle");  ///< 原始文本锚点
+    uint32_t color = 0x000000;  ///< 颜色（0x00BBGGRR）
+    bool isDisplayed = true;  ///< 是否显示文本
+    bool isHidden = false;  ///< 是否强制隐藏文本
     int orientation = 0;  ///< 0-3，表示 0°/90°/180°/270°
     int ownerPartId = 1;
 };

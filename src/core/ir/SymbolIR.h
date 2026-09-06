@@ -77,10 +77,12 @@ struct SymbolPinIR {
     QPointF namePosition;  ///< 引脚名称原始位置（已解析，单位 mm）
     double nameRotation = 0.0;  ///< 引脚名称旋转角度
     QString nameAnchor;  ///< 引脚名称原始文本锚点
+    double nameFontSizeMm = 0.0;  ///< 引脚名称字体大小（mm，0 表示默认）
     bool hasNamePosition = false;  ///< 是否存在可靠的原始名称坐标
     QPointF numberPosition;  ///< 引脚编号原始位置（已解析，单位 mm）
     double numberRotation = 0.0;  ///< 引脚编号旋转角度
     QString numberAnchor;  ///< 引脚编号原始文本锚点
+    double numberFontSizeMm = 0.0;  ///< 引脚编号字体大小（mm，0 表示默认）
     bool hasNumberPosition = false;  ///< 是否存在可靠的原始编号坐标
     double length = 0.0;  ///< 引脚长度（mm，替代 SVG path 解析）
     PinDirection direction = PinDirection::Right;  ///< 引脚方向

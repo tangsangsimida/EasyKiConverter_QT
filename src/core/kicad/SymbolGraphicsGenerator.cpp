@@ -1,3 +1,7 @@
+/**
+ * @file SymbolGraphicsGenerator.cpp
+ * @brief SymbolGraphicsGenerator 的实现。
+ */
 #include "SymbolGraphicsGenerator.h"
 
 #include "KiCadTypeMap.h"
@@ -113,23 +117,39 @@ QString SymbolGraphicsGenerator::generatePin(const IR::SymbolPinIR& pin) const {
     }
     content += "    )\n";
 
-    auto appendOriginalText = [&](const QString& text, const QPointF& position, double rotation) {
-        double textRotation = rotation;
-        if (textRotation != 0.0)
-            textRotation = 360.0 - textRotation;
-        content += "    (text\n";
-        content += QString("      \"%1\"\n").arg(text);
-        content += QString("      (at %1 %2 %3)\n")
-                       .arg(position.x() - m_originX, 0, 'f', 2)
-                       .arg(position.y() - m_originY, 0, 'f', 2)
-                       .arg(textRotation, 0, 'f', 0);
-        content += "      (effects (font (size 1.27 1.27) (thickness 0.1)))\n";
-        content += "    )\n";
+    auto kicadJustification = [](const QString& anchor) {
+        const QString normalized = anchor.trimmed().toLower();
+        if (normalized == QStringLiteral("start") || normalized == QStringLiteral("left"))
+            return QStringLiteral(" (justify left)");
+        if (normalized == QStringLiteral("end") || normalized == QStringLiteral("right"))
+            return QStringLiteral(" (justify right)");
+        if (normalized == QStringLiteral("top"))
+            return QStringLiteral(" (justify top)");
+        if (normalized == QStringLiteral("bottom"))
+            return QStringLiteral(" (justify bottom)");
+        return QString();
     };
+    auto appendOriginalText =
+        [&](const QString& text, const QPointF& position, double rotation, const QString& anchor, double fontSizeMm) {
+            double textRotation = rotation;
+            if (textRotation != 0.0)
+                textRotation = 360.0 - textRotation;
+            const double size = fontSizeMm > 0.0 ? fontSizeMm : 1.27;
+            content += "    (text\n";
+            content += QString("      \"%1\"\n").arg(text);
+            content += QString("      (at %1 %2 %3)\n")
+                           .arg(position.x() - m_originX, 0, 'f', 2)
+                           .arg(position.y() - m_originY, 0, 'f', 2)
+                           .arg(textRotation, 0, 'f', 0);
+            content += QString("      (effects (font (size %1 %1) (thickness 0.1))%2)\n")
+                           .arg(size, 0, 'f', 2)
+                           .arg(kicadJustification(anchor));
+            content += "    )\n";
+        };
     if (useOriginalNamePosition)
-        appendOriginalText(pinName, pin.namePosition, pin.nameRotation);
+        appendOriginalText(pinName, pin.namePosition, pin.nameRotation, pin.nameAnchor, pin.nameFontSizeMm);
     if (useOriginalNumberPosition)
-        appendOriginalText(pinNumber, pin.numberPosition, pin.numberRotation);
+        appendOriginalText(pinNumber, pin.numberPosition, pin.numberRotation, pin.numberAnchor, pin.numberFontSizeMm);
 
     return content;
 }

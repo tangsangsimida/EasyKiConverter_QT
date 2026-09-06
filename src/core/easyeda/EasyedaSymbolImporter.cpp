@@ -1,3 +1,7 @@
+/**
+ * @file EasyedaSymbolImporter.cpp
+ * @brief EasyedaSymbolImporter 的实现。
+ */
 #include "EasyedaSymbolImporter.h"
 
 #include "EasyedaUtils.h"
@@ -316,7 +320,9 @@ SymbolPin EasyedaSymbolImporter::importPinData(const QString& pinData) {
 
             pin.dot.circleX = segments[4][1].toDouble();
             pin.dot.circleY = segments[4][2].toDouble();
-            pin.number.isDisplayed = (segments[4][0] == "show");
+            // Segment 4 的首字段描述 Pin Dot 状态，不直接等同于 Pin Number 显示状态。
+            // 只有存在编号文本时才建立可导出的编号文本元数据。
+            pin.number.isDisplayed = false;
             pin.number.posX = pin.dot.circleX;
             pin.number.posY = pin.dot.circleY;
             pin.number.rotation = pin.settings.rotation;
@@ -328,6 +334,7 @@ SymbolPin EasyedaSymbolImporter::importPinData(const QString& pinData) {
             if (!pinNumberDisplayText.isEmpty()) {
                 pin.settings.spicePinNumber = pinNumberDisplayText;
                 pin.number.text = pinNumberDisplayText;
+                pin.number.isDisplayed = true;
                 qDebug() << "Pin Number Display Text extracted from Segment 4:" << pinNumberDisplayText << "for pin"
                          << pin.name.text << "(replaced spicePinNumber)";
             }

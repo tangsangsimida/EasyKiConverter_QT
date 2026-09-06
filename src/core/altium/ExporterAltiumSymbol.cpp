@@ -202,6 +202,9 @@ AltiumSchComponent ExporterAltiumSymbol::convertSymbol(const IR::SymbolComponent
             text.locationX = AltiumCoord::mmToRaw(pin.namePosition.x());
             text.locationY = AltiumCoord::mmToRaw(pin.namePosition.y());
             text.text = pin.name;
+            text.fontSizeMm = pin.nameFontSizeMm;
+            text.anchor = pin.nameAnchor;
+            text.isDisplayed = true;
             text.orientation = static_cast<int>(pin.nameRotation / 90.0) % 4;
             text.ownerPartId = qMax(1, pin.partIndex + 1);
             component.texts.append(text);
@@ -211,6 +214,9 @@ AltiumSchComponent ExporterAltiumSymbol::convertSymbol(const IR::SymbolComponent
             text.locationX = AltiumCoord::mmToRaw(pin.numberPosition.x());
             text.locationY = AltiumCoord::mmToRaw(pin.numberPosition.y());
             text.text = pin.designator;
+            text.fontSizeMm = pin.numberFontSizeMm;
+            text.anchor = pin.numberAnchor;
+            text.isDisplayed = true;
             text.orientation = static_cast<int>(pin.numberRotation / 90.0) % 4;
             text.ownerPartId = qMax(1, pin.partIndex + 1);
             component.texts.append(text);

@@ -1,3 +1,7 @@
+/**
+ * @file SvgPathParser.cpp
+ * @brief SvgPathParser 的实现。
+ */
 #include "SvgPathParser.h"
 
 #include <QDebug>
@@ -365,7 +369,42 @@ QStringList SvgPathParser::splitPath(const QString& path) {
     // 将命令字母前后添加空格，然后按空格分
     QString processed = path;
     processed.replace(QRegularExpression("([a-zA-Z])"), " \\1 ");
-    QStringList tokens = processed.split(QRegularExpression("[\\s,]+"), Qt::SkipEmptyParts);
+    processed.replace(QRegularExpression("(?<=[0-9.])(?=[+-])"), " ");
+    const QStringList rawTokens = processed.split(QRegularExpression("[\\s,]+"), Qt::SkipEmptyParts);
+
+    // SVG 允许一个命令后连续跟随多组参数。当前主解析循环按一次命令消费一组
+    // 曲线/圆弧参数，因此在分词阶段把后续参数组展开成同类型的重复命令。
+    QStringList tokens;
+    int index = 0;
+    while (index < rawTokens.size()) {
+        const QString command = rawTokens.at(index++);
+        tokens.append(command);
+        if (command.size() != 1 || !command.at(0).isLetter())
+            continue;
+
+        const QChar upper = command.at(0).toUpper();
+        int groupSize = 0;
+        if (upper == 'A')
+            groupSize = 7;
+        else if (upper == 'C')
+            groupSize = 6;
+        else if (upper == 'S' || upper == 'Q')
+            groupSize = 4;
+        else if (upper == 'T')
+            groupSize = 2;
+        if (groupSize == 0)
+            continue;
+
+        int parameterCount = 0;
+        while (index < rawTokens.size() && !rawTokens.at(index).at(0).isLetter()) {
+            if (parameterCount == groupSize) {
+                tokens.append(command);
+                parameterCount = 0;
+            }
+            tokens.append(rawTokens.at(index++));
+            ++parameterCount;
+        }
+    }
     return tokens;
 }
 
