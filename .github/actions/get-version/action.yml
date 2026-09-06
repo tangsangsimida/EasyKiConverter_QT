@@ -1,5 +1,10 @@
 name: 'Get Version'
 description: 'Extract version info from git ref and commit hash'
+inputs:
+  tag_name:
+    description: 'Release tag used when called from a reusable workflow'
+    required: false
+    default: ''
 outputs:
   VERSION:
     description: 'Version string (e.g. 3.0.2 or dev)'
@@ -20,6 +25,8 @@ runs:
     - name: 'Extract Version'
       id: get_version
       shell: bash
+      env:
+        INPUT_TAG_NAME: ${{ inputs.tag_name }}
       run: |
         set -euo pipefail
 
@@ -27,7 +34,10 @@ runs:
         git config --global --add safe.directory $GITHUB_WORKSPACE
 
         # 1. VERSION (from Tag or default)
-        if [[ $GITHUB_REF == refs/tags/* ]]; then
+        if [[ -n "$INPUT_TAG_NAME" ]]; then
+          TAG_NAME="$INPUT_TAG_NAME"
+          VERSION="${TAG_NAME#[vV]}"
+        elif [[ $GITHUB_REF == refs/tags/* ]]; then
           # Strip 'refs/tags/'
           TAG_NAME=${GITHUB_REF#refs/tags/}
           # Strip 'v' or 'V' prefix (case-insensitive)
@@ -55,6 +65,11 @@ runs:
         latest_tags=$(git tag -l --sort=-v:refname "v*" "V*" | head -n 2)
         current_tag=$(echo "$latest_tags" | head -n 1)
         prev_tag=$(echo "$latest_tags" | sed -n '2p')
+
+        if [[ -n "$INPUT_TAG_NAME" ]]; then
+          current_tag="$INPUT_TAG_NAME"
+          prev_tag=$(git describe --tags --abbrev=0 "${current_tag}^" 2>/dev/null || echo "")
+        fi
 
         if [ -z "$current_tag" ]; then
            current_tag="v0.0.0"

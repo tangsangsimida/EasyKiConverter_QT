@@ -1,11 +1,18 @@
 name: Packaging (Linux)
 
 on:
-  push:
-    tags:
-      - 'v*'
-      - 'V*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: true
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -56,6 +63,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag_name || github.ref }}
 
       - name: 'Record Start Time'
         run: echo "BUILD_START_TIME=$(date +%s)" >> "$GITHUB_ENV"
@@ -63,6 +71,8 @@ jobs:
       - name: Get Version
         id: version
         uses: ./.github/actions/get-version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: Export Version
         run: |
@@ -701,8 +711,13 @@ jobs:
             appimage_arch: aarch64
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: Install System Dependencies
         run: |
@@ -770,8 +785,13 @@ jobs:
             deb_arch: arm64
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: Install System Dependencies
         run: |
@@ -830,8 +850,13 @@ jobs:
             rpm_arch: aarch64
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: Install System Dependencies
         run: |
@@ -890,8 +915,13 @@ jobs:
             archlinux_arch: aarch64
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: Install System Dependencies
         run: |
