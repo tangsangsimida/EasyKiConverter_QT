@@ -139,6 +139,7 @@ QJsonObject SymbolPinSerializer::toJson(const SymbolPin& pin) {
     json["pin_dot"] = toJson(pin.pinDot);
     json["pin_path"] = toJson(pin.pinPath);
     json["name"] = toJson(pin.name);
+    json["number"] = toJson(pin.number);
     json["dot"] = toJson(pin.dot);
     json["clock"] = toJson(pin.clock);
     return json;
@@ -154,6 +155,9 @@ bool SymbolPinSerializer::fromJson(SymbolPin& pin, const QJsonObject& json) {
     fromJson(pin.pinDot, json["pin_dot"].toObject());
     fromJson(pin.pinPath, json["pin_path"].toObject());
     fromJson(pin.name, json["name"].toObject());
+    if (json.contains("number")) {
+        fromJson(pin.number, json["number"].toObject());
+    }
     fromJson(pin.dot, json["dot"].toObject());
     fromJson(pin.clock, json["clock"].toObject());
     return true;

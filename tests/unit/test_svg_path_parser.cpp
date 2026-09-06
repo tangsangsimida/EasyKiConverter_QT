@@ -65,6 +65,16 @@ private slots:
         QVERIFY(points.size() > 3);
         QCOMPARE(points.first(), QPointF(0, 0));
         QCOMPARE(points.last(), QPointF(5.08, 0));
+        QVERIFY(points.at(points.size() / 2).y() > 2.0);
+    }
+
+    void smoothCurvesProduceValidEndpoints() {
+        const QList<QPointF> points =
+            SvgPathParser::parsePath(QStringLiteral("M 0 0 C 0 10 10 10 10 0 S 20 -10 20 0 Q 30 10 40 0 T 60 0"));
+
+        QVERIFY(points.size() > 20);
+        QCOMPARE(points.first(), QPointF(0, 0));
+        QCOMPARE(points.last(), QPointF(60, 0));
     }
 
     void invalidOrEmptyPathsReturnNoPoints() {

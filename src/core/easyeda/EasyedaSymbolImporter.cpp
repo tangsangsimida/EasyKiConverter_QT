@@ -316,12 +316,18 @@ SymbolPin EasyedaSymbolImporter::importPinData(const QString& pinData) {
 
             pin.dot.circleX = segments[4][1].toDouble();
             pin.dot.circleY = segments[4][2].toDouble();
+            pin.number.isDisplayed = (segments[4][0] == "show");
+            pin.number.posX = pin.dot.circleX;
+            pin.number.posY = pin.dot.circleY;
+            pin.number.rotation = pin.settings.rotation;
+            pin.number.textAnchor = QStringLiteral("middle");
 
             qDebug() << "  dot.isDisplayed set to: false (always hide)";
 
             QString pinNumberDisplayText = segments[4][4];
             if (!pinNumberDisplayText.isEmpty()) {
                 pin.settings.spicePinNumber = pinNumberDisplayText;
+                pin.number.text = pinNumberDisplayText;
                 qDebug() << "Pin Number Display Text extracted from Segment 4:" << pinNumberDisplayText << "for pin"
                          << pin.name.text << "(replaced spicePinNumber)";
             }

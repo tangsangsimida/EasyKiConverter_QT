@@ -22,6 +22,9 @@
 
 #include <QRegularExpression>
 
+#include <cmath>
+#include <limits>
+
 namespace EasyKiConverter {
 namespace IR {
 
@@ -68,9 +71,22 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
             pir.name = pin.name.text;
             pir.designator = pin.settings.spicePinNumber;
             pir.position = GeometryNormalizer::transformPoint(pin.settings.posX, pin.settings.posY, originX, originY);
-            pir.namePosition = GeometryNormalizer::transformPoint(pin.name.posX, pin.name.posY, originX, originY);
+            const bool hasNamePosition = pin.name.isDisplayed && !pin.name.text.isEmpty() &&
+                                         std::isfinite(pin.name.posX) && std::isfinite(pin.name.posY);
+            pir.namePosition = hasNamePosition
+                                   ? GeometryNormalizer::transformPoint(pin.name.posX, pin.name.posY, originX, originY)
+                                   : pir.position;
             pir.nameRotation = pin.name.rotation;
             pir.nameAnchor = pin.name.textAnchor;
+            pir.hasNamePosition = hasNamePosition;
+            const bool hasNumberPosition = pin.number.isDisplayed && !pin.number.text.isEmpty() &&
+                                           std::isfinite(pin.number.posX) && std::isfinite(pin.number.posY);
+            pir.numberPosition = hasNumberPosition ? GeometryNormalizer::transformPoint(
+                                                         pin.number.posX, pin.number.posY, originX, originY)
+                                                   : pir.position;
+            pir.numberRotation = pin.number.rotation;
+            pir.numberAnchor = pin.number.textAnchor;
+            pir.hasNumberPosition = hasNumberPosition;
 
             // 从 pinPath SVG 解析引脚长度
             const QString pathStr = pin.pinPath.path;
@@ -324,8 +340,39 @@ inline SymbolComponentIR toSymbolIR(const SymbolData& data) {
             ++partIdx;
         }
     } else {
-        const double ox = data.bbox().hasHeadCenter ? data.bbox().headX : data.bbox().x;
-        const double oy = data.bbox().hasHeadCenter ? data.bbox().headY : data.bbox().y;
+        const SymbolBBox bbox = data.bbox();
+        double ox = bbox.x;
+        double oy = bbox.y;
+        const bool headInsideBbox = bbox.width > 0.0 && bbox.height > 0.0 && bbox.headX >= bbox.x - bbox.width &&
+                                    bbox.headX <= bbox.x + 2.0 * bbox.width && bbox.headY >= bbox.y - bbox.height &&
+                                    bbox.headY <= bbox.y + 2.0 * bbox.height;
+        if (bbox.hasHeadCenter && std::isfinite(bbox.headX) && std::isfinite(bbox.headY) && headInsideBbox) {
+            ox = bbox.headX;
+            oy = bbox.headY;
+        } else if (!bbox.hasHeadCenter) {
+            // 兼容旧缓存：没有 head 中心时保留原有 BBox 原点语义。
+        } else {
+            double minX = std::numeric_limits<double>::max();
+            double minY = std::numeric_limits<double>::max();
+            double maxX = std::numeric_limits<double>::lowest();
+            double maxY = std::numeric_limits<double>::lowest();
+            auto include = [&](double x, double y) {
+                minX = qMin(minX, x);
+                minY = qMin(minY, y);
+                maxX = qMax(maxX, x);
+                maxY = qMax(maxY, y);
+            };
+            for (const auto& pin : data.pins())
+                include(pin.settings.posX, pin.settings.posY);
+            for (const auto& rect : data.rectangles()) {
+                include(rect.posX, rect.posY);
+                include(rect.posX + rect.width, rect.posY + rect.height);
+            }
+            if (minX <= maxX && minY <= maxY) {
+                ox = (minX + maxX) / 2.0;
+                oy = (minY + maxY) / 2.0;
+            }
+        }
         convertPins(data.pins(), ox, oy);
         convertRectangles(data.rectangles(), ox, oy);
         convertCircles(data.circles(), ox, oy);

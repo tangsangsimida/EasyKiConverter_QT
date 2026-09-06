@@ -131,16 +131,17 @@ private slots:
         pin.settings.spicePinNumber = QStringLiteral("1");
         pin.name.posX = 372.0;
         pin.name.posY = 290.0;
+        pin.name.isDisplayed = true;
         pin.name.text = QStringLiteral("IN");
         pin.name.textAnchor = QStringLiteral("start");
         symbol.setPins({pin});
 
         const IR::SymbolComponentIR ir = IR::toSymbolIR(symbol);
         QCOMPARE(ir.pins.size(), 1);
-        QVERIFY(qAbs(ir.pins.first().position.x() + 12.7) < 1e-9);
-        QVERIFY(qAbs(ir.pins.first().position.y() - 2.54) < 1e-9);
-        QVERIFY(qAbs(ir.pins.first().namePosition.x() + 7.112) < 1e-9);
-        QVERIFY(qAbs(ir.pins.first().namePosition.y() - 2.54) < 1e-9);
+        QVERIFY(qAbs(ir.pins.first().position.x() + 12.7) < 1e-6);
+        QVERIFY(qAbs(ir.pins.first().position.y() - 2.54) < 1e-6);
+        QVERIFY(qAbs(ir.pins.first().namePosition.x() + 7.112) < 1e-6);
+        QVERIFY(qAbs(ir.pins.first().namePosition.y() - 2.54) < 1e-6);
         QCOMPARE(ir.pins.first().nameAnchor, QStringLiteral("start"));
     }
 

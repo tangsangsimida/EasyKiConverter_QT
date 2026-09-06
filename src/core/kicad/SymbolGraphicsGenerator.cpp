@@ -88,15 +88,48 @@ QString SymbolGraphicsGenerator::generatePin(const IR::SymbolPinIR& pin) const {
         pinName = pinNumber;
     }
 
+    const bool useOriginalNamePosition = pin.hasNamePosition && !pinName.isEmpty();
+    const bool useOriginalNumberPosition = pin.hasNumberPosition && !pinNumber.isEmpty();
+    const QString nameHide = useOriginalNamePosition ? QStringLiteral(" hide") : QString();
+    const QString numberHide = useOriginalNumberPosition ? QStringLiteral(" hide") : QString();
+
     // 使用 IR 方向枚举获取 KiCad 角度
     double kicadOrientation = KiCadTypeMap::toKicadAngle(pin.direction);
 
     content += QString("    (pin %1 %2\n").arg(kicadPinType, kicadPinStyle);
     content += QString("      (at %1 %2 %3)\n").arg(x, 0, 'f', 2).arg(y, 0, 'f', 2).arg(kicadOrientation, 0, 'f', 0);
     content += QString("      (length %1)\n").arg(length, 0, 'f', 2);
-    content += QString("      (name \"%1\" (effects (font (size 1.27 1.27) (thickness 0) )))\n").arg(pinName);
-    content += QString("      (number \"%1\" (effects (font (size 1.27 1.27) (thickness 0) )))\n").arg(pinNumber);
+    if (useOriginalNamePosition) {
+        content +=
+            QString("      (name \"%1\" (effects (font (size 1.27 1.27) (thickness 0))%2))\n").arg(pinName, nameHide);
+    } else {
+        content += QString("      (name \"%1\" (effects (font (size 1.27 1.27) (thickness 0) )))\n").arg(pinName);
+    }
+    if (useOriginalNumberPosition) {
+        content += QString("      (number \"%1\" (effects (font (size 1.27 1.27) (thickness 0))%2))\n")
+                       .arg(pinNumber, numberHide);
+    } else {
+        content += QString("      (number \"%1\" (effects (font (size 1.27 1.27) (thickness 0) )))\n").arg(pinNumber);
+    }
     content += "    )\n";
+
+    auto appendOriginalText = [&](const QString& text, const QPointF& position, double rotation) {
+        double textRotation = rotation;
+        if (textRotation != 0.0)
+            textRotation = 360.0 - textRotation;
+        content += "    (text\n";
+        content += QString("      \"%1\"\n").arg(text);
+        content += QString("      (at %1 %2 %3)\n")
+                       .arg(position.x() - m_originX, 0, 'f', 2)
+                       .arg(position.y() - m_originY, 0, 'f', 2)
+                       .arg(textRotation, 0, 'f', 0);
+        content += "      (effects (font (size 1.27 1.27) (thickness 0.1)))\n";
+        content += "    )\n";
+    };
+    if (useOriginalNamePosition)
+        appendOriginalText(pinName, pin.namePosition, pin.nameRotation);
+    if (useOriginalNumberPosition)
+        appendOriginalText(pinNumber, pin.numberPosition, pin.numberRotation);
 
     return content;
 }

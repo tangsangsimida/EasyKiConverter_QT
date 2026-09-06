@@ -18,6 +18,9 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
     QStringList tokens = splitPath(path);
     double currentX = 0.0;
     double currentY = 0.0;
+    QPointF lastCubicControl;
+    QPointF lastQuadraticControl;
+    QChar previousCommand;
 
     int i = 0;
     while (i < tokens.size()) {
@@ -49,6 +52,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
                 QPointF pt = createPoint(x, y, relative, currentX, currentY);
                 points.append(pt);
             }
+            previousCommand = 'M';
         }
         // 处理L/l（LineTo）命
         else if (command == 'L') {
@@ -70,6 +74,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
                 QPointF pt = createPoint(x, y, relative, currentX, currentY);
                 points.append(pt);
             }
+            previousCommand = 'L';
         }
         // 处理H/h（Horizontal LineTo）命
         else if (command == 'H') {
@@ -89,6 +94,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
                 }
                 points.append(QPointF(currentX, currentY));
             }
+            previousCommand = 'H';
         }
         // 处理V/v（Vertical LineTo）命
         else if (command == 'V') {
@@ -108,6 +114,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
                 }
                 points.append(QPointF(currentX, currentY));
             }
+            previousCommand = 'V';
         }
         // 处理A/a（Arc）命
         else if (command == 'A') {
@@ -160,6 +167,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
             }
             currentX = endPoint.x();
             currentY = endPoint.y();
+            previousCommand = 'A';
         }
         // 处理C/c（Bezier Curve）命
         else if (command == 'C') {
@@ -214,6 +222,46 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
             }
             currentX = endX;
             currentY = endY;
+            lastCubicControl = QPointF(cp2x, cp2y);
+            previousCommand = 'C';
+        }
+        // 处理S/s（平滑三次贝塞尔曲线）命令
+        else if (command == 'S') {
+            const bool relative = (cmd[0] == 's');
+            if (points.isEmpty() || i + 4 >= tokens.size()) {
+                qWarning() << "Smooth cubic bezier param length error";
+                i++;
+                continue;
+            }
+            const QPointF startPoint = points.last();
+            const QPointF cp1 =
+                (previousCommand == 'C' || previousCommand == 'S')
+                    ? QPointF(2.0 * startPoint.x() - lastCubicControl.x(), 2.0 * startPoint.y() - lastCubicControl.y())
+                    : startPoint;
+            bool okCp2x = false, okCp2y = false, okX = false, okY = false;
+            i++;
+            double cp2x = tokens[i++].toDouble(&okCp2x);
+            double cp2y = tokens[i++].toDouble(&okCp2y);
+            double endX = tokens[i++].toDouble(&okX);
+            double endY = tokens[i].toDouble(&okY);
+            if (!okCp2x || !okCp2y || !okX || !okY)
+                continue;
+            if (relative) {
+                cp2x += startPoint.x();
+                cp2y += startPoint.y();
+                endX += startPoint.x();
+                endY += startPoint.y();
+            }
+            const QList<QPointF> bezierPoints =
+                bezierToPolyline(startPoint.x(), startPoint.y(), cp1.x(), cp1.y(), cp2x, cp2y, endX, endY);
+            for (const QPointF& point : bezierPoints) {
+                if (point != points.last())
+                    points.append(point);
+            }
+            currentX = endX;
+            currentY = endY;
+            lastCubicControl = QPointF(cp2x, cp2y);
+            previousCommand = 'S';
         }
         // 处理Q/q（二次贝塞尔曲线）命令
         else if (command == 'Q') {
@@ -225,16 +273,16 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
             }
 
             const QPointF startPoint = points.last();
-            bool ok = true;
+            bool okCpX = false, okCpY = false, okEndX = false, okEndY = false;
             i++;
-            double cpX = tokens[i].toDouble(&ok);
+            double cpX = tokens[i].toDouble(&okCpX);
             i++;
-            double cpY = tokens[i].toDouble(&ok);
+            double cpY = tokens[i].toDouble(&okCpY);
             i++;
-            double endX = tokens[i].toDouble(&ok);
+            double endX = tokens[i].toDouble(&okEndX);
             i++;
-            double endY = tokens[i].toDouble(&ok);
-            if (!ok) {
+            double endY = tokens[i].toDouble(&okEndY);
+            if (!okCpX || !okCpY || !okEndX || !okEndY) {
                 qWarning() << "Quadratic bezier param parse error";
                 continue;
             }
@@ -244,7 +292,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
                 endX += startPoint.x();
                 endY += startPoint.y();
             }
-            const QPointF cp2(endX + (endX - cpX) / 3.0, endY + (endY - cpY) / 3.0);
+            const QPointF cp2(endX + 2.0 * (cpX - endX) / 3.0, endY + 2.0 * (cpY - endY) / 3.0);
             const QPointF cp1(startPoint.x() + 2.0 * (cpX - startPoint.x()) / 3.0,
                               startPoint.y() + 2.0 * (cpY - startPoint.y()) / 3.0);
             const QList<QPointF> bezierPoints =
@@ -255,6 +303,45 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
             }
             currentX = endX;
             currentY = endY;
+            lastQuadraticControl = QPointF(cpX, cpY);
+            previousCommand = 'Q';
+        }
+        // 处理T/t（平滑二次贝塞尔曲线）命令
+        else if (command == 'T') {
+            const bool relative = (cmd[0] == 't');
+            if (points.isEmpty() || i + 2 >= tokens.size()) {
+                qWarning() << "Smooth quadratic bezier param length error";
+                i++;
+                continue;
+            }
+            const QPointF startPoint = points.last();
+            const QPointF control = (previousCommand == 'Q' || previousCommand == 'T')
+                                        ? QPointF(2.0 * startPoint.x() - lastQuadraticControl.x(),
+                                                  2.0 * startPoint.y() - lastQuadraticControl.y())
+                                        : startPoint;
+            bool okX = false, okY = false;
+            i++;
+            double endX = tokens[i++].toDouble(&okX);
+            double endY = tokens[i].toDouble(&okY);
+            if (!okX || !okY)
+                continue;
+            if (relative) {
+                endX += startPoint.x();
+                endY += startPoint.y();
+            }
+            const QPointF cp1(startPoint.x() + 2.0 * (control.x() - startPoint.x()) / 3.0,
+                              startPoint.y() + 2.0 * (control.y() - startPoint.y()) / 3.0);
+            const QPointF cp2(endX + 2.0 * (control.x() - endX) / 3.0, endY + 2.0 * (control.y() - endY) / 3.0);
+            const QList<QPointF> bezierPoints =
+                bezierToPolyline(startPoint.x(), startPoint.y(), cp1.x(), cp1.y(), cp2.x(), cp2.y(), endX, endY);
+            for (const QPointF& point : bezierPoints) {
+                if (point != points.last())
+                    points.append(point);
+            }
+            currentX = endX;
+            currentY = endY;
+            lastQuadraticControl = control;
+            previousCommand = 'T';
         }
         // 处理Z/z（ClosePath）命
         else if (command == 'Z') {
@@ -262,6 +349,7 @@ QList<QPointF> SvgPathParser::parsePath(const QString& path) {
                 points.append(points.first());
             }
             i++;
+            previousCommand = 'Z';
         }
         // 未知命令
         else {

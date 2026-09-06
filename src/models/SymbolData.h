@@ -93,22 +93,22 @@ struct SymbolBBox {
  * @brief 引脚设置
  */
 struct SymbolPinSettings {
-    bool isDisplayed;
-    PinType type;
+    bool isDisplayed = true;
+    PinType type = PinType::Unspecified;
     QString spicePinNumber;
-    double posX;
-    double posY;
-    int rotation;
+    double posX = 0.0;
+    double posY = 0.0;
+    int rotation = 0;
     QString id;
-    bool isLocked;
+    bool isLocked = false;
 };
 
 /**
  * @brief 引脚
  */
 struct SymbolPinDot {
-    double dotX;
-    double dotY;
+    double dotX = 0.0;
+    double dotY = 0.0;
 };
 
 /**
@@ -123,30 +123,30 @@ struct SymbolPinPath {
  * @brief 引脚名称
  */
 struct SymbolPinName {
-    bool isDisplayed;
-    double posX;
-    double posY;
-    int rotation;
+    bool isDisplayed = false;
+    double posX = 0.0;
+    double posY = 0.0;
+    int rotation = 0;
     QString text;
     QString textAnchor;
     QString font;
-    double fontSize;
+    double fontSize = 7.0;
 };
 
 /**
  * @brief 引脚圆点（第二个
  */
 struct SymbolPinDotBis {
-    bool isDisplayed;
-    double circleX;
-    double circleY;
+    bool isDisplayed = false;
+    double circleX = 0.0;
+    double circleY = 0.0;
 };
 
 /**
  * @brief 引脚时钟
  */
 struct SymbolPinClock {
-    bool isDisplayed;
+    bool isDisplayed = false;
     QString path;
 };
 
@@ -158,6 +158,7 @@ struct SymbolPin {
     SymbolPinDot pinDot;
     SymbolPinPath pinPath;
     SymbolPinName name;
+    SymbolPinName number;  ///< 引脚编号的原始文本几何属性
     SymbolPinDotBis dot;
     SymbolPinClock clock;
 };

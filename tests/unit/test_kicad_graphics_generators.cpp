@@ -85,6 +85,27 @@ private slots:
         QVERIFY(output.contains(QStringLiteral("(number \"1\"")));
     }
 
+    void generatePinUsesOriginalNameAndNumberPositions() {
+        SymbolGraphicsGenerator generator;
+        IR::SymbolPinIR pin;
+        pin.position = QPointF(0.0, 0.0);
+        pin.length = 2.54;
+        pin.name = QStringLiteral("IN");
+        pin.designator = QStringLiteral("1");
+        pin.hasNamePosition = true;
+        pin.namePosition = QPointF(-5.08, 2.54);
+        pin.nameRotation = 90.0;
+        pin.hasNumberPosition = true;
+        pin.numberPosition = QPointF(5.08, -2.54);
+
+        const QString output = generator.generatePin(pin);
+
+        QVERIFY(output.contains(QStringLiteral("(name \"IN\" (effects (font (size 1.27 1.27) (thickness 0)) hide))")));
+        QVERIFY(output.contains(QStringLiteral("(number \"1\" (effects (font (size 1.27 1.27) (thickness 0)) hide))")));
+        QVERIFY(output.contains(QStringLiteral("(at -5.08 2.54 270)")));
+        QVERIFY(output.contains(QStringLiteral("(at 5.08 -2.54 0)")));
+    }
+
     void generatePolylineAndPathReturnKiCadPolylines() {
         SymbolGraphicsGenerator generator;
         generator.setCurrentOrigin(0.0, 0.0);

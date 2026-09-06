@@ -197,6 +197,24 @@ AltiumSchComponent ExporterAltiumSymbol::convertSymbol(const IR::SymbolComponent
     // 转换引脚
     for (const IR::SymbolPinIR& pin : data.pins) {
         component.pins.append(convertPin(pin));
+        if (pin.hasNamePosition && !pin.name.isEmpty()) {
+            AltiumSchText text;
+            text.locationX = AltiumCoord::mmToRaw(pin.namePosition.x());
+            text.locationY = AltiumCoord::mmToRaw(pin.namePosition.y());
+            text.text = pin.name;
+            text.orientation = static_cast<int>(pin.nameRotation / 90.0) % 4;
+            text.ownerPartId = qMax(1, pin.partIndex + 1);
+            component.texts.append(text);
+        }
+        if (pin.hasNumberPosition && !pin.designator.isEmpty()) {
+            AltiumSchText text;
+            text.locationX = AltiumCoord::mmToRaw(pin.numberPosition.x());
+            text.locationY = AltiumCoord::mmToRaw(pin.numberPosition.y());
+            text.text = pin.designator;
+            text.orientation = static_cast<int>(pin.numberRotation / 90.0) % 4;
+            text.ownerPartId = qMax(1, pin.partIndex + 1);
+            component.texts.append(text);
+        }
     }
 
     // 转换图形元素
@@ -249,8 +267,9 @@ AltiumSchPin ExporterAltiumSymbol::convertPin(const IR::SymbolPinIR& pin) {
     // 仍是符号的一部分。Altium 的 PinConglomerate 必须显式打开 show-name，
     // 否则 AD 只绘制 Pin Number，名称会表现为脱离引脚的独立文本。
     // 优先从 display 控制层获取，兼容旧 showName 字段。
-    altiumPin.showName = pin.display.showName || pin.showName || !pin.name.trimmed().isEmpty();
-    altiumPin.showDesignator = pin.display.showDesignator || pin.showDesignator;
+    altiumPin.showName =
+        !pin.hasNamePosition && (pin.display.showName || pin.showName || !pin.name.trimmed().isEmpty());
+    altiumPin.showDesignator = !pin.hasNumberPosition && (pin.display.showDesignator || pin.showDesignator);
     altiumPin.isHidden = !altiumPin.showName && !altiumPin.showDesignator;
     altiumPin.color = toAltiumColor(QColor(Qt::black));
     // EasyEDA 的反相圆点位于引脚外侧，时钟标记贴近主体内侧。
