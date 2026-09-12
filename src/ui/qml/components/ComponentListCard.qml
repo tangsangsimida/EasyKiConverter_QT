@@ -1127,8 +1127,8 @@ Card {
                 var w = width - AppStyle.spacing.md;
                 var minCellW = ResponsiveHelper.responsive(180, 220, 230, 250);
                 var c = Math.max(1, Math.floor(w / minCellW));
-                // 使用整数逻辑像素，避免 Windows 高 DPI 下 delegate 和缩略图落在半像素。
-                return Math.max(1, Math.round(w / c));
+                // 向下取整，确保所有列的总宽度不超过可用宽度。
+                return Math.max(1, Math.floor(w / c));
             }
             cellHeight: ResponsiveHelper.isShortWindow ? 60 : 76
             flow: GridView.FlowLeftToRight
