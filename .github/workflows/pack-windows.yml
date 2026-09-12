@@ -118,8 +118,33 @@ jobs:
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          # 安装 Inno Setup (最新版本)
-          choco install innosetup --version=6.4.2 --no-progress
+          # 优先使用 runner 已安装的 Inno Setup，避免 Chocolatey 因版本更高而失败。
+          $innoCandidates = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          )
+          $innoCommand = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+          if ($innoCommand) {
+            $innoCandidates += $innoCommand.Source
+          }
+
+          $innoPath = $innoCandidates |
+            Where-Object { $_ -and (Test-Path $_) } |
+            Select-Object -First 1
+          if ($innoPath) {
+            Write-Host "Inno Setup is already available: $innoPath"
+          } else {
+            choco install innosetup -y --no-progress
+            $innoPath = $innoCandidates |
+              Where-Object { $_ -and (Test-Path $_) } |
+              Select-Object -First 1
+          }
+          if (-not $innoPath) {
+            Write-Error "Inno Setup compiler (ISCC.exe) was not found after installation."
+            exit 1
+          }
+          "INNO_SETUP_PATH=$innoPath" >> $env:GITHUB_ENV
+
           # 下载并安装简体中文语言文件（可选，失败不影响构建）
           $langDir = "${env:ProgramFiles(x86)}\Inno Setup 6\Languages"
           $langUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl"
@@ -236,9 +261,9 @@ jobs:
             Write-Error "Portable executable not found: $executable"
             exit 1
           }
-          & $executable --version
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Portable executable smoke test failed with exit code: $LASTEXITCODE"
+          $process = Start-Process -FilePath $executable -ArgumentList @('--version') -Wait -NoNewWindow -PassThru
+          if ($process.ExitCode -ne 0) {
+            Write-Error "Portable executable smoke test failed with exit code: $($process.ExitCode)"
             exit 1
           }
 
@@ -276,7 +301,7 @@ jobs:
             exit 1
           }
           
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ env.VERSION }}" "/DSourceDir=$stagingDir" "/DAppIconPath=$iconPath" "/DLicensePath=$licensePath" "/O$outputDir" "$issFile"
+          & "$env:INNO_SETUP_PATH" "/DMyAppVersion=${{ env.VERSION }}" "/DSourceDir=$stagingDir" "/DAppIconPath=$iconPath" "/DLicensePath=$licensePath" "/O$outputDir" "$issFile"
 
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Inno Setup Compiler failed with exit code: $LASTEXITCODE"
