@@ -74,18 +74,18 @@ runs:
           libglib2.0-0
 
     - name: 'Setup CMake'
-      uses: jwlawson/actions-setup-cmake@v2
+      uses: jwlawson/actions-setup-cmake@0d6a7d60b009d01c9e7523be22153ff8f19460d3 # v2
       with:
         cmake-version: ${{ inputs.cmake-version }}
 
     - name: 'Setup Python for macOS Qt installation'
       if: runner.os == 'macOS'
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
       with:
         python-version: '3.12'
 
     - name: 'Install Qt'
-      uses: jurplel/install-qt-action@v4
+      uses: jurplel/install-qt-action@48d3ad6db93f3627c8ee7a0454bc6f3744f7e730 # v4.3.1
       with:
         version: ${{ inputs.qt-version }}
         host: ${{ inputs.qt-host }}
@@ -99,10 +99,10 @@ runs:
 
     - name: 'Setup CCache'
       if: inputs.enable-ccache == 'true' && (runner.os == 'Linux' || runner.os == 'macOS')
-      uses: hendrikmuhs/ccache-action@v1.2.23
+      uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
       with:
         key: ${{ runner.os }}-build-${{ hashFiles('**/CMakeLists.txt') }}
 
     - name: 'Setup sccache'
       if: inputs.enable-sccache == 'true' && runner.os == 'Windows'
-      uses: mozilla-actions/sccache-action@v0.0.5
+      uses: mozilla-actions/sccache-action@89e9040de88b577a072e3760aaf59f585da083af # v0.0.5

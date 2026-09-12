@@ -13,6 +13,10 @@ on:
         description: 'Release tag to package'
         required: true
         type: string
+      target_sha:
+        description: '固定的发布提交 SHA'
+        required: false
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,7 +28,7 @@ permissions:
 
 env:
   PRODUCT: EasyKiConverter
-  DOCKER_IMAGE: ghcr.io/tangsangsimida/easykiconverter/build-env:latest
+  NFPM_VERSION: '2.47.0'
 
 jobs:
   # ===========================================================================
@@ -39,7 +43,7 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             qt_host: linux
             qt_arch: linux_gcc_64
             qt_dir: gcc_64
@@ -60,10 +64,10 @@ jobs:
             appimage_arch: aarch64
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag_name || github.ref }}
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
 
       - name: 'Record Start Time'
         run: echo "BUILD_START_TIME=$(date +%s)" >> "$GITHUB_ENV"
@@ -105,7 +109,7 @@ jobs:
 
       - name: 'Setup CCache'
         if: matrix.dist.name == 'amd64'
-        uses: hendrikmuhs/ccache-action@v1.2.23
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
         with:
           key: ${{ runner.os }}-pack-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
@@ -115,7 +119,7 @@ jobs:
       - name: Install Qt 6.10.2
         run: |
           QT_VERSION="6.10.2"
-          pip3 install --no-cache-dir --break-system-packages aqtinstall
+          pip3 install --no-cache-dir --break-system-packages aqtinstall==3.2.1
           aqt install-qt ${{ matrix.dist.qt_host }} desktop $QT_VERSION ${{ matrix.dist.qt_arch }} --outputdir /opt/qt --modules qtshadertools qtimageformats
           echo "/opt/qt/$QT_VERSION/${{ matrix.dist.qt_dir }}/bin" >> "$GITHUB_PATH"
           echo "Qt6_DIR=/opt/qt/$QT_VERSION/${{ matrix.dist.qt_dir }}/lib/cmake/Qt6" >> "$GITHUB_ENV"
@@ -680,7 +684,7 @@ jobs:
           echo "=== AppDir verification passed ==="
 
       - name: Upload AppDir Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: built-appdir-${{ matrix.dist.deb_arch }}
           path: ${{ github.workspace }}/${{ env.PRODUCT }}.AppDir
@@ -700,7 +704,7 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             linuxdeploy_arch: x86_64
             deb_arch: amd64
             appimage_arch: x86_64
@@ -710,10 +714,10 @@ jobs:
             deb_arch: arm64
             appimage_arch: aarch64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag_name || github.ref }}
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
         with:
@@ -729,7 +733,7 @@ jobs:
           tools/linux/ci-package.sh install-linuxdeploy ${{ matrix.dist.linuxdeploy_arch }}
 
       - name: Download AppDir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: built-appdir-${{ matrix.dist.deb_arch }}
           path: ${{ env.PRODUCT }}.AppDir
@@ -761,8 +765,15 @@ jobs:
             ${{ steps.version.outputs.GIT_HASH }} \
             ${{ matrix.dist.appimage_arch }}
 
+      - name: Smoke test AppImage
+        run: |
+          appimage="$(find . -maxdepth 1 -type f -name '*.AppImage' -print -quit)"
+          test -n "$appimage"
+          chmod +x "$appimage"
+          APPIMAGE_EXTRACT_AND_RUN=1 QT_QPA_PLATFORM=offscreen "$appimage" --version
+
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ steps.version.outputs.VERSION }}-g${{ steps.version.outputs.GIT_HASH }}-${{ matrix.dist.appimage_arch }}.AppImage
           path: |
@@ -778,16 +789,16 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             deb_arch: amd64
           - name: arm64
             runner: ubuntu-24.04-arm
             deb_arch: arm64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag_name || github.ref }}
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
         with:
@@ -800,12 +811,18 @@ jobs:
 
       - name: Install nfpm
         run: |
-          echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
-          sudo apt-get update
-          sudo apt-get install -y nfpm
+          case "$(uname -m)" in
+            x86_64) nfpm_arch=x86_64 ;;
+            aarch64) nfpm_arch=arm64 ;;
+            *) echo "Unsupported nfpm architecture: $(uname -m)"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_linux_${nfpm_arch}.tar.gz" -o /tmp/nfpm.tar.gz
+          tar -xzf /tmp/nfpm.tar.gz -C /tmp nfpm
+          sudo install -m 0755 /tmp/nfpm /usr/local/bin/nfpm
+          nfpm --version
 
       - name: Download AppDir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: built-appdir-${{ matrix.dist.deb_arch }}
           path: ${{ env.PRODUCT }}.AppDir
@@ -823,7 +840,7 @@ jobs:
             deb
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ steps.version.outputs.VERSION }}-g${{ steps.version.outputs.GIT_HASH }}-${{ matrix.dist.deb_arch }}.deb
           path: |
@@ -839,7 +856,7 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             nfpm_arch: amd64
             deb_arch: amd64
             rpm_arch: x86_64
@@ -849,10 +866,10 @@ jobs:
             deb_arch: arm64
             rpm_arch: aarch64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag_name || github.ref }}
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
         with:
@@ -865,12 +882,18 @@ jobs:
 
       - name: Install nfpm
         run: |
-          echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
-          sudo apt-get update
-          sudo apt-get install -y nfpm
+          case "$(uname -m)" in
+            x86_64) nfpm_arch=x86_64 ;;
+            aarch64) nfpm_arch=arm64 ;;
+            *) echo "Unsupported nfpm architecture: $(uname -m)"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_linux_${nfpm_arch}.tar.gz" -o /tmp/nfpm.tar.gz
+          tar -xzf /tmp/nfpm.tar.gz -C /tmp nfpm
+          sudo install -m 0755 /tmp/nfpm /usr/local/bin/nfpm
+          nfpm --version
 
       - name: Download AppDir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: built-appdir-${{ matrix.dist.deb_arch }}
           path: ${{ env.PRODUCT }}.AppDir
@@ -888,7 +911,7 @@ jobs:
             rpm
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ steps.version.outputs.VERSION }}-g${{ steps.version.outputs.GIT_HASH }}-${{ matrix.dist.rpm_arch }}.rpm
           path: |
@@ -904,7 +927,7 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             nfpm_arch: amd64
             deb_arch: amd64
             archlinux_arch: x86_64
@@ -914,10 +937,10 @@ jobs:
             deb_arch: arm64
             archlinux_arch: aarch64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag_name || github.ref }}
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
       - uses: ./.github/actions/get-version
         id: version
         with:
@@ -930,12 +953,18 @@ jobs:
 
       - name: Install nfpm
         run: |
-          echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
-          sudo apt-get update
-          sudo apt-get install -y nfpm
+          case "$(uname -m)" in
+            x86_64) nfpm_arch=x86_64 ;;
+            aarch64) nfpm_arch=arm64 ;;
+            *) echo "Unsupported nfpm architecture: $(uname -m)"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_linux_${nfpm_arch}.tar.gz" -o /tmp/nfpm.tar.gz
+          tar -xzf /tmp/nfpm.tar.gz -C /tmp nfpm
+          sudo install -m 0755 /tmp/nfpm /usr/local/bin/nfpm
+          nfpm --version
 
       - name: Download AppDir
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: built-appdir-${{ matrix.dist.deb_arch }}
           path: ${{ env.PRODUCT }}.AppDir
@@ -953,7 +982,7 @@ jobs:
             pkg.tar.zst
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ steps.version.outputs.VERSION }}-g${{ steps.version.outputs.GIT_HASH }}-${{ matrix.dist.archlinux_arch }}.pkg.tar.zst
           path: |

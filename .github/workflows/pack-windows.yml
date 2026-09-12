@@ -13,6 +13,10 @@ on:
         description: 'Release tag to package'
         required: true
         type: string
+      target_sha:
+        description: '固定的发布提交 SHA'
+        required: false
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -47,10 +51,10 @@ jobs:
         type: [portable, installer]
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag_name || github.ref }}
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
 
       - name: 'Record Start Time'
         shell: pwsh
@@ -77,13 +81,13 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: 'Setup MSVC'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: ${{ matrix.config.arch }}
           vsversion: '2022'
 
       - name: 'Setup vcpkg'
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
@@ -100,14 +104,14 @@ jobs:
           enable-sccache: 'false'
 
       - name: 'Install Ninja'
-        run: choco install ninja -y --no-progress
+        run: choco install ninja --version=1.12.1 -y --no-progress
 
       - name: 'Setup Inno Setup'
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
           # 安装 Inno Setup (最新版本)
-          choco install innosetup --no-progress
+          choco install innosetup --version=6.4.2 --no-progress
           # 下载并安装简体中文语言文件（可选，失败不影响构建）
           $langDir = "${env:ProgramFiles(x86)}\Inno Setup 6\Languages"
           $langUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl"
@@ -214,6 +218,21 @@ jobs:
           Copy-Item -Path $env:GITHUB_WORKSPACE\README*.md -Destination $env:GITHUB_WORKSPACE\build\Package\portable\ -ErrorAction SilentlyContinue
           Copy-Item -Path $env:GITHUB_WORKSPACE\LICENSE -Destination $env:GITHUB_WORKSPACE\build\Package\portable\
           Compress-Archive -Path $env:GITHUB_WORKSPACE\build\Package\portable\* -DestinationPath $env:GITHUB_WORKSPACE\build\Package\portable\${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.pak_arch }}.zip
+
+      - name: 'Smoke test portable executable'
+        if: matrix.type == 'portable'
+        shell: pwsh
+        run: |
+          $executable = "$env:GITHUB_WORKSPACE\build\Package\portable\easykiconverter.exe"
+          if (-not (Test-Path $executable)) {
+            Write-Error "Portable executable not found: $executable"
+            exit 1
+          }
+          & $executable --version
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Portable executable smoke test failed with exit code: $LASTEXITCODE"
+            exit 1
+          }
 
       - name: 'Create installer package'
         if: matrix.type == 'installer'
@@ -379,7 +398,7 @@ jobs:
 
       - name: 'Artifact Upload (portable)'
         if: matrix.type == 'portable'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-portable
           path: |
@@ -389,7 +408,7 @@ jobs:
 
       - name: 'Artifact Upload (installer)'
         if: matrix.type == 'installer'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup
           path: |
@@ -399,7 +418,7 @@ jobs:
 
       - name: 'Artifact Upload (MSIX)'
         if: matrix.type == 'installer'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-msix
           path: |

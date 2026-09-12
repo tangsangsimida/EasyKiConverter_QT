@@ -17,20 +17,19 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  actions: read
+  contents: read
 
 jobs:
   resolve-target:
     name: Validate release target
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       tag_name: ${{ steps.target.outputs.tag_name }}
       version: ${{ steps.target.outputs.version }}
       target_sha: ${{ steps.target.outputs.target_sha }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
@@ -51,8 +50,12 @@ jobs:
             echo "Tag not found: $tag_name"
             exit 1
           fi
+          if [[ "$(git cat-file -t "refs/tags/$tag_name")" != "tag" ]]; then
+            echo "Release tag must be an annotated tag: $tag_name"
+            exit 1
+          fi
 
-          target_sha="$(git rev-list -n 1 "$tag_name")"
+          target_sha="$(git rev-parse "refs/tags/$tag_name^{commit}")"
           version="${tag_name#[vV]}"
           if ! grep -Eq "set\(VERSION_FROM_CI \"$version\"\)" CMakeLists.txt; then
             echo "CMakeLists.txt default version does not match $version"
@@ -84,6 +87,7 @@ jobs:
     uses: ./.github/workflows/pack-linux.yml
     with:
       tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
     permissions:
       contents: read
       packages: read
@@ -94,6 +98,7 @@ jobs:
     uses: ./.github/workflows/pack-windows.yml
     with:
       tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
     permissions:
       contents: read
 
@@ -103,22 +108,26 @@ jobs:
     uses: ./.github/workflows/pack-macos.yml
     with:
       tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
     permissions:
       contents: read
 
   publish:
     name: Validate and publish release
     needs: [resolve-target, package-linux, package-windows, package-macos]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
     steps:
       - name: Checkout release tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ needs.resolve-target.outputs.tag_name }}
+          ref: ${{ needs.resolve-target.outputs.target_sha }}
 
       - name: Download packaging artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: artifact_downloads
 
@@ -148,6 +157,9 @@ jobs:
 
       - name: Validate expected assets and SHA256 files
         shell: bash
+        env:
+          VERSION: ${{ needs.resolve-target.outputs.version }}
+          TARGET_SHA: ${{ needs.resolve-target.outputs.target_sha }}
         run: |
           set -euo pipefail
           require_asset() {
@@ -160,21 +172,37 @@ jobs:
 
           require_asset '*-win64.zip'
           require_asset '*-x64-setup.exe'
-          require_asset '*-x86_64.AppImage'
-          require_asset '*-aarch64.AppImage'
-          require_asset '*-amd64.deb'
-          require_asset '*-arm64.deb'
-          require_asset '*-x86_64.rpm'
-          require_asset '*-aarch64.rpm'
-          require_asset '*-x86_64.pkg.tar.zst'
-          require_asset '*-aarch64.pkg.tar.zst'
+          require_asset '*.x86_64.AppImage'
+          require_asset '*.aarch64.AppImage'
+          require_asset '*_amd64.deb'
+          require_asset '*_arm64.deb'
+          require_asset '*_x86_64.rpm'
+          require_asset '*_aarch64.rpm'
+          require_asset '*_x86_64.pkg.tar.zst'
+          require_asset '*_aarch64.pkg.tar.zst'
           require_asset '*-intel.dmg'
           require_asset '*-arm64.dmg'
           require_asset '*.msix'
 
+          target_short_sha="${TARGET_SHA:0:7}"
+          while IFS= read -r asset; do
+            filename="$(basename "$asset")"
+            [[ "$filename" == EasyKiConverter-${VERSION}-g${target_short_sha}-* ]] || {
+              echo "Asset version or commit mismatch: $filename"
+              exit 1
+            }
+          done < <(find release_assets -maxdepth 1 -type f ! -name '*.sha256sum' -print)
+
           while IFS= read -r checksum; do
             [[ -s "$checksum" ]] || { echo "Empty checksum file: $checksum"; exit 1; }
             (cd release_assets && sha256sum -c "$(basename "$checksum")")
+            asset_name="${checksum%.sha256sum}"
+            [[ -f "$asset_name" ]] || { echo "Checksum has no matching asset: $checksum"; exit 1; }
+            referenced_asset="$(awk '{print $2}' "$checksum" | sed 's/^\*//')"
+            [[ "$referenced_asset" == "$(basename "$asset_name")" ]] || {
+              echo "Checksum file references an unexpected asset: $checksum"
+              exit 1
+            }
           done < <(find release_assets -maxdepth 1 -type f -name '*.sha256sum' -print)
 
           checksum_count="$(find release_assets -maxdepth 1 -type f -name '*.sha256sum' | wc -l)"
@@ -211,7 +239,7 @@ jobs:
             while IFS= read -r asset; do
               filename="$(basename "$asset")"
               [[ "$filename" == *.sha256sum ]] && continue
-              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+-//; s/\.[^.]+$//')"
+              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+[._-]//; s/\.(AppImage|deb|rpm|pkg\.tar\.zst|zip|exe|msix|dmg)$//')"
               case "$filename" in
                 *win64*|*-setup.exe|*.msix) platform="Windows" ;;
                 *.AppImage|*.deb|*.rpm|*.pkg.tar.zst) platform="Linux" ;;

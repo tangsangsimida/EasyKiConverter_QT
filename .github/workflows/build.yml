@@ -39,7 +39,7 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             qt_host: linux
             qt_arch: linux_gcc_64
             qt_dir: gcc_64
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
 
@@ -91,7 +91,7 @@ jobs:
             ninja-build
 
       - name: 'Setup CCache'
-        uses: hendrikmuhs/ccache-action@v1.2.23
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
         with:
           key: ${{ runner.os }}-${{ matrix.dist.name }}-linux-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
@@ -100,7 +100,7 @@ jobs:
 
       - name: 'Install Qt 6.10.2'
         run: |
-          pip3 install --no-cache-dir --break-system-packages aqtinstall
+          pip3 install --no-cache-dir --break-system-packages aqtinstall==3.2.1
           aqt install-qt ${{ matrix.dist.qt_host }} desktop 6.10.2 ${{ matrix.dist.qt_arch }} --outputdir /opt/qt --modules qtshadertools qtimageformats
           echo "/opt/qt/6.10.2/${{ matrix.dist.qt_dir }}/bin" >> "$GITHUB_PATH"
           echo "Qt6_DIR=/opt/qt/6.10.2/${{ matrix.dist.qt_dir }}/lib/cmake/Qt6" >> "$GITHUB_ENV"
@@ -173,7 +173,7 @@ jobs:
             arch: 'x64'
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
 
@@ -182,13 +182,13 @@ jobs:
         run: echo "BUILD_START_TIME=$(Get-Date -Format o)" >> $env:GITHUB_ENV
 
       - name: 'Setup MSVC'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: ${{ matrix.arch }}
           vsversion: '2022'
 
       - name: 'Setup vcpkg'
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
@@ -205,12 +205,12 @@ jobs:
           enable-sccache: 'false'
 
       - name: 'Install Ninja'
-        run: choco install ninja -y --no-progress
+        run: choco install ninja --version=1.12.1 -y --no-progress
 
       - name: 'Install ccache'
         shell: pwsh
         run: |
-          choco install ccache -y --no-progress
+          choco install ccache --version=4.11.1 -y --no-progress
           echo "CCACHE_DIR=${{ runner.temp }}\ccache" >> $env:GITHUB_ENV
           echo "CCACHE_MAXSIZE=2G" >> $env:GITHUB_ENV
           echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $env:GITHUB_ENV
@@ -219,7 +219,7 @@ jobs:
 
       - name: 'Restore CCache'
         id: cache-ccache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ runner.temp }}\ccache
           key: win-ccache-${{ matrix.platform }}-${{ env.BUILD_TYPE }}-${{ env.QT_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -258,7 +258,7 @@ jobs:
 
       - name: 'Save CCache'
         if: always() && steps.cache-ccache.outputs.cache-primary-key != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ runner.temp }}\ccache
           key: ${{ steps.cache-ccache.outputs.cache-primary-key }}
@@ -301,7 +301,7 @@ jobs:
             os: macos-15
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
 
