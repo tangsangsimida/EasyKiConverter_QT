@@ -205,7 +205,15 @@ jobs:
           enable-sccache: 'false'
 
       - name: 'Install Ninja'
-        run: choco install ninja --version=1.12.1 -y --no-progress
+        shell: pwsh
+        run: |
+          $ninja = Get-Command ninja -ErrorAction SilentlyContinue
+          if ($ninja) {
+            Write-Host "Ninja is already available:"
+            ninja --version
+          } else {
+            choco install ninja --version=1.12.1 -y --no-progress
+          }
 
       - name: 'Install ccache'
         shell: pwsh
