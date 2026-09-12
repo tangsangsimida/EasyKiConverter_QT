@@ -678,14 +678,14 @@ class BuildManager:
             self.logger.info("")
             self.logger.info("[翻译工具]")
             # 6. lupdate
-            lupdate_path = shutil.which("lupdate")
+            lupdate_path = self._find_qt_tool("lupdate", qt_path)
             if lupdate_path:
                 self.logger.info(f"  ✓ lupdate: {lupdate_path}")
             else:
                 self.logger.warning("  ⚠ lupdate: 未找到 (翻译提取需要)")
 
             # 7. lrelease
-            lrelease_path = shutil.which("lrelease")
+            lrelease_path = self._find_qt_tool("lrelease", qt_path)
             if lrelease_path:
                 self.logger.info(f"  ✓ lrelease: {lrelease_path}")
             else:
@@ -708,11 +708,11 @@ class BuildManager:
                 self.logger.warning("  ⚠ clang-format: 未找到 (代码格式化需要)")
 
             # 9. qmlformat
-            qmlformat_path = shutil.which("qmlformat")
+            qmlformat_path = self._find_qt_tool("qmlformat", qt_path)
             if qmlformat_path:
                 try:
                     res = subprocess.run(
-                        ["qmlformat", "--version"], capture_output=True, text=True
+                        [qmlformat_path, "--version"], capture_output=True, text=True
                     )
                     version = res.stdout.splitlines()[0] if res.stdout else "已安装"
                     self.logger.info(f"  ✓ qmlformat: {version}")
@@ -731,6 +731,17 @@ class BuildManager:
         self.logger.info("环境检查通过")
         self.logger.info("=" * 60)
         return True
+
+    def _find_qt_tool(self, tool: str, qt_path: Optional[str]) -> Optional[str]:
+        """查找项目 Qt 安装中的工具，避免依赖系统 PATH。"""
+        path_tool = shutil.which(tool)
+        if path_tool:
+            return path_tool
+        if qt_path:
+            candidate = Path(qt_path) / "bin" / tool
+            if candidate.is_file() and os.access(candidate, os.X_OK):
+                return str(candidate)
+        return None
 
     def clean_build_dir(self, force: bool = False) -> bool:
         """清理构建目录，含确认提示"""

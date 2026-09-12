@@ -67,6 +67,8 @@ export CMAKE_PREFIX_PATH=/home/dennis/software/QT/6.10.2/gcc_64
 export PATH=/home/dennis/software/QT/6.10.2/gcc_64/bin:$PATH
 ```
 
+`format_code.py` 会自动从 `tools/config/build_config.json` 查找项目 Qt 的 `qmlformat`；上述 `PATH` 设置仍推荐用于直接调用 Qt 工具。
+
 验证 Qt 版本：
 
 ```bash

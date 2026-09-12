@@ -154,42 +154,18 @@ Item {
         property: "windowHeight"
         value: window.height
     }
-    // 从 FolderDialog URL 中提取本地路径（跨平台处理）
+    // 从 FolderDialog URL 中提取本地路径（由后端 QUrl 处理编码和 UNC 主机）
     function urlToLocalPath(url) {
-        if (!url)
+        if (!url || !fileUtils)
             return "";
-        var s = url.toString();
-        // file:///C:/Users/... → Windows 需要去掉第三个 /
-        // file:///home/...     → Linux 第三个 / 是路径的一部分
-        if (Qt.platform.os === "windows") {
-            s = s.replace(/^file:\/\/\//, "");
-        } else {
-            s = s.replace(/^file:\/\//, "");
-        }
-        return decodeURIComponent(s);
+        return fileUtils.urlToLocalPath(url);
     }
 
-    // 将本地路径转换为 FolderDialog 所需的 file URL。
+    // 将本地路径转换为 FolderDialog 所需的 file URL（由后端完整编码）。
     function localPathToFileUrl(path) {
-        if (!path)
+        if (!path || !fileUtils)
             return "";
-        var normalized = path.toString().replace(/\\/g, "/");
-        if (normalized.indexOf("file://") === 0)
-            return normalized;
-        if (Qt.platform.os === "windows") {
-            // UNC 路径：//server/share/path -> file://server/share/path
-            if (normalized.indexOf("//") === 0)
-                return encodeURI("file:" + normalized);
-            // 本地盘符：C:/path -> file:///C:/path
-            if (!/^[A-Za-z]:\//.test(normalized))
-                return "";
-            normalized = normalized.replace(/^\/+/, "");
-            return encodeURI("file:///" + normalized);
-        }
-        // Unix 路径：/home/user/path -> file:///home/user/path
-        if (normalized.indexOf("/") === 0)
-            return encodeURI("file://" + normalized);
-        return "";
+        return fileUtils.localPathToFileUrl(path);
     }
 
     // BOM 文件选择对话框

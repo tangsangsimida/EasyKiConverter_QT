@@ -65,6 +65,24 @@ QString FileUtils::toAbsolutePath(const QString& path) {
     return absolutePath;
 }
 
+QUrl FileUtils::localPathToFileUrl(const QString& path) const {
+    if (path.isEmpty()) {
+        return {};
+    }
+    const QUrl existingUrl(path);
+    if (existingUrl.isValid() && existingUrl.scheme().compare(QStringLiteral("file"), Qt::CaseInsensitive) == 0) {
+        return existingUrl;
+    }
+    return QUrl::fromLocalFile(path);
+}
+
+QString FileUtils::urlToLocalPath(const QUrl& url) const {
+    if (!url.isValid() || url.scheme().compare(QStringLiteral("file"), Qt::CaseInsensitive) != 0) {
+        return {};
+    }
+    return url.toLocalFile();
+}
+
 bool FileUtils::pathExists(const QString& path) {
     if (path.isEmpty()) {
         return false;

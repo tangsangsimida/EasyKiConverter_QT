@@ -20,6 +20,7 @@
 #include "ui/viewmodels/ExportTargetModel.h"
 #include "ui/viewmodels/ThemeSettingsViewModel.h"
 #include "utils/CommandLineParser.h"
+#include "utils/FileUtils.h"
 #include "utils/cli/CliConverter.h"
 #include "utils/cli/CompletionGenerator.h"
 #include "utils/logging/Log.h"
@@ -709,6 +710,7 @@ int main(int argc, char* argv[]) {
     engine->rootContext()->setContextProperty("configService", EasyKiConverter::ConfigService::instance());
     engine->rootContext()->setContextProperty("componentCacheService",
                                               EasyKiConverter::ComponentCacheService::instance());
+    engine->rootContext()->setContextProperty("fileUtils", new EasyKiConverter::FileUtils(engine));
 
     // 连接对象创建失败信号
     QObject::connect(

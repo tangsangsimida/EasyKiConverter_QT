@@ -140,16 +140,16 @@ python tools/python/manage_translations.py --release
 **快速用法:**
 ```bash
 # 格式化所有代码
-python tools/python/format_code.py --all
+.venv/bin/python tools/python/format_code.py --all
 
 # 仅格式化 C++ 文件
-python tools/python/format_code.py --cpp
+.venv/bin/python tools/python/format_code.py --cpp
 
 # 仅格式化 QML 文件
-python tools/python/format_code.py --qml
+.venv/bin/python tools/python/format_code.py --qml
 
 # 检查格式而不修改（CI 模式）
-python tools/python/format_code.py --check --all
+.venv/bin/python tools/python/format_code.py --check --all
 ```
 
 ### [count_lines.py](file:///C:/Users/48813/Desktop/workspace/github_projects/EasyKiConverter_QT/tools/python/count_lines.py)

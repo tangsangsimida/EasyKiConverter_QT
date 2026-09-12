@@ -235,7 +235,8 @@ class CodeFormatter:
 
         self._ensure_build_dirs()
         self.clang_format_version = self._get_tool_version("clang-format")
-        self.qmlformat_version = self._get_tool_version("qmlformat")
+        self.qmlformat_path = self._find_qmlformat()
+        self.qmlformat_version = self._get_tool_version(self.qmlformat_path) if self.qmlformat_path else None
         self.hash_cache = self._load_cache()
         self.cache_updated = False
 
@@ -261,6 +262,41 @@ class CodeFormatter:
 
         return logger
 
+    def _find_qmlformat(self) -> Optional[str]:
+        """查找 qmlformat，优先使用项目配置指定的 Qt。"""
+        path_tool = shutil.which("qmlformat")
+        if path_tool:
+            return path_tool
+
+        qt_roots = []
+        for variable in ("Qt6_DIR", "QTDIR", "QT_PREFIX_PATH", "Qt6_ROOT", "QT_ROOT", "CMAKE_PREFIX_PATH"):
+            value = os.environ.get(variable)
+            if value:
+                qt_roots.append(Path(value))
+
+        config_file = self.project_root / "tools" / "config" / "build_config.json"
+        try:
+            with config_file.open(encoding="utf-8") as file:
+                config = json.load(file)
+            platform_name = {
+                "linux": "qt_path_linux",
+                "darwin": "qt_path_macos",
+                "win32": "qt_path_windows",
+            }.get(sys.platform)
+            if platform_name and config.get(platform_name):
+                qt_roots.append(Path(config[platform_name]))
+        except (OSError, json.JSONDecodeError):
+            pass
+
+        for root in qt_roots:
+            candidates = [root / "bin" / "qmlformat"]
+            if root.name == "Qt6":
+                candidates.append(root.parent / "bin" / "qmlformat")
+            for candidate in candidates:
+                if candidate.is_file() and os.access(candidate, os.X_OK):
+                    return str(candidate)
+        return None
+
     def _get_tool_version(self, tool: str) -> Optional[str]:
         """获取工具版本"""
         try:
@@ -276,7 +312,7 @@ class CodeFormatter:
 
                     match = re.search(r"version\s+(\d+\.\d+\.\d+)", output)
                     return match.group(1) if match else output.split("\n")[0]
-                elif tool == "qmlformat":
+                elif Path(tool).name == "qmlformat":
                     # qmlformat 6.10.2
                     import re
 
@@ -417,7 +453,7 @@ class CodeFormatter:
 
                 try:
                     result = subprocess.run(
-                        ["qmlformat", "-i"] + config_arg + [tmp_path],
+                        [self.qmlformat_path, "-i"] + config_arg + [tmp_path],
                         capture_output=True,
                         text=True,
                         timeout=30,
@@ -434,7 +470,7 @@ class CodeFormatter:
             else:
                 original = file_path.read_text(encoding="utf-8")
                 result = subprocess.run(
-                    ["qmlformat", "-i"] + config_arg + [str(file_path)],
+                    [self.qmlformat_path, "-i"] + config_arg + [str(file_path)],
                     capture_output=True,
                     text=True,
                     timeout=30,

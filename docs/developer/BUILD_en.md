@@ -70,6 +70,8 @@ export CMAKE_PREFIX_PATH=/home/dennis/software/QT/6.10.2/gcc_64
 export PATH=/home/dennis/software/QT/6.10.2/gcc_64/bin:$PATH
 ```
 
+`format_code.py` automatically locates the project Qt `qmlformat` from `tools/config/build_config.json`; the `PATH` export is still recommended when invoking Qt tools directly.
+
 Verify the Qt version:
 
 ```bash
