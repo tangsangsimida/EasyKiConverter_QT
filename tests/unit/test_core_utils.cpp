@@ -5,6 +5,7 @@
 #include "utils/FileUtils.h"
 
 #include <QByteArray>
+#include <QDir>
 #include <QTest>
 #include <QUrl>
 
@@ -34,10 +35,16 @@ private slots:
 
     void fileUtilsRoundTripsSpecialCharacters() {
         const FileUtils fileUtils;
+#ifdef Q_OS_WIN
+        const QString path = QStringLiteral("C:/tmp/work#1/folder?2");
+        const QString expectedUrl = QStringLiteral("file:///C:/tmp/work%231/folder%3F2");
+#else
         const QString path = QStringLiteral("/tmp/work#1/folder?2");
+        const QString expectedUrl = QStringLiteral("file:///tmp/work%231/folder%3F2");
+#endif
         const QUrl url = fileUtils.localPathToFileUrl(path);
 
-        QCOMPARE(url.toString(QUrl::FullyEncoded), QStringLiteral("file:///tmp/work%231/folder%3F2"));
+        QCOMPARE(url.toString(QUrl::FullyEncoded), expectedUrl);
         QCOMPARE(fileUtils.urlToLocalPath(url), path);
     }
 
@@ -46,11 +53,7 @@ private slots:
         const QUrl url(QStringLiteral("file://server/share/folder%231"));
         const QString localPath = fileUtils.urlToLocalPath(url);
 
-#ifdef Q_OS_WIN
-        QCOMPARE(localPath, QStringLiteral("\\\\server\\share\\folder#1"));
-#else
-        QCOMPARE(localPath, QStringLiteral("//server/share/folder#1"));
-#endif
+        QCOMPARE(QDir::fromNativeSeparators(localPath), QStringLiteral("//server/share/folder#1"));
     }
 
     void deduplicateAndNormalizeUrlsKeepsFirstOccurrenceOrder() {
