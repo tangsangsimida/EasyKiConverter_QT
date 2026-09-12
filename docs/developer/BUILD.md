@@ -49,6 +49,30 @@
 
 ## 安装依赖
 
+### 项目本地开发环境（Linux）
+
+本项目不使用系统 Qt，也不向系统 Python 安装项目依赖。Python 工具统一使用仓库根目录的 `.venv`，Qt 使用独立安装的 6.10.2。
+
+```bash
+# 创建并启用项目虚拟环境
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 安装 Python 构建辅助工具
+python -m pip install aqtinstall==3.2.1
+
+# 使用项目专用 Qt（不要使用 /usr/lib 下的系统 Qt）
+export Qt6_DIR=/home/dennis/software/QT/6.10.2/gcc_64/lib/cmake/Qt6
+export CMAKE_PREFIX_PATH=/home/dennis/software/QT/6.10.2/gcc_64
+export PATH=/home/dennis/software/QT/6.10.2/gcc_64/bin:$PATH
+```
+
+验证 Qt 版本：
+
+```bash
+qmake -query QT_VERSION       # 必须为 6.10.2
+```
+
 ### Windows
 
 #### 安装 Qt
@@ -116,10 +140,6 @@ xcode-select --install
 # 更新包管理器
 sudo apt-get update
 
-# 安装 Qt 6 基础和必需模块
-# 注意：Network 模块已包含在 qt6-base-dev 中，无需单独安装 qt6-network-dev
-sudo apt-get install qt6-base-dev qt6-declarative-dev qt6-tools-dev qt6-websockets-dev
-
 # 安装 CMake
 sudo apt-get install cmake
 
@@ -129,8 +149,10 @@ sudo apt-get install build-essential g++
 # 安装 zlib
 sudo apt-get install zlib1g-dev
 
-# 安装 XKB 支持（Qt 6 GuiPrivate 模块需要）
-sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev qt6-base-private-dev
+# 安装 XKB 支持和其他 Qt 运行时依赖
+sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev
+
+# Qt 请按照上面的“项目本地开发环境”安装到独立目录，禁止使用系统 Qt
 ```
 
 **Fedora**
@@ -198,9 +220,9 @@ tools\windows\build_project.bat -v             # 详细日志模式
 
 ```bash
 # 直接调用 Python 构建脚本
-python tools/python/build_project.py -t Release --parallel
-python tools/python/build_project.py --check
-python tools/python/build_project.py -c -y
+.venv/bin/python tools/python/build_project.py -t Release --parallel
+.venv/bin/python tools/python/build_project.py --check
+.venv/bin/python tools/python/build_project.py -c -y
 ```
 
 **Python 构建脚本参数**:

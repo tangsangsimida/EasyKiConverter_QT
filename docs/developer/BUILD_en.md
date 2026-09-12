@@ -14,7 +14,7 @@ This document provides detailed instructions for building the EasyKiConverter pr
 
 #### Qt Framework
 
-- **Version**: Qt 6.8 or higher (Recommended Qt 6.10.2)
+- **Version**: Qt 6.6 or higher (Recommended Qt 6.10.2)
 - **Required Modules**:
   - Qt Quick
   - Qt Network
@@ -51,6 +51,30 @@ This document provides detailed instructions for building the EasyKiConverter pr
   ```
 
 ## Installation Instructions
+
+### Project-local development environment (Linux)
+
+This project does not use the system Qt installation and does not install project Python packages into system Python. Use the repository-local `.venv` and the standalone Qt 6.10.2 installation.
+
+```bash
+# Create and activate the project virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install Python build helpers into the project environment
+python -m pip install aqtinstall==3.2.1
+
+# Use the project-specific Qt (not /usr/lib system Qt)
+export Qt6_DIR=/home/dennis/software/QT/6.10.2/gcc_64/lib/cmake/Qt6
+export CMAKE_PREFIX_PATH=/home/dennis/software/QT/6.10.2/gcc_64
+export PATH=/home/dennis/software/QT/6.10.2/gcc_64/bin:$PATH
+```
+
+Verify the Qt version:
+
+```bash
+qmake -query QT_VERSION       # must be 6.10.2
+```
 
 ### Windows
 
@@ -107,7 +131,10 @@ xcode-select --install
 
 ```bash
 sudo apt-get update
-sudo apt-get install qt6-base-dev qt6-declarative-dev qt6-network-dev
+sudo apt-get install cmake ninja-build build-essential zlib1g-dev libxkbcommon-dev libxkbcommon-x11-dev
+
+# Install project-specific Qt 6.10.2 using the project-local Qt instructions above.
+# Do not use the system Qt under /usr/lib.
 ```
 
 #### 2. Install CMake
@@ -192,7 +219,7 @@ mkdir build
 cd build
 
 # Configure project
-cmake .. -DCMAKE_PREFIX_PATH="/opt/Qt/6.10.2/gcc_64"
+cmake .. -DCMAKE_PREFIX_PATH="/home/dennis/software/QT/6.10.2/gcc_64"
 
 # Build project (Debug version)
 cmake --build . --config Debug

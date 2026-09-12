@@ -88,6 +88,7 @@ vcpkg.json.bak
 .rcc/
 .uic/
 /build*/
+/.venv/
 
 
 
@@ -135,6 +136,7 @@ flatpak-build-local.log
 .gitignore
 flatpak-build.log
 build.log
+aqtinstall.log
 temp.md
 squashfs-root/*
 deploy/flatpak/.flatpak-builder/*
@@ -155,3 +157,4 @@ PROJECT_INSTRUCTIONS.md
 *.mp4
 *.rar
 docs/submissions/北京开元工业软件研究/05-video.rar
+.venv
