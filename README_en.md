@@ -37,7 +37,7 @@
 Please visit the [Releases](https://github.com/tangsangsimida/EasyKiConverter/releases) page to download the version for your platform:
 
 *   **Windows**: x64 and ARM64 builds are available; download the matching `.exe` installer or `.zip` portable package for your device.
-*   **Linux**: Recommended to download `.AppImage` (no installation required, just grant execute permission and run), or `.tar.gz` archive.
+*   **Linux**: For x86_64/ARM64, download the `.AppImage`; for LoongArch64, download the native `loongarch64.tar.gz` archive.
 *   **macOS**: Download `.dmg` image file.
 *   **Arch Linux**: `yay -S easykiconverter`
 

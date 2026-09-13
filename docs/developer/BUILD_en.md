@@ -112,6 +112,22 @@ Windows release builds support both architectures:
 
 The ARM64 release packages are built on the GitHub Actions `windows-11-arm` runner and include portable, installer, and MSIX packages.
 
+### LoongArch64
+
+LoongArch64 uses an independent native build workflow and does not reuse the x86_64 or ARM64 Qt binaries. GitHub Actions requires a self-hosted runner with these labels:
+
+```text
+self-hosted, linux, loongarch64
+```
+
+The runner must provide Qt 6, CMake, Ninja, and the Linux development libraries required by the project. `qmake6` or `qmake` must resolve to Qt 6. The release workflow produces:
+
+```text
+EasyKiConverter-<version>-g<commit>-loongarch64.tar.gz
+```
+
+This is a native package for LoongArch64 Linux distributions and uses the system Qt/runtime libraries. Validate startup and a basic conversion flow on the target Chinese Linux distribution before release.
+
 ### macOS
 
 #### 1. Install Qt

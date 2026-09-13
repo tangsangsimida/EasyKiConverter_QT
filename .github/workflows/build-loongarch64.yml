@@ -1,0 +1,141 @@
+name: Build LoongArch64
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to build'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Release tag to build'
+        required: true
+        type: string
+      target_sha:
+        description: 'Fixed release commit SHA'
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PRODUCT: EasyKiConverter
+
+jobs:
+  loongarch64-build:
+    name: 'Build LoongArch64'
+    runs-on: [self-hosted, linux, loongarch64]
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
+
+      - name: Record Start Time
+        run: echo "BUILD_START_TIME=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Get Version
+        id: version
+        uses: ./.github/actions/get-version
+        with:
+          tag_name: ${{ inputs.tag_name }}
+
+      - name: Export Version
+        run: |
+          echo "VERSION=${{ steps.version.outputs.VERSION }}" >> "$GITHUB_ENV"
+          echo "GIT_HASH=${{ steps.version.outputs.GIT_HASH }}" >> "$GITHUB_ENV"
+
+      - name: Verify LoongArch64 Build Environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            loongarch64|loong64) ;;
+            *) echo "This job requires a LoongArch64 runner, got $(uname -m)"; exit 1 ;;
+          esac
+
+          for command in cmake ninja; do
+            command -v "$command" >/dev/null || {
+              echo "Required command is missing: $command"
+              exit 1
+            }
+          done
+
+          qt_query_tool="$(command -v qmake6 || command -v qmake || true)"
+          if [ -z "$qt_query_tool" ]; then
+            echo "qmake6 or qmake is required from the LoongArch64 Qt installation"
+            exit 1
+          fi
+
+          qt_version="$($qt_query_tool -query QT_VERSION)"
+          qt_prefix="$($qt_query_tool -query QT_INSTALL_PREFIX)"
+          case "$qt_version" in
+            6.*) ;;
+            *) echo "Qt 6 is required, got Qt $qt_version from $qt_query_tool"; exit 1 ;;
+          esac
+
+          echo "LoongArch64 runner: $(uname -m)"
+          echo "CMake: $(cmake --version | head -n 1)"
+          echo "Ninja: $(ninja --version)"
+          echo "Qt: $qt_version ($qt_prefix)"
+          echo "QT6_PREFIX=$qt_prefix" >> "$GITHUB_ENV"
+
+      - name: Configure
+        shell: bash
+        run: |
+          set -euo pipefail
+          export QT_QML_DISABLE_AOT_COMPILE=1
+          export QML_DISABLE_DISK_CACHE=1
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_PREFIX_PATH="$QT6_PREFIX" \
+            -DENABLE_SYMBOL_FOOTPRINT_DEBUG_EXPORT=OFF \
+            -DEASYKICONVERTER_BUILD_TESTS=ON \
+            -DVERSION_FROM_CI="${VERSION}"
+
+      - name: Build
+        shell: bash
+        run: cmake --build build --config RelWithDebInfo --parallel
+
+      - name: Run Tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          export QT_QPA_PLATFORM=offscreen
+          ctest --test-dir build -C RelWithDebInfo --output-on-failure --no-tests=error
+
+      - name: Create LoongArch64 Package
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_root="$RUNNER_TEMP/${PRODUCT}-loongarch64"
+          install_root="$package_root/usr"
+          package_name="${PRODUCT}-${VERSION}-g${GIT_HASH}-loongarch64.tar.gz"
+
+          rm -rf "$package_root"
+          mkdir -p "$install_root"
+          cmake --install build --prefix "$install_root"
+          cp README.md README_en.md LICENSE "$package_root/"
+
+          test -x "$install_root/bin/easykiconverter"
+          tar --sort=name --owner=0 --group=0 --numeric-owner \
+            -czf "$package_name" -C "$package_root" .
+          sha256sum "$package_name" | tee "$package_name.sha256sum"
+
+      - name: Upload LoongArch64 Package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-loongarch64
+          path: |
+            EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-loongarch64.tar.gz
+            EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-loongarch64.tar.gz.sha256sum
+          if-no-files-found: error

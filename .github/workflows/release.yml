@@ -92,6 +92,16 @@ jobs:
       contents: read
       packages: read
 
+  package-loongarch64:
+    name: Package Linux LoongArch64
+    needs: resolve-target
+    uses: ./.github/workflows/build-loongarch64.yml
+    with:
+      tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
+    permissions:
+      contents: read
+
   package-windows:
     name: Package Windows
     needs: resolve-target
@@ -114,7 +124,7 @@ jobs:
 
   publish:
     name: Validate and publish release
-    needs: [resolve-target, package-linux, package-windows, package-macos]
+    needs: [resolve-target, package-linux, package-loongarch64, package-windows, package-macos]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -176,6 +186,7 @@ jobs:
           require_asset '*-arm64-setup.exe'
           require_asset '*.x86_64.AppImage'
           require_asset '*.aarch64.AppImage'
+          require_asset '*-loongarch64.tar.gz'
           require_asset '*_amd64.deb'
           require_asset '*_arm64.deb'
           require_asset '*_x86_64.rpm'
@@ -221,6 +232,7 @@ jobs:
           VERSION: ${{ needs.resolve-target.outputs.version }}
           TARGET_SHA: ${{ needs.resolve-target.outputs.target_sha }}
           LINUX_RESULT: ${{ needs.package-linux.result }}
+          LOONGARCH64_RESULT: ${{ needs.package-loongarch64.result }}
           WINDOWS_RESULT: ${{ needs.package-windows.result }}
           MACOS_RESULT: ${{ needs.package-macos.result }}
         shell: bash
@@ -242,10 +254,10 @@ jobs:
             while IFS= read -r asset; do
               filename="$(basename "$asset")"
               [[ "$filename" == *.sha256sum ]] && continue
-              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+[._-]//; s/\.(AppImage|deb|rpm|pkg\.tar\.zst|zip|exe|msix|dmg)$//')"
+              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+[._-]//; s/\.(AppImage|deb|rpm|pkg\.tar\.zst|tar\.gz|zip|exe|msix|dmg)$//')"
               case "$filename" in
                 *win64*|*-setup.exe|*.msix) platform="Windows" ;;
-                *.AppImage|*.deb|*.rpm|*.pkg.tar.zst) platform="Linux" ;;
+                *.AppImage|*.deb|*.rpm|*.pkg.tar.zst|*.tar.gz) platform="Linux" ;;
                 *.dmg) platform="macOS" ;;
                 *) platform="其他" ;;
               esac
@@ -284,6 +296,7 @@ jobs:
             echo
             for platform_status in \
               "Linux:${LINUX_RESULT}" \
+              "Linux LoongArch64:${LOONGARCH64_RESULT}" \
               "Windows:${WINDOWS_RESULT}" \
               "macOS:${MACOS_RESULT}"; do
               platform="${platform_status%%:*}"

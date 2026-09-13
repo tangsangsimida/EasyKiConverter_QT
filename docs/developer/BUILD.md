@@ -116,6 +116,22 @@ Windows 发布构建同时支持以下架构：
 
 ARM64 发布包由 GitHub Actions 的 `windows-11-arm` runner 构建，生成 ARM64 便携版、安装程序和 MSIX 包。
 
+### LoongArch64（龙架构）
+
+LoongArch64 使用独立的原生构建流程，不复用 x86_64 或 ARM64 的 Qt 二进制包。GitHub Actions 需要配置带有以下标签的自托管 runner：
+
+```text
+self-hosted, linux, loongarch64
+```
+
+Runner 必须预装 Qt 6、CMake、Ninja 以及项目运行所需的 Linux 开发库，并确保 `qmake6`/`qmake` 能查询到 Qt 6。发布流程会生成：
+
+```text
+EasyKiConverter-<version>-g<commit>-loongarch64.tar.gz
+```
+
+该归档是面向 LoongArch64 国产 Linux 系统的原生包，使用系统 Qt/运行库；发布前必须在目标国产操作系统上验证启动和基本转换流程。
+
 ### macOS
 
 #### 使用 Homebrew 安装
