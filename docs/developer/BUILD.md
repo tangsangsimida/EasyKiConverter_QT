@@ -2,6 +2,8 @@
 
 本文档介绍如何在本地编译 EasyKiConverter 项目。
 
+发布说明样例请参阅 [RELEASE_NOTES_TEMPLATE.md](RELEASE_NOTES_TEMPLATE.md)。
+
 ## 环境要求
 
 ### 操作系统
