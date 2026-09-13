@@ -50,10 +50,19 @@ jobs:
             echo "Tag not found: $tag_name"
             exit 1
           fi
-          if [[ "$(git cat-file -t "refs/tags/$tag_name")" != "tag" ]]; then
-            echo "Release tag must be an annotated tag: $tag_name"
-            exit 1
-          fi
+          tag_type="$(git cat-file -t "refs/tags/$tag_name")"
+          case "$tag_type" in
+            tag)
+              echo "Release tag is annotated: $tag_name"
+              ;;
+            commit)
+              echo "::warning::Release tag is lightweight rather than annotated: $tag_name"
+              ;;
+            *)
+              echo "Invalid release tag object type '$tag_type': $tag_name"
+              exit 1
+              ;;
+          esac
 
           target_sha="$(git rev-parse "refs/tags/$tag_name^{commit}")"
           version="${tag_name#[vV]}"
