@@ -37,7 +37,7 @@
 ### 安装
 请前往 [Releases](https://github.com/tangsangsimida/EasyKiConverter/releases) 页面下载适用于您平台的版本：
 
-*   **Windows**: 推荐下载 `.exe` 安装程序（包含完整运行时），或下载 `.zip` 便携版。
+*   **Windows**: 提供 x64 和 ARM64 版本；请按设备架构下载对应的 `.exe` 安装程序或 `.zip` 便携版。
 *   **Linux**: 推荐下载 `.AppImage`（无需安装，赋予执行权限即可运行），或 `.tar.gz` 归档。
 *   **macOS**: 下载 `.dmg` 镜像文件。
 *   **Arch Linux**: `yay -S easykiconverter`

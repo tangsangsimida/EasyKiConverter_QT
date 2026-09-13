@@ -105,6 +105,13 @@ qmake -query QT_VERSION       # must be 6.10.2
 2. Extract to a directory (e.g., C:\mingw64)
 3. Add bin directory to system PATH
 
+Windows release builds support both architectures:
+
+- x64: Qt `win64_msvc2022_64`, vcpkg triplet `x64-windows`
+- ARM64: Windows 11 on Arm, Qt `win64_msvc2022_arm64`, vcpkg triplet `arm64-windows`
+
+The ARM64 release packages are built on the GitHub Actions `windows-11-arm` runner and include portable, installer, and MSIX packages.
+
 ### macOS
 
 #### 1. Install Qt

@@ -32,22 +32,36 @@ env:
 
 jobs:
   windows-pack:
-    name: 'VS 2022 ${{ matrix.config.arch }}-${{ matrix.type }}'
-    runs-on: windows-2022
+    name: 'Windows ${{ matrix.config.package_arch }}-${{ matrix.type }}'
+    runs-on: ${{ matrix.config.runner }}
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.config.vcpkg_triplet }}
+      VCPKG_TARGET_TRIPLET: ${{ matrix.config.vcpkg_triplet }}
     strategy:
       fail-fast: false
       matrix:
         qt_target: [desktop]
         config:
-          - {
-              arch: 'x64',
-              generator: 'Ninja',
-              gen_arch: '',
-              vcpkg_triplet: 'x64-windows',
-              qt_arch: 'win64_msvc2022_64',
-              qt_arch_install: 'msvc2022_64',
-              pak_arch: 'win64'
-            }
+          - runner: 'windows-2022'
+            arch: 'x64'
+            generator: 'Ninja'
+            gen_arch: ''
+            vcpkg_triplet: 'x64-windows'
+            qt_host: 'windows'
+            qt_arch: 'win64_msvc2022_64'
+            setup_cmake: true
+            package_arch: 'x64'
+            pak_arch: 'win64'
+          - runner: 'windows-11-arm'
+            arch: 'arm64'
+            generator: 'Ninja'
+            gen_arch: ''
+            vcpkg_triplet: 'arm64-windows'
+            qt_host: 'windows_arm64'
+            qt_arch: 'win64_msvc2022_arm64'
+            setup_cmake: false
+            package_arch: 'arm64'
+            pak_arch: 'win64-arm64'
         type: [portable, installer]
     steps:
       - name: 'Checkout Source code'
@@ -84,7 +98,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: ${{ matrix.config.arch }}
-          vsversion: '2022'
 
       - name: 'Setup vcpkg'
         uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
@@ -97,9 +110,10 @@ jobs:
         with:
           cmake-version: ${{ env.CMAKE_VERSION }}
           qt-version: ${{ env.QT_VERSION }}
-          qt-host: 'windows'
+          qt-host: ${{ matrix.config.qt_host }}
           qt-target: ${{ matrix.qt_target }}
           qt-arch: ${{ matrix.config.qt_arch }}
+          setup-cmake: ${{ matrix.config.setup_cmake }}
           enable-ccache: 'false'
           enable-sccache: 'false'
 
@@ -310,7 +324,7 @@ jobs:
 
           # Rename output to standard format
           $setupExe = Get-ChildItem -Path $outputDir -Filter "EasyKiConverter_*_Setup.exe" | Select-Object -First 1
-          $newContentName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-x64-setup.exe"
+          $newContentName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}-setup.exe"
           Rename-Item -Path $setupExe.FullName -NewName $newContentName
 
           Write-Host "Installer created at: $outputDir\$newContentName"
@@ -330,7 +344,7 @@ jobs:
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-x64-setup.exe"
+          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}-setup.exe"
           $filePath = "$env:GITHUB_WORKSPACE\build\Package\installer\$fileName"
           $hash = Get-FileHash -Path $filePath -Algorithm SHA256
           $hashString = $hash.Hash.ToLower() + " *" + $fileName
@@ -356,8 +370,15 @@ jobs:
           if (Test-Path $manifestPath) {
             [xml]$xml = Get-Content $manifestPath
             $xml.Package.Identity.Version = $msixVersion
+            $expectedArchitecture = "${{ matrix.config.package_arch }}"
+            if ($expectedArchitecture -notin @('x64', 'arm64')) {
+              Write-Error "Unsupported MSIX architecture: $expectedArchitecture"
+              exit 1
+            }
+            $xml.Package.Identity.ProcessorArchitecture = $expectedArchitecture
             $xml.Save($manifestPath)
             Write-Host "Manifest version updated to: $msixVersion"
+            Write-Host "Manifest architecture updated to: $expectedArchitecture"
           } else {
             Write-Error "AppxManifest.xml not found at $manifestPath"
             exit 1
@@ -391,7 +412,7 @@ jobs:
                 # 注意：AppxManifest.xml 必须在 staging 目录中，文件名必须为 AppxManifest.xml
                 $stagingDir = "$env:GITHUB_WORKSPACE\build\Staging"
                 $outputDir = "$env:GITHUB_WORKSPACE\build\Package\msix"
-                $msixPath = "$outputDir\${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}.msix"
+                $msixPath = "$outputDir\${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}.msix"
       
                 mkdir -p $outputDir
       
@@ -399,6 +420,21 @@ jobs:
                 $manifestInStaging = "$stagingDir\AppxManifest.xml"
                 if (-not (Test-Path $manifestInStaging)) {
                   Write-Error "AppxManifest.xml not found in staging directory at $manifestInStaging"
+                  exit 1
+                }
+
+                [xml]$stagingManifest = Get-Content $manifestInStaging
+                $expectedArchitecture = "${{ matrix.config.package_arch }}"
+                $actualArchitecture = $stagingManifest.Package.Identity.ProcessorArchitecture
+                if ($actualArchitecture -ne $expectedArchitecture) {
+                  Write-Error "MSIX architecture mismatch: expected '$expectedArchitecture', got '$actualArchitecture'"
+                  exit 1
+                }
+                Write-Host "MSIX manifest architecture verified: $actualArchitecture"
+
+                $packagedExecutable = Join-Path $stagingDir 'easykiconverter.exe'
+                if (-not (Test-Path $packagedExecutable)) {
+                  Write-Error "MSIX executable not found in staging directory: $packagedExecutable"
                   exit 1
                 }
       
@@ -422,7 +458,7 @@ jobs:
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}.msix"
+          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}.msix"
           $filePath = "$env:GITHUB_WORKSPACE\build\Package\msix\$fileName"
           $hash = Get-FileHash -Path $filePath -Algorithm SHA256
           $hashString = $hash.Hash.ToLower() + " *" + $fileName
@@ -433,7 +469,7 @@ jobs:
         if: matrix.type == 'portable'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-portable
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-portable
           path: |
             ${{ github.workspace }}/build/Package/portable/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.pak_arch }}.zip
             ${{ github.workspace }}/build/Package/portable/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.pak_arch }}.zip.sha256sum
@@ -443,19 +479,19 @@ jobs:
         if: matrix.type == 'installer'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-setup
           path: |
-            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup.exe
-            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup.exe.sha256sum
+            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-setup.exe
+            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-setup.exe.sha256sum
           overwrite: true
 
       - name: 'Artifact Upload (MSIX)'
         if: matrix.type == 'installer'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-msix
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-msix
           path: |
-            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}.msix
-            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}.msix.sha256sum
+            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}.msix
+            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}.msix.sha256sum
           overwrite: true
           if-no-files-found: error

@@ -109,6 +109,13 @@ qmake -query QT_VERSION       # 必须为 6.10.2
 1. 安装 Visual Studio 2019 或更高版本
 2. 在安装时选择 "使用 C++ 的桌面开发" 工作负载
 
+Windows 发布构建同时支持以下架构：
+
+- x64：Qt `win64_msvc2022_64`，vcpkg triplet `x64-windows`
+- ARM64：Windows 11 on ARM、Qt `win64_msvc2022_arm64`，vcpkg triplet `arm64-windows`
+
+ARM64 发布包由 GitHub Actions 的 `windows-11-arm` runner 构建，生成 ARM64 便携版、安装程序和 MSIX 包。
+
 ### macOS
 
 #### 使用 Homebrew 安装

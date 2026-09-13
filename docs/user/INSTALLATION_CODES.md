@@ -120,14 +120,14 @@ EasyKiConverter 使用 **Inno Setup** 创建的 Windows 安装程序（.exe 格�
 
 - **名称**: EasyKiConverter Setup
 - **版本**: 3.1.4
-- **架构**: x64
+- **架构**: x64 或 ARM64（根据安装包文件名选择）
 - **类型**: Inno Setup (.exe)
 - **大小**: 约 100-150 MB
 - **签名**: 包含数字签名
 
 ## 系统要求
 
-- **操作系统**: Windows 10/11 (64-bit)
+- **操作系统**: Windows 10/11 (64-bit)，ARM64 安装包需要 Windows on Arm
 - **权限**: 需要管理员权限
 - **磁盘空间**: 至少 200MB
 - **网络**: 不需要（除非从网络下载）
