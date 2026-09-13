@@ -58,6 +58,9 @@ fix_permissions() {
     find "$appdir/usr/bin" -type f -exec chmod 755 {} \; 2>/dev/null || true
     find "$appdir/usr/libexec" -type f -exec chmod 755 {} \; 2>/dev/null || true
     chmod 755 "$appdir/AppRun" 2>/dev/null || true
+    # linuxdeploy 重新包装 AppRun 时可能生成 AppRun.wrapped，且不会保留执行权限。
+    # 如果该文件不可执行，AppImage 解包运行会以 126 退出。
+    chmod 755 "$appdir/AppRun.wrapped" 2>/dev/null || true
 }
 
 render_nfpm_config() {
@@ -92,15 +95,24 @@ package_appimage() {
 
     fix_permissions "$appdir"
 
+    # 先只准备 AppDir，避免 linuxdeploy 内置 output 插件在权限修复前生成 AppImage。
     /opt/linuxdeploy/AppRun --appdir "$appdir" \
         --executable "$appdir/usr/bin/easykiconverter" \
-        --desktop-file "$appdir/io.github.tangsangsimida.easykiconverter.desktop" \
-        --output appimage
+        --desktop-file "$appdir/io.github.tangsangsimida.easykiconverter.desktop"
 
     sed -i "s|^Exec=.*easykiconverter|Exec=AppRun|" "$appdir/io.github.tangsangsimida.easykiconverter.desktop"
     sed -i "s|^Exec=.*easykiconverter|Exec=AppRun|" "$appdir/usr/share/applications/io.github.tangsangsimida.easykiconverter.desktop"
 
-    /opt/linuxdeploy/AppRun --appdir "$appdir" --output appimage
+    # linuxdeploy 可能在准备阶段新建或覆盖包装启动脚本，必须在 appimagetool
+    # 读取 AppDir 前再次修复两个启动文件的执行权限。
+    fix_permissions "$appdir"
+
+    local appimagetool="/opt/linuxdeploy/plugins/linuxdeploy-plugin-appimage/usr/bin/appimagetool"
+    if [ ! -x "$appimagetool" ]; then
+        echo "ERROR: appimagetool not found or not executable: $appimagetool" >&2
+        exit 1
+    fi
+    ARCH="$appimage_arch" "$appimagetool" "$appdir"
 
     chmod +x "${product}"-*.AppImage
     mv "${product}"-*.AppImage "$output_name"
