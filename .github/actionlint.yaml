@@ -1,0 +1,4 @@
+# Custom labels used by the native LoongArch64 self-hosted runner.
+self-hosted-runner:
+  labels:
+    - loongarch64
