@@ -176,6 +176,7 @@ jobs:
             qt_host: 'windows'
             qt_arch: 'win64_msvc2022_64'
             vcpkg_triplet: 'x64-windows'
+            setup_cmake: true
             enable_ccache: true
           - name: 'Windows ARM64'
             runner: 'windows-11-arm'
@@ -185,6 +186,7 @@ jobs:
             qt_host: 'windows_arm64'
             qt_arch: 'win64_msvc2022_arm64'
             vcpkg_triplet: 'arm64-windows'
+            setup_cmake: false
             enable_ccache: false
     steps:
       - name: 'Checkout Source code'
@@ -215,6 +217,7 @@ jobs:
           qt-host: ${{ matrix.qt_host }}
           qt-target: 'desktop'
           qt-arch: ${{ matrix.qt_arch }}
+          setup-cmake: ${{ matrix.setup_cmake }}
           enable-ccache: 'false'
           enable-sccache: 'false'
 

@@ -49,6 +49,7 @@ jobs:
             vcpkg_triplet: 'x64-windows'
             qt_host: 'windows'
             qt_arch: 'win64_msvc2022_64'
+            setup_cmake: true
             package_arch: 'x64'
             pak_arch: 'win64'
           - runner: 'windows-11-arm'
@@ -58,6 +59,7 @@ jobs:
             vcpkg_triplet: 'arm64-windows'
             qt_host: 'windows_arm64'
             qt_arch: 'win64_msvc2022_arm64'
+            setup_cmake: false
             package_arch: 'arm64'
             pak_arch: 'win64-arm64'
         type: [portable, installer]
@@ -111,6 +113,7 @@ jobs:
           qt-host: ${{ matrix.config.qt_host }}
           qt-target: ${{ matrix.qt_target }}
           qt-arch: ${{ matrix.config.qt_arch }}
+          setup-cmake: ${{ matrix.config.setup_cmake }}
           enable-ccache: 'false'
           enable-sccache: 'false'
 

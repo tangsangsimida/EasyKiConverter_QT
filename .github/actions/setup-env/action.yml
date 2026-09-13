@@ -6,6 +6,10 @@ inputs:
     description: 'CMake version to install'
     required: false
     default: '3.22'
+  setup-cmake:
+    description: 'Whether to install the pinned CMake version'
+    required: false
+    default: 'true'
   qt-version:
     description: 'Qt version to install'
     required: false
@@ -74,6 +78,7 @@ runs:
           libglib2.0-0
 
     - name: 'Setup CMake'
+      if: inputs.setup-cmake == 'true'
       uses: jwlawson/actions-setup-cmake@0d6a7d60b009d01c9e7523be22153ff8f19460d3 # v2
       with:
         cmake-version: ${{ inputs.cmake-version }}
