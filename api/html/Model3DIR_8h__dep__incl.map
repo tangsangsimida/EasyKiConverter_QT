@@ -1,0 +1,71 @@
+<map id="core/ir/Model3DIR.h" name="core/ir/Model3DIR.h">
+<area shape="rect" id="Node000001" title="通用 3D 模型中间表示" alt="" coords="1397,5,1548,31"/>
+<area shape="rect" id="Node000002" href="$IModel3DExporter_8h.html" title=" " alt="" coords="778,159,1029,185"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1417,37,947,162,946,157,1416,32"/>
+<area shape="rect" id="Node000007" href="$Exporter3DModel_8h.html" title=" " alt="" coords="573,247,791,273"/>
+<area shape="poly" id="edge43_Node000001_Node000007" title=" " alt="" coords="1384,31,1232,49,1052,76,883,111,816,132,767,154,741,176,718,202,690,248,685,246,714,198,737,172,765,150,814,127,882,106,1051,71,1231,44,1383,26"/>
+<area shape="rect" id="Node000013" href="$ComponentIR_8h.html" title="顶层组件聚合结构体" alt="" coords="1787,159,1953,185"/>
+<area shape="poly" id="edge15_Node000001_Node000013" title=" " alt="" coords="1529,32,1667,76,1769,119,1848,157,1846,162,1767,124,1665,81,1527,37"/>
+<area shape="rect" id="Node000015" href="$FootprintIR_8h.html" title="PCB 封装的通用中间表示" alt="" coords="1503,79,1653,104"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="1503,36,1562,76,1559,81,1500,41"/>
+<area shape="rect" id="Node000023" href="$FootprintGraphicsGenerator_8h.html" title=" " alt="" coords="1053,152,1261,192"/>
+<area shape="poly" id="edge44_Node000001_Node000023" title=" " alt="" coords="1438,39,1197,154,1195,149,1436,34"/>
+<area shape="rect" id="Node000025" href="$Model3DDataConverter_8h.html" title="Model3DData &#45;&gt; Model3DIR 转换桥接" alt="" coords="1987,159,2217,185"/>
+<area shape="poly" id="edge38_Node000001_Node000025" title=" " alt="" coords="1534,31,2055,157,2054,162,1532,36"/>
+<area shape="rect" id="Node000003" href="$ExporterFactory_8h.html" title=" " alt="" coords="1295,247,1461,273"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="982,184,1278,237,1318,245,1317,250,1278,243,981,190"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="862,192,713,250,711,245,860,187"/>
+<area shape="rect" id="Node000004" href="$ExporterFactory_8cpp.html" title=" " alt="" coords="1066,335,1247,361"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1336,280,1187,338,1185,333,1334,275"/>
+<area shape="rect" id="Node000005" href="$FootprintExportStage_8cpp.html" title=" " alt="" coords="1765,328,1949,368"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="1456,272,1753,325,1765,327,1764,333,1752,331,1455,278"/>
+<area shape="rect" id="Node000006" href="$SymbolExportStage_8cpp.html" title=" " alt="" coords="1272,328,1489,368"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="1381,286,1383,327,1377,328,1376,286"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="759,273,1094,333,1093,338,758,278"/>
+<area shape="poly" id="edge9_Node000007_Node000005" title=" " alt="" coords="762,272,804,277,948,290,1070,296,1278,299,1486,304,1609,311,1753,325,1765,327,1764,332,1752,331,1608,317,1486,309,1278,305,1070,301,947,295,803,283,761,277"/>
+<area shape="rect" id="Node000008" href="$Exporter3DModel_8cpp.html" title=" " alt="" coords="5,335,239,361"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="594,277,197,338,196,333,593,272"/>
+<area shape="rect" id="Node000009" href="$Model3DExportStage_8cpp.html" title=" " alt="" coords="263,328,490,368"/>
+<area shape="poly" id="edge10_Node000007_Node000009" title=" " alt="" coords="628,279,445,330,443,325,627,274"/>
+<area shape="rect" id="Node000010" href="$Model3DExportWorker_8cpp.html" title=" " alt="" coords="1514,328,1741,368"/>
+<area shape="poly" id="edge11_Node000007_Node000010" title=" " alt="" coords="763,272,804,277,1000,295,1153,302,1306,308,1502,325,1514,327,1514,332,1502,331,1306,314,1153,307,999,300,803,283,762,277"/>
+<area shape="rect" id="Node000011" href="$WriteWorker_8cpp.html" title=" " alt="" coords="937,416,1120,441"/>
+<area shape="poly" id="edge12_Node000007_Node000011" title=" " alt="" coords="636,280,598,297,565,318,554,330,548,342,547,354,555,366,572,376,605,385,705,400,937,420,937,425,705,405,604,390,570,381,551,370,542,355,542,340,549,327,562,314,596,292,634,275"/>
+<area shape="rect" id="Node000012" href="$WriteWorker_8h.html" title=" " alt="" coords="565,335,733,361"/>
+<area shape="poly" id="edge13_Node000007_Node000012" title=" " alt="" coords="675,287,656,336,651,334,670,285"/>
+<area shape="poly" id="edge14_Node000012_Node000011" title=" " alt="" coords="718,361,974,413,973,419,717,366"/>
+<area shape="rect" id="Node000014" href="$ComponentDataConverter_8h.html" title="ComponentData &#45;&gt; ComponentIR 转换桥接" alt="" coords="2246,335,2494,361"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="1947,184,2231,238,2357,333,2353,337,2229,242,1946,190"/>
+<area shape="poly" id="edge29_Node000015_Node000013" title=" " alt="" coords="1634,105,1828,157,1827,162,1633,110"/>
+<area shape="rect" id="Node000016" href="$ExporterAltiumFootprint_8h.html" title=" " alt="" coords="1543,240,1741,280"/>
+<area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="1626,108,1653,125,1675,151,1681,174,1678,199,1669,222,1658,241,1653,239,1664,220,1673,198,1676,175,1670,153,1650,129,1623,112"/>
+<area shape="rect" id="Node000018" href="$IFootprintExporter_8h.html" title=" " alt="" coords="1285,152,1471,192"/>
+<area shape="poly" id="edge21_Node000015_Node000018" title=" " alt="" coords="1537,111,1427,154,1425,149,1535,106"/>
+<area shape="rect" id="Node000021" href="$FootprintDataConverter_8h.html" title="FootprintData &#45;&gt; FootprintComponentIR 转换桥接" alt="" coords="1987,247,2217,273"/>
+<area shape="poly" id="edge30_Node000015_Node000021" title=" " alt="" coords="1613,108,1776,190,1837,208,1900,223,2015,245,2014,250,1899,229,1836,213,1774,194,1611,113"/>
+<area shape="rect" id="Node000022" href="$FootprintIR_8cpp.html" title="封装 IR 辅助函数实现" alt="" coords="1495,159,1661,185"/>
+<area shape="poly" id="edge34_Node000015_Node000022" title=" " alt="" coords="1581,118,1581,159,1575,159,1575,118"/>
+<area shape="poly" id="edge35_Node000015_Node000023" title=" " alt="" coords="1504,109,1258,155,1257,149,1503,104"/>
+<area shape="poly" id="edge19_Node000016_Node000004" title=" " alt="" coords="1529,284,1261,331,1220,338,1219,333,1260,325,1529,278"/>
+<area shape="rect" id="Node000017" href="$ExporterAltiumFootprint_8cpp.html" title=" " alt="" coords="1973,328,2172,368"/>
+<area shape="poly" id="edge20_Node000016_Node000017" title=" " alt="" coords="1750,280,1979,325,1978,331,1749,285"/>
+<area shape="poly" id="edge22_Node000018_Node000003" title=" " alt="" coords="1381,206,1381,247,1375,247,1375,206"/>
+<area shape="poly" id="edge23_Node000018_Node000016" title=" " alt="" coords="1450,194,1585,237,1583,243,1448,199"/>
+<area shape="rect" id="Node000019" href="$ExporterFootprint_8h.html" title=" " alt="" coords="1047,247,1266,273"/>
+<area shape="poly" id="edge24_Node000018_Node000019" title=" " alt="" coords="1318,199,1187,250,1185,245,1316,194"/>
+<area shape="poly" id="edge25_Node000019_Node000004" title=" " alt="" coords="1159,287,1159,335,1154,335,1154,287"/>
+<area shape="poly" id="edge27_Node000019_Node000011" title=" " alt="" coords="1117,281,1084,302,1056,330,1044,351,1037,375,1032,416,1026,415,1032,374,1040,349,1052,326,1081,297,1114,277"/>
+<area shape="poly" id="edge28_Node000019_Node000012" title=" " alt="" coords="1072,277,745,331,706,338,705,333,744,325,1071,272"/>
+<area shape="rect" id="Node000020" href="$ExporterFootprint_8cpp.html" title=" " alt="" coords="757,335,991,361"/>
+<area shape="poly" id="edge26_Node000019_Node000020" title=" " alt="" coords="1106,279,913,338,911,333,1105,274"/>
+<area shape="poly" id="edge32_Node000021_Node000005" title=" " alt="" coords="2057,280,1912,330,1910,325,2055,275"/>
+<area shape="poly" id="edge33_Node000021_Node000011" title=" " alt="" coords="2136,278,2162,297,2184,320,2196,345,2194,358,2186,370,2170,377,2140,384,2041,395,1739,412,1394,423,1120,429,1120,423,1394,418,1739,407,2040,390,2139,379,2169,372,2183,366,2189,356,2190,346,2180,323,2158,301,2132,282"/>
+<area shape="poly" id="edge31_Node000021_Node000014" title=" " alt="" coords="2152,274,2335,333,2333,338,2150,279"/>
+<area shape="poly" id="edge36_Node000023_Node000019" title=" " alt="" coords="1159,206,1159,247,1154,247,1154,206"/>
+<area shape="rect" id="Node000024" href="$FootprintGraphicsGenerator_8cpp.html" title=" " alt="" coords="815,240,1023,280"/>
+<area shape="poly" id="edge37_Node000023_Node000024" title=" " alt="" coords="1093,199,972,242,970,237,1091,194"/>
+<area shape="poly" id="edge41_Node000025_Node000010" title=" " alt="" coords="2059,192,1680,330,1678,325,2057,187"/>
+<area shape="poly" id="edge42_Node000025_Node000011" title=" " alt="" coords="2206,184,2331,208,2394,225,2450,245,2495,269,2512,283,2524,298,2530,315,2530,332,2523,351,2508,370,2487,379,2446,388,2314,401,2130,411,1913,419,1463,427,1120,430,1120,424,1463,422,1913,413,2129,406,2313,396,2445,382,2485,374,2504,366,2518,348,2525,331,2525,316,2520,301,2508,287,2492,274,2448,250,2392,230,2329,213,2205,189"/>
+<area shape="poly" id="edge39_Node000025_Node000014" title=" " alt="" coords="2169,186,2227,206,2285,238,2312,261,2335,288,2366,334,2361,336,2330,291,2308,265,2282,242,2225,211,2167,191"/>
+<area shape="poly" id="edge40_Node000025_Node000021" title=" " alt="" coords="2105,199,2105,247,2099,247,2099,199"/>
+</map>

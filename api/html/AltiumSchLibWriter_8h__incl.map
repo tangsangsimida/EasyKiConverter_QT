@@ -1,0 +1,38 @@
+<map id="core/altium/writers/AltiumSchLibWriter.h" name="core/altium/writers/AltiumSchLibWriter.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="486,5,649,45"/>
+<area shape="rect" id="Node000002" href="$OLECompoundWriter_8h.html" title=" " alt="" coords="87,93,327,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="486,47,273,93,272,88,485,42"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="439,240,509,265"/>
+<area shape="poly" id="edge20_Node000001_Node000006" title=" " alt="" coords="486,34,381,41,262,54,152,72,109,83,77,96,53,110,36,124,24,142,13,168,8,180,12,190,32,201,71,210,186,227,426,246,425,251,185,232,70,216,30,206,8,194,3,180,8,166,19,140,32,121,50,106,74,91,107,78,151,66,261,48,380,36,485,28"/>
+<area shape="rect" id="Node000008" href="$AltiumSchComponent_8h.html" title=" " alt="" coords="571,93,798,119"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="597,43,658,84,655,88,594,48"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="907,167,961,192"/>
+<area shape="poly" id="edge19_Node000001_Node000011" title=" " alt="" coords="650,39,729,60,811,91,866,123,912,156,908,160,864,127,809,96,728,65,648,45"/>
+<area shape="rect" id="Node000013" href="$AltiumBinaryWriter_8h.html" title=" " alt="" coords="356,93,547,119"/>
+<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="541,48,481,88,479,83,538,43"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="873,93,966,119"/>
+<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="650,42,859,89,858,94,648,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="241,167,339,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="222,117,268,155,264,160,219,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="23,167,88,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="184,121,94,163,91,158,182,116"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="113,167,166,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="198,121,162,158,158,155,194,117"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="210,119,214,154,220,174,232,190,264,208,315,223,426,243,425,248,314,228,262,213,228,194,216,176,208,156,204,119"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="363,167,436,192"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="239,116,356,159,354,164,237,121"/>
+<area shape="poly" id="edge13_Node000008_Node000006" title=" " alt="" coords="674,121,636,155,586,194,513,236,510,232,583,190,633,151,671,117"/>
+<area shape="rect" id="Node000009" href="$AltiumCommon_8h.html" title=" " alt="" coords="746,167,882,192"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="707,116,782,157,779,162,704,121"/>
+<area shape="poly" id="edge11_Node000008_Node000011" title=" " alt="" coords="726,116,894,164,893,169,724,121"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="648,167,721,192"/>
+<area shape="poly" id="edge12_Node000008_Node000012" title=" " alt="" coords="687,119,687,153,682,153,682,119"/>
+<area shape="poly" id="edge9_Node000009_Node000006" title=" " alt="" coords="760,195,524,244,523,239,759,189"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="781,240,847,265"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="817,192,817,226,811,226,811,192"/>
+<area shape="poly" id="edge15_Node000013_Node000003" title=" " alt="" coords="427,121,330,163,328,159,424,116"/>
+<area shape="poly" id="edge17_Node000013_Node000006" title=" " alt="" coords="456,119,473,226,467,227,451,120"/>
+<area shape="poly" id="edge18_Node000013_Node000007" title=" " alt="" coords="445,121,418,157,414,154,441,117"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="512,167,572,192"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="468,117,518,156,515,160,464,121"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="EasyKiConverter::ExporterAltiumFootprint" name="EasyKiConverter::ExporterAltiumFootprint">
+<area shape="rect" id="Node000001" title="Altium 封装导出器" alt="" coords="109,388,315,748"/>
+<area shape="rect" id="Node000002" href="$classEasyKiConverter_1_1IFootprintExporter.html" title="封装导出器通用接口" alt="" coords="5,85,197,245"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,258,165,387,160,388,124,260"/>
+<area shape="rect" id="Node000003" href="$classEasyKiConverter_1_1AltiumPcbLibWriter.html" title="Altium PcbLib 文件写入器" alt="" coords="222,5,426,325"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="282,327,269,373,264,371,277,325"/>
+</map>

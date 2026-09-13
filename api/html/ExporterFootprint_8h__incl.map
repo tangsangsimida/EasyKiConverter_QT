@@ -1,0 +1,40 @@
+<map id="core/kicad/ExporterFootprint.h" name="core/kicad/ExporterFootprint.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="303,5,521,31"/>
+<area shape="rect" id="Node000002" href="$FootprintGraphicsGenerator_8h.html" title=" " alt="" coords="81,86,295,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="380,33,234,84,232,79,378,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="187,313,258,339"/>
+<area shape="poly" id="edge22_Node000001_Node000006" title=" " alt="" coords="303,28,234,35,166,46,108,61,86,70,71,81,33,124,20,146,11,169,8,192,11,215,19,239,34,264,55,279,91,293,174,314,173,319,89,298,53,284,30,267,14,241,5,216,3,192,6,168,15,144,28,121,67,77,84,65,107,56,165,40,234,30,302,23"/>
+<area shape="rect" id="Node000013" href="$IFootprintExporter_8h.html" title=" " alt="" coords="319,79,505,119"/>
+<area shape="poly" id="edge17_Node000001_Node000013" title=" " alt="" coords="415,31,415,65,409,65,409,31"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="529,86,631,111"/>
+<area shape="poly" id="edge21_Node000001_Node000014" title=" " alt="" coords="437,28,544,78,542,83,435,33"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="655,86,761,111"/>
+<area shape="poly" id="edge23_Node000001_Node000015" title=" " alt="" coords="458,28,643,76,656,80,655,85,642,81,457,33"/>
+<area shape="rect" id="Node000003" href="$FootprintIR_8h.html" title="PCB 封装的通用中间表示" alt="" coords="358,167,509,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="224,109,386,160,384,165,223,114"/>
+<area shape="poly" id="edge16_Node000002_Node000006" title=" " alt="" coords="192,111,221,299,216,300,187,112"/>
+<area shape="rect" id="Node000007" href="$Model3DIR_8h.html" title="通用 3D 模型中间表示" alt="" coords="45,240,150,265"/>
+<area shape="poly" id="edge15_Node000002_Node000007" title=" " alt="" coords="183,113,113,230,109,227,179,110"/>
+<area shape="rect" id="Node000004" href="$IRTypes_8h.html" title="EDA 无关的通用枚举和类型定义" alt="" coords="609,240,692,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="469,189,603,233,601,238,467,195"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="656,313,723,339"/>
+<area shape="poly" id="edge9_Node000003_Node000005" title=" " alt="" coords="509,184,566,191,625,202,674,218,693,227,706,238,713,253,714,270,705,302,700,300,709,270,708,255,702,242,690,232,672,223,623,208,566,197,508,189"/>
+<area shape="poly" id="edge14_Node000003_Node000006" title=" " alt="" coords="427,194,398,229,356,267,314,292,271,311,269,306,311,288,353,263,394,226,423,191"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="380,195,164,240,163,235,379,189"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="767,240,822,265"/>
+<area shape="poly" id="edge10_Node000003_Node000009" title=" " alt="" coords="500,189,748,237,754,239,753,244,747,243,499,195"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="418,240,491,265"/>
+<area shape="poly" id="edge11_Node000003_Node000010" title=" " alt="" coords="439,192,450,226,445,228,434,193"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="516,240,585,265"/>
+<area shape="poly" id="edge12_Node000003_Node000011" title=" " alt="" coords="453,190,521,230,518,235,451,194"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="276,240,343,265"/>
+<area shape="poly" id="edge13_Node000003_Node000012" title=" " alt="" coords="415,194,343,235,340,231,412,190"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="659,264,679,300,674,303,655,267"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="609,266,598,268,418,298,272,320,271,315,417,293,597,263,608,260"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="119,263,191,304,189,309,116,268"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="49,313,146,339"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="100,266,100,300,95,300,95,266"/>
+<area shape="poly" id="edge18_Node000013_Node000003" title=" " alt="" coords="420,118,429,152,424,154,415,120"/>
+<area shape="poly" id="edge20_Node000013_Node000006" title=" " alt="" coords="389,121,329,172,296,206,266,242,248,272,234,302,229,299,243,269,262,238,292,202,325,168,385,117"/>
+<area shape="poly" id="edge19_Node000013_Node000009" title=" " alt="" coords="460,116,755,233,753,238,458,121"/>
+</map>

@@ -1,0 +1,40 @@
+<map id="core/ir/ComponentIR.h" name="core/ir/ComponentIR.h">
+<area shape="rect" id="Node000001" title="顶层组件聚合结构体" alt="" coords="324,5,491,31"/>
+<area shape="rect" id="Node000002" href="$FootprintIR_8h.html" title="PCB 封装的通用中间表示" alt="" coords="355,79,460,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="410,31,410,65,405,65,405,31"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="164,225,235,251"/>
+<area shape="poly" id="edge23_Node000001_Node000005" title=" " alt="" coords="373,33,332,50,285,76,241,110,221,131,206,153,197,182,197,211,192,212,192,181,201,151,217,127,237,106,282,71,330,46,371,28"/>
+<area shape="rect" id="Node000006" href="$Model3DIR_8h.html" title="通用 3D 模型中间表示" alt="" coords="5,152,111,177"/>
+<area shape="poly" id="edge14_Node000001_Node000006" title=" " alt="" coords="324,26,278,32,228,42,178,58,131,81,98,110,74,142,69,139,94,106,129,76,176,53,227,37,277,27,324,20"/>
+<area shape="rect" id="Node000012" href="$SymbolIR_8h.html" title="原理图符号的通用中间表示" alt="" coords="553,79,649,104"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="439,28,557,71,556,76,437,33"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="673,79,779,104"/>
+<area shape="poly" id="edge24_Node000001_Node000014" title=" " alt="" coords="459,28,662,73,661,78,458,33"/>
+<area shape="rect" id="Node000003" href="$IRTypes_8h.html" title="EDA 无关的通用枚举和类型定义" alt="" coords="327,152,410,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="403,106,384,141,379,139,399,103"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="414,225,481,251"/>
+<area shape="poly" id="edge8_Node000002_Node000004" title=" " alt="" coords="413,104,443,211,438,213,408,105"/>
+<area shape="poly" id="edge13_Node000002_Node000005" title=" " alt="" coords="355,99,322,106,288,116,255,132,227,154,217,167,210,182,203,212,198,211,205,180,212,164,223,150,252,127,286,111,321,100,354,94"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="355,106,125,153,124,147,354,101"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="485,152,540,177"/>
+<area shape="poly" id="edge9_Node000002_Node000008" title=" " alt="" coords="426,102,486,142,483,147,423,106"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="564,152,637,177"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="439,102,557,145,556,150,437,107"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="662,152,731,177"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="454,101,649,149,648,154,453,107"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="237,152,303,177"/>
+<area shape="poly" id="edge12_Node000002_Node000011" title=" " alt="" coords="386,106,306,148,303,143,384,102"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="383,175,426,214,423,218,380,179"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="342,180,241,222,239,217,340,175"/>
+<area shape="poly" id="edge7_Node000006_Node000005" title=" " alt="" coords="82,175,165,217,163,221,80,180"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="9,225,107,251"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="61,178,61,212,55,212,55,178"/>
+<area shape="poly" id="edge16_Node000012_Node000003" title=" " alt="" coords="564,107,420,151,418,145,563,101"/>
+<area shape="poly" id="edge17_Node000012_Node000004" title=" " alt="" coords="647,102,734,126,770,139,789,150,795,165,789,179,769,195,739,207,659,224,571,234,495,238,495,233,571,229,659,219,737,202,766,190,785,176,790,165,785,154,768,144,732,131,645,107"/>
+<area shape="poly" id="edge22_Node000012_Node000005" title=" " alt="" coords="649,100,691,112,730,129,744,139,752,151,753,165,745,179,723,187,678,195,539,211,249,236,248,230,538,206,677,190,722,182,742,175,748,164,747,153,740,143,727,133,690,117,648,105"/>
+<area shape="poly" id="edge18_Node000012_Node000008" title=" " alt="" coords="588,106,539,145,536,141,585,102"/>
+<area shape="poly" id="edge20_Node000012_Node000009" title=" " alt="" coords="603,104,603,138,598,138,598,104"/>
+<area shape="poly" id="edge21_Node000012_Node000010" title=" " alt="" coords="618,102,671,141,668,146,615,106"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="857,152,917,177"/>
+<area shape="poly" id="edge19_Node000012_Node000013" title=" " alt="" coords="647,101,845,150,844,155,646,107"/>
+</map>

@@ -1,0 +1,27 @@
+<map id="core/utils/SvgPathParser.h" name="core/utils/SvgPathParser.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="497,5,687,31"/>
+<area shape="rect" id="Node000002" href="$EasyedaSymbolImporter_8cpp.html" title="EasyedaSymbolImporter 的实现。" alt="" coords="126,79,343,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="528,36,321,81,320,76,526,31"/>
+<area shape="rect" id="Node000003" href="$GeometryNormalizer_8h.html" title="坐标解析和几何归一化工具" alt="" coords="367,86,582,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="565,41,494,88,491,84,562,36"/>
+<area shape="rect" id="Node000011" href="$GeometryUtils_8cpp.html" title=" " alt="" coords="607,86,815,111"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="623,36,695,84,692,88,620,41"/>
+<area shape="rect" id="Node000012" href="$SvgPathParser_8cpp.html" title="SvgPathParser 的实现。" alt="" coords="839,86,1043,111"/>
+<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="657,31,891,83,890,89,656,36"/>
+<area shape="rect" id="Node000004" href="$FootprintDataConverter_8h.html" title="FootprintData &#45;&gt; FootprintComponentIR 转换桥接" alt="" coords="217,240,447,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="457,123,345,242,341,238,453,119"/>
+<area shape="rect" id="Node000008" href="$IrBuilder_8h.html" title="SymbolData &#45;&gt; SymbolComponentIR 的 IR 构建器" alt="" coords="479,167,612,192"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="496,120,537,165,533,168,492,123"/>
+<area shape="rect" id="Node000005" href="$ComponentDataConverter_8h.html" title="ComponentData &#45;&gt; ComponentIR 转换桥接" alt="" coords="213,321,461,346"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="336,279,339,320,334,321,331,279"/>
+<area shape="rect" id="Node000006" href="$FootprintExportStage_8cpp.html" title=" " alt="" coords="5,313,189,353"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="286,272,155,316,153,311,284,267"/>
+<area shape="rect" id="Node000007" href="$WriteWorker_8cpp.html" title=" " alt="" coords="486,321,669,346"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="381,267,542,318,541,323,380,272"/>
+<area shape="rect" id="Node000009" href="$SymbolDataConverter_8h.html" title="SymbolData &#45;&gt; SymbolComponentIR 转换桥接（薄包装层）" alt="" coords="471,240,694,265"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="560,203,579,239,574,241,555,205"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="535,272,374,323,372,318,533,267"/>
+<area shape="poly" id="edge11_Node000009_Node000007" title=" " alt="" coords="584,279,581,321,575,320,578,279"/>
+<area shape="rect" id="Node000010" href="$SymbolExportStage_8cpp.html" title=" " alt="" coords="693,313,910,353"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="628,267,750,311,748,316,626,272"/>
+</map>

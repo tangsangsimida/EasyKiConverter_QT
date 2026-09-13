@@ -1,0 +1,679 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EasyKiConverter: core/kicad/SymbolGraphicsGenerator.cpp 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/MathJax.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">EasyKiConverter<span id="projectnumber">&#160;3.0.5</span>
+   </div>
+   <div id="projectbrief">LCSC/EasyEDA 元件转 KiCad 库文件转换器</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('SymbolGraphicsGenerator_8cpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SymbolGraphicsGenerator.cpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="SymbolGraphicsGenerator_8cpp.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="SymbolGraphicsGenerator_8h.html">SymbolGraphicsGenerator.h</a>&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;<a class="code" href="KiCadTypeMap_8h.html">KiCadTypeMap.h</a>&quot;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;QDebug&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;QRegularExpression&gt;</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;cmath&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceEasyKiConverter.html">EasyKiConverter</a> {</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="foldopen" id="foldopen00016" data-start="{" data-end="}">
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af1cb22aa2cdf32f3d7c6c3e9b88b9df3">   16</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af1cb22aa2cdf32f3d7c6c3e9b88b9df3">SymbolGraphicsGenerator::generateDrawings</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a>&amp; data)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    QString content;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html">IR::SymbolRectangleIR</a>&amp; rect : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#af85ad517c3969fdc6e7de9c286c23675">rectangles</a>) {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a754d47c37c950574ddb8b98d032ffae0">generateRectangle</a>(rect);</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    }</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html">IR::SymbolCircleIR</a>&amp; circle : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a875e6c46f486d50142d76272db2bbebc">circles</a>) {</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af13b84ecba182e467b7fb1e0f81f2cc0">generateCircle</a>(circle);</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    }</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html">IR::SymbolArcIR</a>&amp; arc : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#aced591c82a46fda26eaa506505c35aa4">arcs</a>) {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7e5522d5eeb6ae72d0032a64122af662">generateArc</a>(arc);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    }</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html">IR::SymbolEllipseIR</a>&amp; ellipse : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a5e3c1a9b2707ad1302c8ecd2046e2493">ellipses</a>) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ac076e816efea90831371800b3b2283a3">generateEllipse</a>(ellipse);</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    }</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html">IR::SymbolPolygonIR</a>&amp; polygon : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a80f9173459349254a0c61719059e8d39">polygons</a>) {</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7ae5e24ec62500dec4775ced53bbcd56">generatePolygon</a>(polygon);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    }</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html">IR::SymbolPolylineIR</a>&amp; polyline : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#adc38458b07667275e19ae7ca39c06027">polylines</a>) {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a6f0a1d1b5eaab3a885424d164adafb1a">generatePolyline</a>(polyline);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    }</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html">IR::SymbolPathIR</a>&amp; path : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#ae79d69ac06069a014bb59c0aa7a7ce51">paths</a>) {</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a8c2ca2878007436fdcefea9002e4ba83">generatePath</a>(path);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    }</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html">IR::SymbolTextIR</a>&amp; text : data.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a4ac21c4c2c14393b4b8a2b6faeda34a6">texts</a>) {</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ab70615e69ec1bd8c4db8bb5d9a86fc66">generateText</a>(text);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    }</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>}</div>
+</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="foldopen" id="foldopen00045" data-start="{" data-end="}">
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#abf34833708989861461ecaa64a37f2e7">   45</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#abf34833708989861461ecaa64a37f2e7">SymbolGraphicsGenerator::generatePins</a>(<span class="keyword">const</span> QList&lt;IR::SymbolPinIR&gt;&amp; pins)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    QString content;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html">IR::SymbolPinIR</a>&amp; pin : pins) {</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        content += <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a5329749b5018cbc6f30b0d0a3272dcb6">generatePin</a>(pin);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>    }</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>}</div>
+</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="foldopen" id="foldopen00053" data-start="{" data-end="}">
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a5329749b5018cbc6f30b0d0a3272dcb6">   53</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a5329749b5018cbc6f30b0d0a3272dcb6">SymbolGraphicsGenerator::generatePin</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html">IR::SymbolPinIR</a>&amp; pin)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    QString content;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="comment">// 坐标已为 mm，直接计算相对位置</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keywordtype">double</span> x = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a29dfe6633659854b720b3299db855d1d">position</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordtype">double</span> y = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a29dfe6633659854b720b3299db855d1d">position</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="comment">// 引脚长度（已为 mm）</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keywordtype">double</span> length = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a9360ee62d449971fea1608b2d2006228">length</a>;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="comment">// 确保引脚长度为正数（KiCad 引脚长度必须是正数）</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    length = std::abs(length);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">// 确保引脚长度不为 0</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordflow">if</span> (length &lt; 0.01) {</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>        length = 2.54;  <span class="comment">// 默认引脚长度（100mil）</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    }</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <span class="comment">// 使用 IR 映射获取 KiCad 引脚电气类型</span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* kicadPinType = <a class="code hl_function" href="namespaceEasyKiConverter_1_1KiCadTypeMap.html#a085b4774951bc989930fb9ef1909266e">KiCadTypeMap::toKicadPinType</a>(pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a223f33f935270fc416583d16a4c58fbd">electricalType</a>);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="comment">// 引脚样式：从 IR 语义层获取</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    QString kicadPinStyle = <span class="stringliteral">&quot;line&quot;</span>;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordflow">if</span> (pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a76ccf7a99f1389b3a4c15ec6100655cb">style</a>.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinStyle.html#ae325a23a4c574b79af774aeb339e3186">inverted</a> &amp;&amp; pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a76ccf7a99f1389b3a4c15ec6100655cb">style</a>.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinStyle.html#a251e6bbd6ba02fa40324a58c6143171b">clock</a>) {</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        kicadPinStyle = <span class="stringliteral">&quot;inverted_clock&quot;</span>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a76ccf7a99f1389b3a4c15ec6100655cb">style</a>.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinStyle.html#ae325a23a4c574b79af774aeb339e3186">inverted</a>) {</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        kicadPinStyle = <span class="stringliteral">&quot;inverted&quot;</span>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a76ccf7a99f1389b3a4c15ec6100655cb">style</a>.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinStyle.html#a251e6bbd6ba02fa40324a58c6143171b">clock</a>) {</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        kicadPinStyle = <span class="stringliteral">&quot;clock&quot;</span>;</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    }</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="comment">// 处理引脚名称和编号</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    QString pinName = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a7bfb9b013305cd36497d99e8cab1fdcf">name</a>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    pinName.replace(<span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    QString pinNumber = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a9d8a3fbef2efebd622c5fe3268de3d3f">designator</a>;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    pinNumber.replace(<span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    <span class="comment">// 如果引脚名称为空，使用引脚编号</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keywordflow">if</span> (pinName.isEmpty()) {</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        pinName = pinNumber;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    }</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> useOriginalNamePosition = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a19e4990461743a4b3e0183094829e62b">hasNamePosition</a> &amp;&amp; !pinName.isEmpty();</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> useOriginalNumberPosition = pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#afc946c35861f199527cd8ec8d1ea69f3">hasNumberPosition</a> &amp;&amp; !pinNumber.isEmpty();</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keyword">const</span> QString nameHide = useOriginalNamePosition ? QStringLiteral(<span class="stringliteral">&quot; hide&quot;</span>) : QString();</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keyword">const</span> QString numberHide = useOriginalNumberPosition ? QStringLiteral(<span class="stringliteral">&quot; hide&quot;</span>) : QString();</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="comment">// 使用 IR 方向枚举获取 KiCad 角度</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keywordtype">double</span> kicadOrientation = <a class="code hl_function" href="namespaceEasyKiConverter_1_1KiCadTypeMap.html#a210702e8321cc0f256c2485e7c2ad10b">KiCadTypeMap::toKicadAngle</a>(pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a41c8ccd4d0ab47a9dd6ea5b9e0a885a8">direction</a>);</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    content += QString(<span class="stringliteral">&quot;    (pin %1 %2\n&quot;</span>).arg(kicadPinType, kicadPinStyle);</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    content += QString(<span class="stringliteral">&quot;      (at %1 %2 %3)\n&quot;</span>).arg(x, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(kicadOrientation, 0, <span class="charliteral">&#39;f&#39;</span>, 0);</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    content += QString(<span class="stringliteral">&quot;      (length %1)\n&quot;</span>).arg(length, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    <span class="keywordflow">if</span> (useOriginalNamePosition) {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        content +=</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>            QString(<span class="stringliteral">&quot;      (name \&quot;%1\&quot; (effects (font (size 1.27 1.27) (thickness 0))%2))\n&quot;</span>).arg(pinName, nameHide);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        content += QString(<span class="stringliteral">&quot;      (name \&quot;%1\&quot; (effects (font (size 1.27 1.27) (thickness 0) )))\n&quot;</span>).arg(pinName);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    }</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordflow">if</span> (useOriginalNumberPosition) {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        content += QString(<span class="stringliteral">&quot;      (number \&quot;%1\&quot; (effects (font (size 1.27 1.27) (thickness 0))%2))\n&quot;</span>)</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                       .arg(pinNumber, numberHide);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        content += QString(<span class="stringliteral">&quot;      (number \&quot;%1\&quot; (effects (font (size 1.27 1.27) (thickness 0) )))\n&quot;</span>).arg(pinNumber);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    }</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    <span class="keyword">auto</span> kicadJustification = [](<span class="keyword">const</span> QString&amp; anchor) {</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        <span class="keyword">const</span> QString normalized = anchor.trimmed().toLower();</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">if</span> (normalized == QStringLiteral(<span class="stringliteral">&quot;start&quot;</span>) || normalized == QStringLiteral(<span class="stringliteral">&quot;left&quot;</span>))</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>            <span class="keywordflow">return</span> QStringLiteral(<span class="stringliteral">&quot; (justify left)&quot;</span>);</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        <span class="keywordflow">if</span> (normalized == QStringLiteral(<span class="stringliteral">&quot;end&quot;</span>) || normalized == QStringLiteral(<span class="stringliteral">&quot;right&quot;</span>))</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>            <span class="keywordflow">return</span> QStringLiteral(<span class="stringliteral">&quot; (justify right)&quot;</span>);</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        <span class="keywordflow">if</span> (normalized == QStringLiteral(<span class="stringliteral">&quot;top&quot;</span>))</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>            <span class="keywordflow">return</span> QStringLiteral(<span class="stringliteral">&quot; (justify top)&quot;</span>);</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        <span class="keywordflow">if</span> (normalized == QStringLiteral(<span class="stringliteral">&quot;bottom&quot;</span>))</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>            <span class="keywordflow">return</span> QStringLiteral(<span class="stringliteral">&quot; (justify bottom)&quot;</span>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        <span class="keywordflow">return</span> QString();</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    };</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keyword">auto</span> appendOriginalText =</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        [&amp;](<span class="keyword">const</span> QString&amp; text, <span class="keyword">const</span> QPointF&amp; position, <span class="keywordtype">double</span> rotation, <span class="keyword">const</span> QString&amp; anchor, <span class="keywordtype">double</span> fontSizeMm) {</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>            <span class="keywordtype">double</span> textRotation = rotation;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>            <span class="keywordflow">if</span> (textRotation != 0.0)</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>                textRotation = 360.0 - textRotation;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>            <span class="keyword">const</span> <span class="keywordtype">double</span> size = fontSizeMm &gt; 0.0 ? fontSizeMm : 1.27;</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>            content += <span class="stringliteral">&quot;    (text\n&quot;</span>;</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>            content += QString(<span class="stringliteral">&quot;      \&quot;%1\&quot;\n&quot;</span>).arg(text);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>            content += QString(<span class="stringliteral">&quot;      (at %1 %2 %3)\n&quot;</span>)</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>                           .arg(position.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>, 0, <span class="charliteral">&#39;f&#39;</span>, 2)</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>                           .arg(position.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>, 0, <span class="charliteral">&#39;f&#39;</span>, 2)</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>                           .arg(textRotation, 0, <span class="charliteral">&#39;f&#39;</span>, 0);</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>            content += QString(<span class="stringliteral">&quot;      (effects (font (size %1 %1) (thickness 0.1))%2)\n&quot;</span>)</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>                           .arg(size, 0, <span class="charliteral">&#39;f&#39;</span>, 2)</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>                           .arg(kicadJustification(anchor));</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>            content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        };</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <span class="keywordflow">if</span> (useOriginalNamePosition)</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        appendOriginalText(pinName, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a08cdb62ebb833fb3062518b882ee8691">namePosition</a>, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a114e73587888f88343dff58ab01471c5">nameRotation</a>, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#ac7cb0545fb6b7c74d233efbd2eabb12e">nameAnchor</a>, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a9bddcc004201bce69e716592e896e7cf">nameFontSizeMm</a>);</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    <span class="keywordflow">if</span> (useOriginalNumberPosition)</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        appendOriginalText(pinNumber, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#ab2972fc5050cd27c0a58746eb9cab97a">numberPosition</a>, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a56a6bc12223ebbe5e732e8efc7a2f8d6">numberRotation</a>, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a88c52ed6de2a157a99812d0a3e3f5f89">numberAnchor</a>, pin.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a3de39b789f126f01e2bcae1c1f18b6d1">numberFontSizeMm</a>);</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>}</div>
+</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
+<div class="foldopen" id="foldopen00157" data-start="{" data-end="}">
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a754d47c37c950574ddb8b98d032ffae0">  157</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a754d47c37c950574ddb8b98d032ffae0">SymbolGraphicsGenerator::generateRectangle</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html">IR::SymbolRectangleIR</a>&amp; rect)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    QString content;</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="comment">// 坐标已为 mm，计算相对位置</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <span class="keywordtype">double</span> x0 = rect.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a51a8a970c5ead733efc173469f3fad87">x0</a> - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <span class="keywordtype">double</span> y0 = rect.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#ab51b8ce56717ea1c6f9f0ed63c881a72">y0</a> - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="keywordtype">double</span> x1 = rect.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a21f7aca491ca9054c7d507560fee5040">x1</a> - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <span class="keywordtype">double</span> y1 = rect.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a623ef6b54826c205301db24429a8be73">y1</a> - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    <span class="keywordtype">double</span> strokeWidth = rect.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a8bea178fdb2acd5077df05cc5bad6d95">strokeWidth</a>;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    content += <span class="stringliteral">&quot;    (rectangle\n&quot;</span>;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>    content += QString(<span class="stringliteral">&quot;      (start %1 %2)\n&quot;</span>).arg(x0, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y0, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    content += QString(<span class="stringliteral">&quot;      (end %1 %2)\n&quot;</span>).arg(x1, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y1, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>}</div>
+</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
+<div class="foldopen" id="foldopen00177" data-start="{" data-end="}">
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af13b84ecba182e467b7fb1e0f81f2cc0">  177</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af13b84ecba182e467b7fb1e0f81f2cc0">SymbolGraphicsGenerator::generateCircle</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html">IR::SymbolCircleIR</a>&amp; circle)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    QString content;</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    <span class="comment">// 坐标已为 mm，计算相对位置</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    <span class="keywordtype">double</span> cx = circle.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#ae275c021a4213b1399e3abbee2a0724a">center</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    <span class="keywordtype">double</span> cy = circle.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#ae275c021a4213b1399e3abbee2a0724a">center</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    <span class="keywordtype">double</span> radius = circle.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#ad031b2f5472e693388be037382523c5c">radius</a>;</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <span class="keywordtype">double</span> strokeWidth = circle.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#acc041204ce2e35a2a69354cf0dc52ff4">strokeWidth</a>;</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    content += <span class="stringliteral">&quot;    (circle\n&quot;</span>;</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    content += QString(<span class="stringliteral">&quot;      (center %1 %2)\n&quot;</span>).arg(cx, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(cy, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    content += QString(<span class="stringliteral">&quot;      (radius %1)\n&quot;</span>).arg(radius, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span> </div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>}</div>
+</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span> </div>
+<div class="foldopen" id="foldopen00196" data-start="{" data-end="}">
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7e5522d5eeb6ae72d0032a64122af662">  196</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7e5522d5eeb6ae72d0032a64122af662">SymbolGraphicsGenerator::generateArc</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html">IR::SymbolArcIR</a>&amp; arc)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    QString content;</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <span class="keywordtype">double</span> strokeWidth = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#a9d50816f31568c5f56f7ff9636d2e549">strokeWidth</a>;</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    <span class="comment">// 使用三点法生成 KiCad 圆弧（与旧代码一致）</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <span class="keywordtype">double</span> startX = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#adf9ce8bc6210e36a54a98e529e2594e3">startPoint</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordtype">double</span> startY = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#adf9ce8bc6210e36a54a98e529e2594e3">startPoint</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    <span class="keywordtype">double</span> midX = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#aaa3112fd93c7420153c6fcb469dd94b7">midPoint</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    <span class="keywordtype">double</span> midY = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#aaa3112fd93c7420153c6fcb469dd94b7">midPoint</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    <span class="keywordtype">double</span> endX = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#a4be2a8a42bdf5d7dfd5db05f4de4c99a">endPoint</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <span class="keywordtype">double</span> endY = arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#a4be2a8a42bdf5d7dfd5db05f4de4c99a">endPoint</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    content += <span class="stringliteral">&quot;    (arc\n&quot;</span>;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    content += QString(<span class="stringliteral">&quot;      (start %1 %2)\n&quot;</span>).arg(startX, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(startY, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    content += QString(<span class="stringliteral">&quot;      (mid %1 %2)\n&quot;</span>).arg(midX, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(midY, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    content += QString(<span class="stringliteral">&quot;      (end %1 %2)\n&quot;</span>).arg(endX, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(endY, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>    content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <span class="keywordflow">if</span> (arc.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#ad770dcb197cea72b5a4c68baf254a663">isFilled</a>) {</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>        content += <span class="stringliteral">&quot;      (fill (type background))\n&quot;</span>;</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>        content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    }</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span> </div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>}</div>
+</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span> </div>
+<div class="foldopen" id="foldopen00225" data-start="{" data-end="}">
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ac076e816efea90831371800b3b2283a3">  225</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ac076e816efea90831371800b3b2283a3">SymbolGraphicsGenerator::generateEllipse</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html">IR::SymbolEllipseIR</a>&amp; ellipse)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>    QString content;</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span> </div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <span class="comment">// 坐标已为 mm，计算相对位置</span></div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>    <span class="keywordtype">double</span> cx = ellipse.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a2a4c34a5eec1cc976a5b861adcb29d8f">center</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    <span class="keywordtype">double</span> cy = ellipse.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a2a4c34a5eec1cc976a5b861adcb29d8f">center</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <span class="keywordtype">double</span> radiusX = ellipse.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a43f511cf32233346b652a902c5e946f2">radiusX</a>;</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    <span class="keywordtype">double</span> radiusY = ellipse.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a372a5317c13f070ce1e7204f8141cf23">radiusY</a>;</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    <span class="keywordtype">double</span> strokeWidth = ellipse.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a7c0c0a4caf07910e4b9573df8d7bc1a2">strokeWidth</a>;</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>    <span class="comment">// 如果是圆形（radiusX 等于 radiusY），使用 circle 元素</span></div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    <span class="keywordflow">if</span> (qAbs(radiusX - radiusY) &lt; 0.01) {</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>        content += <span class="stringliteral">&quot;    (circle\n&quot;</span>;</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>        content += QString(<span class="stringliteral">&quot;      (center %1 %2)\n&quot;</span>).arg(cx, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(cy, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        content += QString(<span class="stringliteral">&quot;      (radius %1)\n&quot;</span>).arg(radiusX, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>        <span class="comment">// 椭圆：使用 32 段折线近似</span></div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        content += <span class="stringliteral">&quot;    (polyline\n&quot;</span>;</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>        content += <span class="stringliteral">&quot;      (pts&quot;</span>;</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>        <span class="keyword">const</span> <span class="keywordtype">int</span> segments = 32;</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt;= segments; ++i) {</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>            <span class="keywordtype">double</span> angle = 2.0 * <a class="code hl_define" href="GeometryUtils_8cpp.html#ae71449b1cc6e6250b91f539153a7a0d3">M_PI</a> * i / segments;</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>            <span class="keywordtype">double</span> x = cx + radiusX * std::cos(angle);</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            <span class="keywordtype">double</span> y = cy + radiusY * std::sin(angle);</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>            content += QString(<span class="stringliteral">&quot; (xy %1 %2)&quot;</span>).arg(x, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>        }</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span> </div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        content += <span class="stringliteral">&quot;)\n&quot;</span>;</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>        content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        <span class="keywordflow">if</span> (ellipse.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#ad59e029570b84fc42632f86dc98a6067">isFilled</a>) {</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>            content += <span class="stringliteral">&quot;      (fill (type background))\n&quot;</span>;</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>            content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>        }</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>        content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    }</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>}</div>
+</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="foldopen" id="foldopen00270" data-start="{" data-end="}">
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7ae5e24ec62500dec4775ced53bbcd56">  270</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7ae5e24ec62500dec4775ced53bbcd56">SymbolGraphicsGenerator::generatePolygon</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html">IR::SymbolPolygonIR</a>&amp; polygon)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    QString content;</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    <span class="keywordtype">double</span> strokeWidth = polygon.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#aa05204deda756bfbd30fc93565855fb2">strokeWidth</a>;</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    <span class="comment">// IR 中坐标已解析为 QList&lt;QPointF&gt;</span></div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    <span class="keywordflow">if</span> (polygon.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#a8a12af88417b7eb694e8a0aac9e1975f">points</a>.size() &gt;= 2) {</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>        <span class="comment">// KiCad V6 不支持 polygon 元素，使用 polyline 代替</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>        content += <span class="stringliteral">&quot;    (polyline\n&quot;</span>;</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        content += <span class="stringliteral">&quot;      (pts&quot;</span>;</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        QString firstPoint;</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        QString lastPoint;</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> QPointF&amp; pt : polygon.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#a8a12af88417b7eb694e8a0aac9e1975f">points</a>) {</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>            <span class="keywordtype">double</span> x = pt.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>            <span class="keywordtype">double</span> y = pt.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>            QString point = QString(<span class="stringliteral">&quot; (xy %1 %2)&quot;</span>).arg(x, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>            <span class="comment">// 避免重复点</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>            <span class="keywordflow">if</span> (point != lastPoint) {</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>                content += point;</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>                <span class="keywordflow">if</span> (firstPoint.isEmpty()) {</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>                    firstPoint = point;</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>                }</div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>                lastPoint = point;</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>            }</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>        }</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>        <span class="comment">// 多边形总是重复第一个点以闭合</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>        <span class="keywordflow">if</span> (!firstPoint.isEmpty() &amp;&amp; firstPoint != lastPoint) {</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>            content += firstPoint;</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>        }</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>        content += <span class="stringliteral">&quot;)\n&quot;</span>;</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>        content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>        <span class="keywordflow">if</span> (polygon.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#ae58d0de62ea8369ee89cb39ee6b3d134">isFilled</a>) {</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>            content += <span class="stringliteral">&quot;      (fill (type background))\n&quot;</span>;</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>            content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>        }</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>        content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    }</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>}</div>
+</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span> </div>
+<div class="foldopen" id="foldopen00312" data-start="{" data-end="}">
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a6f0a1d1b5eaab3a885424d164adafb1a">  312</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a6f0a1d1b5eaab3a885424d164adafb1a">SymbolGraphicsGenerator::generatePolyline</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html">IR::SymbolPolylineIR</a>&amp; polyline)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    QString content;</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>    <span class="keywordtype">double</span> strokeWidth = polyline.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#a8a8581cb15f66e97e47df801b9102dbe">strokeWidth</a>;</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span> </div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    <span class="comment">// IR 中坐标已解析为 QList&lt;QPointF&gt;</span></div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    <span class="keywordflow">if</span> (polyline.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#ac56c76bae8c18123beb1336c4dfcf05b">points</a>.size() &gt;= 2) {</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>        content += <span class="stringliteral">&quot;    (polyline\n&quot;</span>;</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>        content += <span class="stringliteral">&quot;      (pts&quot;</span>;</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>        QString firstPoint;</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>        QString lastPoint;</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> QPointF&amp; pt : polyline.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#ac56c76bae8c18123beb1336c4dfcf05b">points</a>) {</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>            <span class="keywordtype">double</span> x = pt.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>            <span class="keywordtype">double</span> y = pt.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>            QString point = QString(<span class="stringliteral">&quot; (xy %1 %2)&quot;</span>).arg(x, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>            <span class="comment">// 避免重复点</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>            <span class="keywordflow">if</span> (point != lastPoint) {</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>                content += point;</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>                <span class="keywordflow">if</span> (firstPoint.isEmpty()) {</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>                    firstPoint = point;</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>                }</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>                lastPoint = point;</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>            }</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>        }</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>        <span class="comment">// 只有 fillColor 为 true 时才重复第一个点</span></div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>        <span class="keywordflow">if</span> (polyline.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#ae80e8356096836baa6cf033a09c54b92">isFilled</a> &amp;&amp; !firstPoint.isEmpty() &amp;&amp; firstPoint != lastPoint) {</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>            content += firstPoint;</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>        }</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>        content += <span class="stringliteral">&quot;)\n&quot;</span>;</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>        content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(strokeWidth, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>        <span class="keywordflow">if</span> (polyline.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#ae80e8356096836baa6cf033a09c54b92">isFilled</a>) {</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>            content += <span class="stringliteral">&quot;      (fill (type background))\n&quot;</span>;</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>            content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>        }</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    }</div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span> </div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>}</div>
+</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span> </div>
+<div class="foldopen" id="foldopen00353" data-start="{" data-end="}">
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a8c2ca2878007436fdcefea9002e4ba83">  353</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a8c2ca2878007436fdcefea9002e4ba83">SymbolGraphicsGenerator::generatePath</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html">IR::SymbolPathIR</a>&amp; path)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    QString content;</div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span> </div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    <span class="comment">// IR 中路径坐标已解析为 QList&lt;QPointF&gt;</span></div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="keywordflow">if</span> (!path.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#a634ef9dc15ad6bd84b388b284f8d6946">points</a>.isEmpty()) {</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>        content += <span class="stringliteral">&quot;    (polyline\n&quot;</span>;</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>        content += <span class="stringliteral">&quot;      (pts&quot;</span>;</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span> </div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>        QString lastPoint;</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>        <span class="keywordflow">for</span> (<span class="keyword">const</span> QPointF&amp; pt : path.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#a634ef9dc15ad6bd84b388b284f8d6946">points</a>) {</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>            <span class="comment">// 坐标已为 mm，计算相对位置</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>            <span class="keywordtype">double</span> x = pt.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>            <span class="keywordtype">double</span> y = pt.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>            QString point = QString(<span class="stringliteral">&quot; (xy %1 %2)&quot;</span>).arg(x, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y, 0, <span class="charliteral">&#39;f&#39;</span>, 2);</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span> </div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>            <span class="comment">// 避免重复点</span></div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>            <span class="keywordflow">if</span> (point != lastPoint) {</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>                content += point;</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>                lastPoint = point;</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>            }</div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>        }</div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span> </div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>        content += <span class="stringliteral">&quot;)\n&quot;</span>;</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>        content += QString(<span class="stringliteral">&quot;      (stroke (width %1) (type default))\n&quot;</span>).arg(path.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#ab59ead3649fcf5f1ee9694ba803b1b40">strokeWidth</a>, 0, <span class="charliteral">&#39;f&#39;</span>, 3);</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span> </div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        <span class="keywordflow">if</span> (path.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#a27985051c7a94593bf7384c135e56c19">isFilled</a>) {</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>            content += <span class="stringliteral">&quot;      (fill (type background))\n&quot;</span>;</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>            content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>        }</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span> </div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>        content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>        <span class="comment">// 如果没有有效点，生成占位</span></div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        content += <span class="stringliteral">&quot;    (polyline (pts (xy 0 0))\n&quot;</span>;</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>        content += <span class="stringliteral">&quot;      (stroke (width 0.127) (type default))\n&quot;</span>;</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span>        content += <span class="stringliteral">&quot;      (fill (type none))\n&quot;</span>;</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>        content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>    }</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span> </div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>}</div>
+</div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span> </div>
+<div class="foldopen" id="foldopen00397" data-start="{" data-end="}">
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ab70615e69ec1bd8c4db8bb5d9a86fc66">  397</a></span>QString <a class="code hl_function" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ab70615e69ec1bd8c4db8bb5d9a86fc66">SymbolGraphicsGenerator::generateText</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html">IR::SymbolTextIR</a>&amp; text)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>    QString content;</div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span> </div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>    <span class="comment">// 坐标已为 mm，计算相对位置</span></div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    <span class="keywordtype">double</span> x = text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a409ef7a6731e5c6afaac968a7820470a">position</a>.x() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">m_originX</a>;</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    <span class="keywordtype">double</span> y = text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a409ef7a6731e5c6afaac968a7820470a">position</a>.y() - <a class="code hl_variable" href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">m_originY</a>;</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span> </div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    <span class="comment">// IR 中 fontSizeMm 已从 pt 转换；部分 EasyEDA 文本记录未提供字号，</span></div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    <span class="comment">// 使用与平台属性一致的默认字号，避免生成 0.00 的不可见文本。</span></div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    <span class="keywordtype">double</span> fontSize = text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a90c1a39cfbcee261ead01cb7cb405cb8">fontSizeMm</a> &gt; 0.0 ? text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a90c1a39cfbcee261ead01cb7cb405cb8">fontSizeMm</a> : 1.27;</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span> </div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>    <span class="comment">// 处理粗体和斜体（IR 中 italic 已为 bool）</span></div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>    QString fontStyle = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>    <span class="keywordflow">if</span> (text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a91693695b11297ad541d95425021ffe2">bold</a>) {</div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>        fontStyle += <span class="stringliteral">&quot;bold &quot;</span>;</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>    }</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>    <span class="keywordflow">if</span> (text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a8eb5797f673a45ea9c184cd717b43903">italic</a>) {</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>        fontStyle += <span class="stringliteral">&quot;italic &quot;</span>;</div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>    }</div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>    <span class="keywordflow">if</span> (fontStyle.isEmpty()) {</div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>        fontStyle = <span class="stringliteral">&quot;normal&quot;</span>;</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>        fontStyle = fontStyle.trimmed();</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>    }</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span> </div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    <span class="comment">// 处理旋转角度</span></div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>    <span class="keywordtype">double</span> rotation = text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a8c981d1a5019b513ea625dad8341dd28">rotation</a>;</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>    <span class="keywordflow">if</span> (rotation != 0) {</div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>        rotation = 360 - rotation;</div>
+<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>    }</div>
+<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span> </div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    <span class="comment">// 处理可见性</span></div>
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>    QString hide = text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#aa3a6b37bfa7e0856eb4a309a0ce430a3">visible</a> ? <span class="stringliteral">&quot;&quot;</span> : <span class="stringliteral">&quot;hide&quot;</span>;</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span> </div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>    <span class="comment">// 转义文本内容</span></div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>    QString textContent = text.<a class="code hl_variable" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#aaed9a9c3bc96ddf32240b46078382676">text</a>;</div>
+<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span>    textContent.replace(<span class="stringliteral">&quot; &quot;</span>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span>    <span class="keywordflow">if</span> (textContent.isEmpty()) {</div>
+<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>        textContent = <span class="stringliteral">&quot;~&quot;</span>;</div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span>    }</div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span> </div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>    <span class="comment">// 生成文本元素</span></div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>    content += <span class="stringliteral">&quot;    (text\n&quot;</span>;</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>    content += QString(<span class="stringliteral">&quot;      \&quot;%1\&quot;\n&quot;</span>).arg(textContent);</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>    content += QString(<span class="stringliteral">&quot;      (at %1 %2 %3)\n&quot;</span>).arg(x, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(y, 0, <span class="charliteral">&#39;f&#39;</span>, 2).arg(rotation, 0, <span class="charliteral">&#39;f&#39;</span>, 0);</div>
+<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>    content += QString(<span class="stringliteral">&quot;      (effects (font (size %1 %2) (thickness 0.1) %3) %4)\n&quot;</span>)</div>
+<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>                   .arg(fontSize, 0, <span class="charliteral">&#39;f&#39;</span>, 2)</div>
+<div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>                   .arg(fontSize, 0, <span class="charliteral">&#39;f&#39;</span>, 2)</div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>                   .arg(fontStyle)</div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>                   .arg(hide);</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>    content += <span class="stringliteral">&quot;    )\n&quot;</span>;</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span> </div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>    <span class="keywordflow">return</span> content;</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>}</div>
+</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span> </div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>}  <span class="comment">// namespace EasyKiConverter</span></div>
+<div class="ttc" id="aGeometryUtils_8cpp_html_ae71449b1cc6e6250b91f539153a7a0d3"><div class="ttname"><a href="GeometryUtils_8cpp.html#ae71449b1cc6e6250b91f539153a7a0d3">M_PI</a></div><div class="ttdeci">#define M_PI</div><div class="ttdef"><b>Definition</b> <a href="GeometryUtils_8cpp_source.html#l00012">GeometryUtils.cpp:12</a></div></div>
+<div class="ttc" id="aKiCadTypeMap_8h_html"><div class="ttname"><a href="KiCadTypeMap_8h.html">KiCadTypeMap.h</a></div><div class="ttdoc">IR 通用枚举 → KiCad 格式字符串的映射</div></div>
+<div class="ttc" id="aSymbolGraphicsGenerator_8h_html"><div class="ttname"><a href="SymbolGraphicsGenerator_8h.html">SymbolGraphicsGenerator.h</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a2831e55cf74810d3c73376aadc4b285e"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a2831e55cf74810d3c73376aadc4b285e">EasyKiConverter::SymbolGraphicsGenerator::m_originX</a></div><div class="ttdeci">double m_originX</div><div class="ttdoc">当前原点 X（mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8h_source.html#l00055">SymbolGraphicsGenerator.h:55</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a5329749b5018cbc6f30b0d0a3272dcb6"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a5329749b5018cbc6f30b0d0a3272dcb6">EasyKiConverter::SymbolGraphicsGenerator::generatePin</a></div><div class="ttdeci">QString generatePin(const IR::SymbolPinIR &amp;pin) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00053">SymbolGraphicsGenerator.cpp:53</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a6f0a1d1b5eaab3a885424d164adafb1a"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a6f0a1d1b5eaab3a885424d164adafb1a">EasyKiConverter::SymbolGraphicsGenerator::generatePolyline</a></div><div class="ttdeci">QString generatePolyline(const IR::SymbolPolylineIR &amp;polyline) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00312">SymbolGraphicsGenerator.cpp:312</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a754d47c37c950574ddb8b98d032ffae0"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a754d47c37c950574ddb8b98d032ffae0">EasyKiConverter::SymbolGraphicsGenerator::generateRectangle</a></div><div class="ttdeci">QString generateRectangle(const IR::SymbolRectangleIR &amp;rect) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00157">SymbolGraphicsGenerator.cpp:157</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a7ae5e24ec62500dec4775ced53bbcd56"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7ae5e24ec62500dec4775ced53bbcd56">EasyKiConverter::SymbolGraphicsGenerator::generatePolygon</a></div><div class="ttdeci">QString generatePolygon(const IR::SymbolPolygonIR &amp;polygon) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00270">SymbolGraphicsGenerator.cpp:270</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a7e5522d5eeb6ae72d0032a64122af662"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a7e5522d5eeb6ae72d0032a64122af662">EasyKiConverter::SymbolGraphicsGenerator::generateArc</a></div><div class="ttdeci">QString generateArc(const IR::SymbolArcIR &amp;arc) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00196">SymbolGraphicsGenerator.cpp:196</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_a8c2ca2878007436fdcefea9002e4ba83"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#a8c2ca2878007436fdcefea9002e4ba83">EasyKiConverter::SymbolGraphicsGenerator::generatePath</a></div><div class="ttdeci">QString generatePath(const IR::SymbolPathIR &amp;path) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00353">SymbolGraphicsGenerator.cpp:353</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_ab70615e69ec1bd8c4db8bb5d9a86fc66"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ab70615e69ec1bd8c4db8bb5d9a86fc66">EasyKiConverter::SymbolGraphicsGenerator::generateText</a></div><div class="ttdeci">QString generateText(const IR::SymbolTextIR &amp;text) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00397">SymbolGraphicsGenerator.cpp:397</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_abf34833708989861461ecaa64a37f2e7"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#abf34833708989861461ecaa64a37f2e7">EasyKiConverter::SymbolGraphicsGenerator::generatePins</a></div><div class="ttdeci">QString generatePins(const QList&lt; IR::SymbolPinIR &gt; &amp;pins) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00045">SymbolGraphicsGenerator.cpp:45</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_ac076e816efea90831371800b3b2283a3"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#ac076e816efea90831371800b3b2283a3">EasyKiConverter::SymbolGraphicsGenerator::generateEllipse</a></div><div class="ttdeci">QString generateEllipse(const IR::SymbolEllipseIR &amp;ellipse) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00225">SymbolGraphicsGenerator.cpp:225</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_aec13abaa2a4a0c337ba841be297a3bcc"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#aec13abaa2a4a0c337ba841be297a3bcc">EasyKiConverter::SymbolGraphicsGenerator::m_originY</a></div><div class="ttdeci">double m_originY</div><div class="ttdoc">当前原点 Y（mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8h_source.html#l00056">SymbolGraphicsGenerator.h:56</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_af13b84ecba182e467b7fb1e0f81f2cc0"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af13b84ecba182e467b7fb1e0f81f2cc0">EasyKiConverter::SymbolGraphicsGenerator::generateCircle</a></div><div class="ttdeci">QString generateCircle(const IR::SymbolCircleIR &amp;circle) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00177">SymbolGraphicsGenerator.cpp:177</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1SymbolGraphicsGenerator_html_af1cb22aa2cdf32f3d7c6c3e9b88b9df3"><div class="ttname"><a href="classEasyKiConverter_1_1SymbolGraphicsGenerator.html#af1cb22aa2cdf32f3d7c6c3e9b88b9df3">EasyKiConverter::SymbolGraphicsGenerator::generateDrawings</a></div><div class="ttdeci">QString generateDrawings(const IR::SymbolComponentIR &amp;data) const</div><div class="ttdef"><b>Definition</b> <a href="SymbolGraphicsGenerator_8cpp_source.html#l00016">SymbolGraphicsGenerator.cpp:16</a></div></div>
+<div class="ttc" id="anamespaceEasyKiConverter_1_1KiCadTypeMap_html_a085b4774951bc989930fb9ef1909266e"><div class="ttname"><a href="namespaceEasyKiConverter_1_1KiCadTypeMap.html#a085b4774951bc989930fb9ef1909266e">EasyKiConverter::KiCadTypeMap::toKicadPinType</a></div><div class="ttdeci">const char * toKicadPinType(IR::PinElectricalType type)</div><div class="ttdoc">PinElectricalType → KiCad 引脚电气类型字符串</div><div class="ttdef"><b>Definition</b> <a href="KiCadTypeMap_8h_source.html#l00073">KiCadTypeMap.h:73</a></div></div>
+<div class="ttc" id="anamespaceEasyKiConverter_1_1KiCadTypeMap_html_a210702e8321cc0f256c2485e7c2ad10b"><div class="ttname"><a href="namespaceEasyKiConverter_1_1KiCadTypeMap.html#a210702e8321cc0f256c2485e7c2ad10b">EasyKiConverter::KiCadTypeMap::toKicadAngle</a></div><div class="ttdeci">double toKicadAngle(IR::PinDirection dir)</div><div class="ttdoc">PinDirection → KiCad 引脚方向角度</div><div class="ttdef"><b>Definition</b> <a href="KiCadTypeMap_8h_source.html#l00053">KiCadTypeMap.h:53</a></div></div>
+<div class="ttc" id="anamespaceEasyKiConverter_html"><div class="ttname"><a href="namespaceEasyKiConverter.html">EasyKiConverter</a></div><div class="ttdef"><b>Definition</b> <a href="OLECompoundWriter_8cpp_source.html#l00010">OLECompoundWriter.cpp:10</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolArcIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html">EasyKiConverter::IR::SymbolArcIR</a></div><div class="ttdoc">通用符号圆弧</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00142">SymbolIR.h:142</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolArcIR_html_a4be2a8a42bdf5d7dfd5db05f4de4c99a"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#a4be2a8a42bdf5d7dfd5db05f4de4c99a">EasyKiConverter::IR::SymbolArcIR::endPoint</a></div><div class="ttdeci">QPointF endPoint</div><div class="ttdoc">终点（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00145">SymbolIR.h:145</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolArcIR_html_a9d50816f31568c5f56f7ff9636d2e549"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#a9d50816f31568c5f56f7ff9636d2e549">EasyKiConverter::IR::SymbolArcIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00147">SymbolIR.h:147</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolArcIR_html_aaa3112fd93c7420153c6fcb469dd94b7"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#aaa3112fd93c7420153c6fcb469dd94b7">EasyKiConverter::IR::SymbolArcIR::midPoint</a></div><div class="ttdeci">QPointF midPoint</div><div class="ttdoc">中点（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00144">SymbolIR.h:144</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolArcIR_html_ad770dcb197cea72b5a4c68baf254a663"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#ad770dcb197cea72b5a4c68baf254a663">EasyKiConverter::IR::SymbolArcIR::isFilled</a></div><div class="ttdeci">bool isFilled</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00149">SymbolIR.h:149</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolArcIR_html_adf9ce8bc6210e36a54a98e529e2594e3"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html#adf9ce8bc6210e36a54a98e529e2594e3">EasyKiConverter::IR::SymbolArcIR::startPoint</a></div><div class="ttdeci">QPointF startPoint</div><div class="ttdoc">起点（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00143">SymbolIR.h:143</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolCircleIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html">EasyKiConverter::IR::SymbolCircleIR</a></div><div class="ttdoc">通用符号圆形</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00126">SymbolIR.h:126</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolCircleIR_html_acc041204ce2e35a2a69354cf0dc52ff4"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#acc041204ce2e35a2a69354cf0dc52ff4">EasyKiConverter::IR::SymbolCircleIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00130">SymbolIR.h:130</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolCircleIR_html_ad031b2f5472e693388be037382523c5c"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#ad031b2f5472e693388be037382523c5c">EasyKiConverter::IR::SymbolCircleIR::radius</a></div><div class="ttdeci">double radius</div><div class="ttdoc">半径（mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00128">SymbolIR.h:128</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolCircleIR_html_ae275c021a4213b1399e3abbee2a0724a"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html#ae275c021a4213b1399e3abbee2a0724a">EasyKiConverter::IR::SymbolCircleIR::center</a></div><div class="ttdeci">QPointF center</div><div class="ttdoc">圆心（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00127">SymbolIR.h:127</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">EasyKiConverter::IR::SymbolComponentIR</a></div><div class="ttdoc">通用符号组件</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00229">SymbolIR.h:229</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_a4ac21c4c2c14393b4b8a2b6faeda34a6"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a4ac21c4c2c14393b4b8a2b6faeda34a6">EasyKiConverter::IR::SymbolComponentIR::texts</a></div><div class="ttdeci">QList&lt; SymbolTextIR &gt; texts</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00246">SymbolIR.h:246</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_a5e3c1a9b2707ad1302c8ecd2046e2493"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a5e3c1a9b2707ad1302c8ecd2046e2493">EasyKiConverter::IR::SymbolComponentIR::ellipses</a></div><div class="ttdeci">QList&lt; SymbolEllipseIR &gt; ellipses</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00242">SymbolIR.h:242</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_a80f9173459349254a0c61719059e8d39"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a80f9173459349254a0c61719059e8d39">EasyKiConverter::IR::SymbolComponentIR::polygons</a></div><div class="ttdeci">QList&lt; SymbolPolygonIR &gt; polygons</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00244">SymbolIR.h:244</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_a875e6c46f486d50142d76272db2bbebc"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#a875e6c46f486d50142d76272db2bbebc">EasyKiConverter::IR::SymbolComponentIR::circles</a></div><div class="ttdeci">QList&lt; SymbolCircleIR &gt; circles</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00240">SymbolIR.h:240</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_aced591c82a46fda26eaa506505c35aa4"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#aced591c82a46fda26eaa506505c35aa4">EasyKiConverter::IR::SymbolComponentIR::arcs</a></div><div class="ttdeci">QList&lt; SymbolArcIR &gt; arcs</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00241">SymbolIR.h:241</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_adc38458b07667275e19ae7ca39c06027"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#adc38458b07667275e19ae7ca39c06027">EasyKiConverter::IR::SymbolComponentIR::polylines</a></div><div class="ttdeci">QList&lt; SymbolPolylineIR &gt; polylines</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00243">SymbolIR.h:243</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_ae79d69ac06069a014bb59c0aa7a7ce51"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#ae79d69ac06069a014bb59c0aa7a7ce51">EasyKiConverter::IR::SymbolComponentIR::paths</a></div><div class="ttdeci">QList&lt; SymbolPathIR &gt; paths</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00245">SymbolIR.h:245</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolComponentIR_html_af85ad517c3969fdc6e7de9c286c23675"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html#af85ad517c3969fdc6e7de9c286c23675">EasyKiConverter::IR::SymbolComponentIR::rectangles</a></div><div class="ttdeci">QList&lt; SymbolRectangleIR &gt; rectangles</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00239">SymbolIR.h:239</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolEllipseIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html">EasyKiConverter::IR::SymbolEllipseIR</a></div><div class="ttdoc">通用符号椭圆</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00156">SymbolIR.h:156</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolEllipseIR_html_a2a4c34a5eec1cc976a5b861adcb29d8f"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a2a4c34a5eec1cc976a5b861adcb29d8f">EasyKiConverter::IR::SymbolEllipseIR::center</a></div><div class="ttdeci">QPointF center</div><div class="ttdoc">中心点（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00157">SymbolIR.h:157</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolEllipseIR_html_a372a5317c13f070ce1e7204f8141cf23"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a372a5317c13f070ce1e7204f8141cf23">EasyKiConverter::IR::SymbolEllipseIR::radiusY</a></div><div class="ttdeci">double radiusY</div><div class="ttdoc">Y 轴半径（mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00159">SymbolIR.h:159</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolEllipseIR_html_a43f511cf32233346b652a902c5e946f2"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a43f511cf32233346b652a902c5e946f2">EasyKiConverter::IR::SymbolEllipseIR::radiusX</a></div><div class="ttdeci">double radiusX</div><div class="ttdoc">X 轴半径（mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00158">SymbolIR.h:158</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolEllipseIR_html_a7c0c0a4caf07910e4b9573df8d7bc1a2"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#a7c0c0a4caf07910e4b9573df8d7bc1a2">EasyKiConverter::IR::SymbolEllipseIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00161">SymbolIR.h:161</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolEllipseIR_html_ad59e029570b84fc42632f86dc98a6067"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html#ad59e029570b84fc42632f86dc98a6067">EasyKiConverter::IR::SymbolEllipseIR::isFilled</a></div><div class="ttdeci">bool isFilled</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00163">SymbolIR.h:163</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPathIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html">EasyKiConverter::IR::SymbolPathIR</a></div><div class="ttdoc">通用符号路径</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00197">SymbolIR.h:197</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPathIR_html_a27985051c7a94593bf7384c135e56c19"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#a27985051c7a94593bf7384c135e56c19">EasyKiConverter::IR::SymbolPathIR::isFilled</a></div><div class="ttdeci">bool isFilled</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00202">SymbolIR.h:202</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPathIR_html_a634ef9dc15ad6bd84b388b284f8d6946"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#a634ef9dc15ad6bd84b388b284f8d6946">EasyKiConverter::IR::SymbolPathIR::points</a></div><div class="ttdeci">QList&lt; QPointF &gt; points</div><div class="ttdoc">路径坐标序列（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00198">SymbolIR.h:198</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPathIR_html_ab59ead3649fcf5f1ee9694ba803b1b40"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html#ab59ead3649fcf5f1ee9694ba803b1b40">EasyKiConverter::IR::SymbolPathIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00200">SymbolIR.h:200</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html">EasyKiConverter::IR::SymbolPinIR</a></div><div class="ttdoc">通用符号引脚</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00072">SymbolIR.h:72</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a08cdb62ebb833fb3062518b882ee8691"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a08cdb62ebb833fb3062518b882ee8691">EasyKiConverter::IR::SymbolPinIR::namePosition</a></div><div class="ttdeci">QPointF namePosition</div><div class="ttdoc">引脚名称原始位置（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00077">SymbolIR.h:77</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a114e73587888f88343dff58ab01471c5"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a114e73587888f88343dff58ab01471c5">EasyKiConverter::IR::SymbolPinIR::nameRotation</a></div><div class="ttdeci">double nameRotation</div><div class="ttdoc">引脚名称旋转角度</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00078">SymbolIR.h:78</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a19e4990461743a4b3e0183094829e62b"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a19e4990461743a4b3e0183094829e62b">EasyKiConverter::IR::SymbolPinIR::hasNamePosition</a></div><div class="ttdeci">bool hasNamePosition</div><div class="ttdoc">是否存在可靠的原始名称坐标</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00081">SymbolIR.h:81</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a223f33f935270fc416583d16a4c58fbd"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a223f33f935270fc416583d16a4c58fbd">EasyKiConverter::IR::SymbolPinIR::electricalType</a></div><div class="ttdeci">PinElectricalType electricalType</div><div class="ttdoc">电气类型</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00091">SymbolIR.h:91</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a29dfe6633659854b720b3299db855d1d"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a29dfe6633659854b720b3299db855d1d">EasyKiConverter::IR::SymbolPinIR::position</a></div><div class="ttdeci">QPointF position</div><div class="ttdoc">引脚位置（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00076">SymbolIR.h:76</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a3de39b789f126f01e2bcae1c1f18b6d1"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a3de39b789f126f01e2bcae1c1f18b6d1">EasyKiConverter::IR::SymbolPinIR::numberFontSizeMm</a></div><div class="ttdeci">double numberFontSizeMm</div><div class="ttdoc">引脚编号字体大小（mm，0 表示默认）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00085">SymbolIR.h:85</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a41c8ccd4d0ab47a9dd6ea5b9e0a885a8"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a41c8ccd4d0ab47a9dd6ea5b9e0a885a8">EasyKiConverter::IR::SymbolPinIR::direction</a></div><div class="ttdeci">PinDirection direction</div><div class="ttdoc">引脚方向</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00088">SymbolIR.h:88</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a56a6bc12223ebbe5e732e8efc7a2f8d6"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a56a6bc12223ebbe5e732e8efc7a2f8d6">EasyKiConverter::IR::SymbolPinIR::numberRotation</a></div><div class="ttdeci">double numberRotation</div><div class="ttdoc">引脚编号旋转角度</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00083">SymbolIR.h:83</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a76ccf7a99f1389b3a4c15ec6100655cb"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a76ccf7a99f1389b3a4c15ec6100655cb">EasyKiConverter::IR::SymbolPinIR::style</a></div><div class="ttdeci">SymbolPinStyle style</div><div class="ttdoc">引脚样式（语义层）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00092">SymbolIR.h:92</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a7bfb9b013305cd36497d99e8cab1fdcf"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a7bfb9b013305cd36497d99e8cab1fdcf">EasyKiConverter::IR::SymbolPinIR::name</a></div><div class="ttdeci">QString name</div><div class="ttdoc">引脚名称（如 &quot;VCC&quot;, &quot;A0&quot;）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00074">SymbolIR.h:74</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a88c52ed6de2a157a99812d0a3e3f5f89"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a88c52ed6de2a157a99812d0a3e3f5f89">EasyKiConverter::IR::SymbolPinIR::numberAnchor</a></div><div class="ttdeci">QString numberAnchor</div><div class="ttdoc">引脚编号原始文本锚点</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00084">SymbolIR.h:84</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a9360ee62d449971fea1608b2d2006228"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a9360ee62d449971fea1608b2d2006228">EasyKiConverter::IR::SymbolPinIR::length</a></div><div class="ttdeci">double length</div><div class="ttdoc">引脚长度（mm，替代 SVG path 解析）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00087">SymbolIR.h:87</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a9bddcc004201bce69e716592e896e7cf"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a9bddcc004201bce69e716592e896e7cf">EasyKiConverter::IR::SymbolPinIR::nameFontSizeMm</a></div><div class="ttdeci">double nameFontSizeMm</div><div class="ttdoc">引脚名称字体大小（mm，0 表示默认）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00080">SymbolIR.h:80</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_a9d8a3fbef2efebd622c5fe3268de3d3f"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#a9d8a3fbef2efebd622c5fe3268de3d3f">EasyKiConverter::IR::SymbolPinIR::designator</a></div><div class="ttdeci">QString designator</div><div class="ttdoc">引脚编号（如 &quot;1&quot;, &quot;2&quot;）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00075">SymbolIR.h:75</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_ab2972fc5050cd27c0a58746eb9cab97a"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#ab2972fc5050cd27c0a58746eb9cab97a">EasyKiConverter::IR::SymbolPinIR::numberPosition</a></div><div class="ttdeci">QPointF numberPosition</div><div class="ttdoc">引脚编号原始位置（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00082">SymbolIR.h:82</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_ac7cb0545fb6b7c74d233efbd2eabb12e"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#ac7cb0545fb6b7c74d233efbd2eabb12e">EasyKiConverter::IR::SymbolPinIR::nameAnchor</a></div><div class="ttdeci">QString nameAnchor</div><div class="ttdoc">引脚名称原始文本锚点</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00079">SymbolIR.h:79</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinIR_html_afc946c35861f199527cd8ec8d1ea69f3"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html#afc946c35861f199527cd8ec8d1ea69f3">EasyKiConverter::IR::SymbolPinIR::hasNumberPosition</a></div><div class="ttdeci">bool hasNumberPosition</div><div class="ttdoc">是否存在可靠的原始编号坐标</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00086">SymbolIR.h:86</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinStyle_html_a251e6bbd6ba02fa40324a58c6143171b"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinStyle.html#a251e6bbd6ba02fa40324a58c6143171b">EasyKiConverter::IR::SymbolPinStyle::clock</a></div><div class="ttdeci">bool clock</div><div class="ttdoc">时钟信号</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00033">SymbolIR.h:33</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPinStyle_html_ae325a23a4c574b79af774aeb339e3186"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPinStyle.html#ae325a23a4c574b79af774aeb339e3186">EasyKiConverter::IR::SymbolPinStyle::inverted</a></div><div class="ttdeci">bool inverted</div><div class="ttdoc">取反（低电平有效）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00032">SymbolIR.h:32</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolygonIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html">EasyKiConverter::IR::SymbolPolygonIR</a></div><div class="ttdoc">通用符号多边形</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00184">SymbolIR.h:184</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolygonIR_html_a8a12af88417b7eb694e8a0aac9e1975f"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#a8a12af88417b7eb694e8a0aac9e1975f">EasyKiConverter::IR::SymbolPolygonIR::points</a></div><div class="ttdeci">QList&lt; QPointF &gt; points</div><div class="ttdoc">顶点列表（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00185">SymbolIR.h:185</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolygonIR_html_aa05204deda756bfbd30fc93565855fb2"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#aa05204deda756bfbd30fc93565855fb2">EasyKiConverter::IR::SymbolPolygonIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00187">SymbolIR.h:187</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolygonIR_html_ae58d0de62ea8369ee89cb39ee6b3d134"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html#ae58d0de62ea8369ee89cb39ee6b3d134">EasyKiConverter::IR::SymbolPolygonIR::isFilled</a></div><div class="ttdeci">bool isFilled</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00189">SymbolIR.h:189</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolylineIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html">EasyKiConverter::IR::SymbolPolylineIR</a></div><div class="ttdoc">通用符号折线</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00171">SymbolIR.h:171</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolylineIR_html_a8a8581cb15f66e97e47df801b9102dbe"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#a8a8581cb15f66e97e47df801b9102dbe">EasyKiConverter::IR::SymbolPolylineIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00174">SymbolIR.h:174</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolylineIR_html_ac56c76bae8c18123beb1336c4dfcf05b"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#ac56c76bae8c18123beb1336c4dfcf05b">EasyKiConverter::IR::SymbolPolylineIR::points</a></div><div class="ttdeci">QList&lt; QPointF &gt; points</div><div class="ttdoc">顶点列表（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00172">SymbolIR.h:172</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolPolylineIR_html_ae80e8356096836baa6cf033a09c54b92"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html#ae80e8356096836baa6cf033a09c54b92">EasyKiConverter::IR::SymbolPolylineIR::isFilled</a></div><div class="ttdeci">bool isFilled</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00176">SymbolIR.h:176</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolRectangleIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html">EasyKiConverter::IR::SymbolRectangleIR</a></div><div class="ttdoc">通用符号矩形</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00111">SymbolIR.h:111</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolRectangleIR_html_a21f7aca491ca9054c7d507560fee5040"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a21f7aca491ca9054c7d507560fee5040">EasyKiConverter::IR::SymbolRectangleIR::x1</a></div><div class="ttdeci">double x1</div><div class="ttdoc">终点 X（mm，已转换）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00114">SymbolIR.h:114</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolRectangleIR_html_a51a8a970c5ead733efc173469f3fad87"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a51a8a970c5ead733efc173469f3fad87">EasyKiConverter::IR::SymbolRectangleIR::x0</a></div><div class="ttdeci">double x0</div><div class="ttdoc">起点 X（mm，已转换）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00112">SymbolIR.h:112</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolRectangleIR_html_a623ef6b54826c205301db24429a8be73"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a623ef6b54826c205301db24429a8be73">EasyKiConverter::IR::SymbolRectangleIR::y1</a></div><div class="ttdeci">double y1</div><div class="ttdoc">终点 Y（mm，已转换，KiCad Y 翻转后）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00115">SymbolIR.h:115</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolRectangleIR_html_a8bea178fdb2acd5077df05cc5bad6d95"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#a8bea178fdb2acd5077df05cc5bad6d95">EasyKiConverter::IR::SymbolRectangleIR::strokeWidth</a></div><div class="ttdeci">double strokeWidth</div><div class="ttdoc">边框宽度（mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00117">SymbolIR.h:117</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolRectangleIR_html_ab51b8ce56717ea1c6f9f0ed63c881a72"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html#ab51b8ce56717ea1c6f9f0ed63c881a72">EasyKiConverter::IR::SymbolRectangleIR::y0</a></div><div class="ttdeci">double y0</div><div class="ttdoc">起点 Y（mm，已转换，KiCad Y 翻转后）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00113">SymbolIR.h:113</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html">EasyKiConverter::IR::SymbolTextIR</a></div><div class="ttdoc">通用符号文本</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00210">SymbolIR.h:210</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_a409ef7a6731e5c6afaac968a7820470a"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a409ef7a6731e5c6afaac968a7820470a">EasyKiConverter::IR::SymbolTextIR::position</a></div><div class="ttdeci">QPointF position</div><div class="ttdoc">位置（已解析，单位 mm）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00212">SymbolIR.h:212</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_a8c981d1a5019b513ea625dad8341dd28"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a8c981d1a5019b513ea625dad8341dd28">EasyKiConverter::IR::SymbolTextIR::rotation</a></div><div class="ttdeci">double rotation</div><div class="ttdoc">旋转角度（度）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00213">SymbolIR.h:213</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_a8eb5797f673a45ea9c184cd717b43903"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a8eb5797f673a45ea9c184cd717b43903">EasyKiConverter::IR::SymbolTextIR::italic</a></div><div class="ttdeci">bool italic</div><div class="ttdoc">是否斜体（替代原始字符串 &quot;1&quot;/&quot;Italic&quot;）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00218">SymbolIR.h:218</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_a90c1a39cfbcee261ead01cb7cb405cb8"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a90c1a39cfbcee261ead01cb7cb405cb8">EasyKiConverter::IR::SymbolTextIR::fontSizeMm</a></div><div class="ttdeci">double fontSizeMm</div><div class="ttdoc">字体大小（mm，已从 pt 转换）</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00216">SymbolIR.h:216</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_a91693695b11297ad541d95425021ffe2"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#a91693695b11297ad541d95425021ffe2">EasyKiConverter::IR::SymbolTextIR::bold</a></div><div class="ttdeci">bool bold</div><div class="ttdoc">是否粗体</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00217">SymbolIR.h:217</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_aa3a6b37bfa7e0856eb4a309a0ce430a3"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#aa3a6b37bfa7e0856eb4a309a0ce430a3">EasyKiConverter::IR::SymbolTextIR::visible</a></div><div class="ttdeci">bool visible</div><div class="ttdoc">是否可见</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00219">SymbolIR.h:219</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1SymbolTextIR_html_aaed9a9c3bc96ddf32240b46078382676"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html#aaed9a9c3bc96ddf32240b46078382676">EasyKiConverter::IR::SymbolTextIR::text</a></div><div class="ttdeci">QString text</div><div class="ttdoc">文本内容</div><div class="ttdef"><b>Definition</b> <a href="SymbolIR_8h_source.html#l00211">SymbolIR.h:211</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_4270bfced15e0e73154b13468c7c9ad9.html">core</a></li><li class="navelem"><a class="el" href="dir_ad1ddbc3e0d75829e0afe087a249d2ba.html">kicad</a></li><li class="navelem"><a class="el" href="SymbolGraphicsGenerator_8cpp.html">SymbolGraphicsGenerator.cpp</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<map id="core/ir/GeometryNormalizer.h" name="core/ir/GeometryNormalizer.h">
+<area shape="rect" id="Node000001" title="坐标解析和几何归一化工具" alt="" coords="350,5,565,31"/>
+<area shape="rect" id="Node000002" href="$FootprintDataConverter_8h.html" title="FootprintData &#45;&gt; FootprintComponentIR 转换桥接" alt="" coords="217,152,447,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="440,43,344,154,340,150,436,40"/>
+<area shape="rect" id="Node000006" href="$IrBuilder_8h.html" title="SymbolData &#45;&gt; SymbolComponentIR 的 IR 构建器" alt="" coords="479,79,612,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="484,37,533,76,529,81,480,41"/>
+<area shape="rect" id="Node000003" href="$ComponentDataConverter_8h.html" title="ComponentData &#45;&gt; ComponentIR 转换桥接" alt="" coords="213,233,461,258"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="336,191,339,232,334,233,331,191"/>
+<area shape="rect" id="Node000004" href="$FootprintExportStage_8cpp.html" title=" " alt="" coords="5,225,189,265"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="286,184,155,228,153,223,284,179"/>
+<area shape="rect" id="Node000005" href="$WriteWorker_8cpp.html" title=" " alt="" coords="486,233,669,258"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="381,179,542,230,541,235,380,184"/>
+<area shape="rect" id="Node000007" href="$SymbolDataConverter_8h.html" title="SymbolData &#45;&gt; SymbolComponentIR 转换桥接（薄包装层）" alt="" coords="471,152,694,177"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="560,115,579,151,574,153,555,117"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="535,184,374,235,372,230,533,179"/>
+<area shape="poly" id="edge9_Node000007_Node000005" title=" " alt="" coords="584,191,581,233,575,232,578,191"/>
+<area shape="rect" id="Node000008" href="$SymbolExportStage_8cpp.html" title=" " alt="" coords="693,225,910,265"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="628,179,750,223,748,228,626,184"/>
+</map>

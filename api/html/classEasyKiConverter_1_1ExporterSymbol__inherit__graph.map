@@ -1,0 +1,5 @@
+<map id="EasyKiConverter::ExporterSymbol" name="EasyKiConverter::ExporterSymbol">
+<area shape="rect" id="Node000001" title="KiCad 符号导出器类" alt="" coords="5,193,203,433"/>
+<area shape="rect" id="Node000002" href="$classEasyKiConverter_1_1ISymbolExporter.html" title="符号导出器通用接口" alt="" coords="13,5,195,145"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,159,107,193,101,193,101,159"/>
+</map>

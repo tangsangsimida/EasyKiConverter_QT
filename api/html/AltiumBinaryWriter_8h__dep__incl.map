@@ -1,0 +1,24 @@
+<map id="core/altium/utils/AltiumBinaryWriter.h" name="core/altium/utils/AltiumBinaryWriter.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="232,5,407,45"/>
+<area shape="rect" id="Node000002" href="$AltiumBinaryWriter_8cpp.html" title=" " alt="" coords="39,93,213,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="265,53,169,96,167,91,263,49"/>
+<area shape="rect" id="Node000003" href="$AltiumPcbLibWriter_8h.html" title=" " alt="" coords="238,93,401,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="322,59,322,93,317,93,317,59"/>
+<area shape="rect" id="Node000008" href="$AltiumSchLibWriter_8h.html" title=" " alt="" coords="450,93,613,133"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="379,48,486,91,484,96,377,53"/>
+<area shape="rect" id="Node000004" href="$ExporterAltiumFootprint_8h.html" title=" " alt="" coords="8,181,207,221"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="261,141,155,184,153,179,259,136"/>
+<area shape="rect" id="Node000007" href="$AltiumPcbLibWriter_8cpp.html" title=" " alt="" coords="231,181,408,221"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="322,147,322,181,317,181,317,147"/>
+<area shape="rect" id="Node000005" href="$ExporterFactory_8cpp.html" title=" " alt="" coords="229,277,410,302"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="168,224,292,274,290,279,166,229"/>
+<area shape="rect" id="Node000006" href="$ExporterAltiumFootprint_8cpp.html" title=" " alt="" coords="5,269,204,309"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="109,235,108,269,103,269,104,235"/>
+<area shape="rect" id="Node000009" href="$ExporterAltiumSymbol_8h.html" title=" " alt="" coords="432,181,631,221"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="534,147,534,181,529,181,529,147"/>
+<area shape="rect" id="Node000011" href="$AltiumSchLibWriter_8cpp.html" title=" " alt="" coords="655,181,832,221"/>
+<area shape="poly" id="edge11_Node000008_Node000011" title=" " alt="" coords="591,136,698,179,696,184,589,141"/>
+<area shape="poly" id="edge9_Node000009_Node000005" title=" " alt="" coords="473,229,349,279,347,274,471,224"/>
+<area shape="rect" id="Node000010" href="$ExporterAltiumSymbol_8cpp.html" title=" " alt="" coords="435,269,633,309"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="535,235,536,269,531,269,530,235"/>
+</map>

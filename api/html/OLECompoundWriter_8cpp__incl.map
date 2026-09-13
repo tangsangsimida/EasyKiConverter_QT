@@ -1,0 +1,27 @@
+<map id="core/altium/compound/OLECompoundWriter.cpp" name="core/altium/compound/OLECompoundWriter.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="518,5,705,45"/>
+<area shape="rect" id="Node000002" href="$OLECompoundWriter_8h.html" title=" " alt="" coords="159,93,327,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="524,48,311,93,310,88,523,43"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="352,93,463,119"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="563,48,451,91,449,86,562,43"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="487,93,562,119"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="592,48,550,86,546,82,589,44"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="586,93,637,119"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="614,46,614,79,609,79,609,46"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="661,93,716,119"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="632,44,670,82,666,85,628,47"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="741,93,821,119"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="653,43,744,85,742,90,651,48"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="845,93,932,119"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="678,43,836,87,834,92,677,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,167,103,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="214,121,99,164,97,159,212,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="127,167,192,192"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="232,121,185,160,182,155,228,117"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="217,167,270,192"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="246,119,246,153,241,153,241,119"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="295,167,365,192"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="259,117,307,156,304,160,256,121"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="389,167,463,192"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="274,116,384,159,382,164,272,121"/>
+</map>

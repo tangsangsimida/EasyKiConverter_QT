@@ -1,0 +1,7 @@
+<map id="类继承关系图" name="类继承关系图">
+<area shape="rect" id="Node000000" href="$classEasyKiConverter_1_1IFootprintExporter.html" title="封装导出器通用接口" alt="" coords="5,37,205,77"/>
+<area shape="rect" id="Node000001" href="$classEasyKiConverter_1_1ExporterAltiumFootprint.html" title="Altium 封装导出器" alt="" coords="253,5,447,45"/>
+<area shape="poly" id="edge68_Node000000_Node000001" title=" " alt="" coords="219,40,253,35,254,41,219,45"/>
+<area shape="rect" id="Node000002" href="$classEasyKiConverter_1_1ExporterFootprint.html" title="KiCad 封装导出器类" alt="" coords="253,69,447,109"/>
+<area shape="poly" id="edge69_Node000000_Node000002" title=" " alt="" coords="219,70,254,74,253,79,219,75"/>
+</map>

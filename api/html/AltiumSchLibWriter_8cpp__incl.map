@@ -1,0 +1,55 @@
+<map id="core/altium/writers/AltiumSchLibWriter.cpp" name="core/altium/writers/AltiumSchLibWriter.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1093,5,1271,45"/>
+<area shape="rect" id="Node000002" href="$AltiumSchLibWriter_8h.html" title=" " alt="" coords="580,93,739,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1093,43,750,94,749,89,1092,37"/>
+<area shape="rect" id="Node000017" href="$AltiumConstants_8h.html" title=" " alt="" coords="5,167,180,192"/>
+<area shape="poly" id="edge23_Node000001_Node000017" title=" " alt="" coords="1093,37,856,61,569,96,346,132,163,167,162,161,345,127,568,91,855,55,1093,32"/>
+<area shape="rect" id="Node000018" href="$AltiumCoord_8h.html" title=" " alt="" coords="1202,93,1349,119"/>
+<area shape="poly" id="edge25_Node000001_Node000018" title=" " alt="" coords="1206,44,1252,82,1249,86,1203,48"/>
+<area shape="rect" id="Node000019" href="$AltiumWriterUtils_8h.html" title=" " alt="" coords="999,93,1178,119"/>
+<area shape="poly" id="edge27_Node000001_Node000019" title=" " alt="" coords="1161,48,1115,86,1112,82,1158,44"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="1373,93,1447,119"/>
+<area shape="poly" id="edge31_Node000001_Node000020" title=" " alt="" coords="1237,43,1364,86,1363,91,1236,48"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1472,93,1623,119"/>
+<area shape="poly" id="edge32_Node000001_Node000021" title=" " alt="" coords="1270,43,1481,88,1480,93,1269,48"/>
+<area shape="rect" id="Node000003" href="$OLECompoundWriter_8h.html" title=" " alt="" coords="779,167,1019,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="699,116,848,160,846,165,697,121"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="627,313,697,339"/>
+<area shape="poly" id="edge21_Node000002_Node000007" title=" " alt="" coords="619,121,583,139,567,152,555,168,543,194,539,216,543,239,555,264,567,279,581,291,615,309,612,314,578,295,563,282,550,267,538,240,533,216,538,192,550,165,564,148,580,135,617,116"/>
+<area shape="rect" id="Node000009" href="$AltiumSchComponent_8h.html" title=" " alt="" coords="211,167,438,192"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="606,121,393,166,392,161,605,116"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="433,240,488,265"/>
+<area shape="poly" id="edge20_Node000002_Node000012" title=" " alt="" coords="606,121,556,139,531,152,509,169,486,197,471,228,466,226,482,194,505,165,528,148,554,135,604,116"/>
+<area shape="rect" id="Node000014" href="$AltiumBinaryWriter_8h.html" title=" " alt="" coords="564,167,755,192"/>
+<area shape="poly" id="edge15_Node000002_Node000014" title=" " alt="" coords="662,119,662,153,657,153,657,119"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="1043,167,1137,192"/>
+<area shape="poly" id="edge22_Node000002_Node000016" title=" " alt="" coords="736,116,1030,164,1029,169,735,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="700,240,797,265"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="876,194,787,236,785,232,874,190"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="971,240,1036,265"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="918,190,976,230,973,234,915,194"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="1098,240,1151,265"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="936,189,1086,236,1084,241,935,195"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="908,192,918,227,918,248,909,267,896,278,877,288,825,304,711,323,710,317,824,299,875,283,893,274,905,264,912,247,913,228,903,193"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="821,240,895,265"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="895,194,874,229,869,227,890,191"/>
+<area shape="poly" id="edge14_Node000009_Node000007" title=" " alt="" coords="336,191,372,227,396,246,422,263,471,284,522,299,614,317,613,322,521,305,469,289,419,268,393,251,368,231,333,194"/>
+<area shape="rect" id="Node000010" href="$AltiumCommon_8h.html" title=" " alt="" coords="123,240,259,265"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="304,194,226,236,224,231,302,190"/>
+<area shape="poly" id="edge12_Node000009_Node000012" title=" " alt="" coords="348,190,428,231,425,236,345,194"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="284,240,357,265"/>
+<area shape="poly" id="edge13_Node000009_Node000013" title=" " alt="" coords="327,192,325,227,319,226,321,192"/>
+<area shape="poly" id="edge10_Node000010_Node000007" title=" " alt="" coords="260,262,613,315,613,320,259,267"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="106,313,173,339"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="185,267,158,304,154,301,181,264"/>
+<area shape="poly" id="edge16_Node000014_Node000004" title=" " alt="" coords="675,190,725,229,722,233,672,194"/>
+<area shape="poly" id="edge18_Node000014_Node000007" title=" " alt="" coords="662,192,664,300,659,300,657,193"/>
+<area shape="poly" id="edge19_Node000014_Node000008" title=" " alt="" coords="692,190,813,233,812,238,690,195"/>
+<area shape="rect" id="Node000015" title=" " alt="" coords="564,240,624,265"/>
+<area shape="poly" id="edge17_Node000014_Node000015" title=" " alt="" coords="651,194,616,232,612,228,647,191"/>
+<area shape="poly" id="edge24_Node000017_Node000011" title=" " alt="" coords="97,192,103,225,114,264,129,300,124,302,109,266,98,226,92,193"/>
+<area shape="poly" id="edge26_Node000018_Node000007" title=" " alt="" coords="1275,120,1266,150,1250,191,1225,233,1208,252,1189,268,1150,285,1097,299,964,317,823,325,711,327,711,322,823,320,963,311,1096,294,1148,280,1186,263,1204,248,1220,230,1245,189,1261,149,1270,118"/>
+<area shape="poly" id="edge28_Node000019_Node000006" title=" " alt="" coords="1108,117,1132,137,1151,166,1155,182,1153,199,1142,229,1137,227,1148,198,1149,182,1146,168,1128,141,1105,121"/>
+<area shape="poly" id="edge29_Node000019_Node000007" title=" " alt="" coords="1116,116,1146,136,1160,149,1171,165,1178,187,1181,215,1178,244,1165,267,1141,279,1097,290,971,306,711,325,710,320,970,301,1096,284,1139,274,1161,263,1173,242,1176,215,1173,188,1166,168,1156,153,1143,140,1113,121"/>
+<area shape="poly" id="edge30_Node000019_Node000016" title=" " alt="" coords="1092,119,1092,153,1087,153,1086,119"/>
+</map>

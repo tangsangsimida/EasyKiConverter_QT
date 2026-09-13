@@ -1,0 +1,7 @@
+<map id="类继承关系图" name="类继承关系图">
+<area shape="rect" id="Node000000" href="$classEasyKiConverter_1_1ISymbolExporter.html" title="符号导出器通用接口" alt="" coords="5,37,196,77"/>
+<area shape="rect" id="Node000001" href="$classEasyKiConverter_1_1ExporterAltiumSymbol.html" title="Altium 符号导出器" alt="" coords="244,5,437,45"/>
+<area shape="poly" id="edge71_Node000000_Node000001" title=" " alt="" coords="209,40,243,36,244,41,210,45"/>
+<area shape="rect" id="Node000002" href="$classEasyKiConverter_1_1ExporterSymbol.html" title="KiCad 符号导出器类" alt="" coords="244,69,437,109"/>
+<area shape="poly" id="edge72_Node000000_Node000002" title=" " alt="" coords="210,69,244,74,243,79,209,74"/>
+</map>

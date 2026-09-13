@@ -1,0 +1,52 @@
+<map id="core/kicad/ExporterSymbol.cpp" name="core/kicad/ExporterSymbol.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="917,5,1141,31"/>
+<area shape="rect" id="Node000002" href="$ExporterSymbol_8h.html" title=" " alt="" coords="557,79,695,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="964,33,705,79,704,74,964,28"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="721,152,827,177"/>
+<area shape="poly" id="edge27_Node000001_Node000014" title=" " alt="" coords="967,33,907,51,876,65,848,81,815,110,790,142,786,139,811,107,844,77,874,60,905,46,965,28"/>
+<area shape="rect" id="Node000015" href="$KiCadExportMetadata_8h.html" title=" " alt="" coords="749,225,925,251"/>
+<area shape="poly" id="edge21_Node000001_Node000015" title=" " alt="" coords="977,33,932,51,910,64,892,80,870,112,856,147,841,212,836,211,850,146,866,109,888,77,907,60,929,46,975,28"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="902,79,977,104"/>
+<area shape="poly" id="edge23_Node000001_Node000016" title=" " alt="" coords="1016,33,966,72,963,68,1013,29"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1001,79,1056,104"/>
+<area shape="poly" id="edge24_Node000001_Node000017" title=" " alt="" coords="1031,31,1031,65,1026,65,1026,31"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="1081,79,1161,104"/>
+<area shape="poly" id="edge25_Node000001_Node000018" title=" " alt="" coords="1045,29,1097,68,1093,72,1042,33"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1185,79,1339,104"/>
+<area shape="poly" id="edge26_Node000001_Node000019" title=" " alt="" coords="1067,28,1212,72,1211,77,1065,33"/>
+<area shape="rect" id="Node000020" title=" " alt="" coords="1363,79,1425,104"/>
+<area shape="poly" id="edge28_Node000001_Node000020" title=" " alt="" coords="1100,28,1213,48,1350,76,1349,81,1212,53,1099,33"/>
+<area shape="rect" id="Node000021" title=" " alt="" coords="1450,79,1509,104"/>
+<area shape="poly" id="edge29_Node000001_Node000021" title=" " alt="" coords="1132,28,1273,47,1437,76,1436,81,1272,52,1132,33"/>
+<area shape="rect" id="Node000003" href="$SymbolGraphicsGenerator_8h.html" title=" " alt="" coords="441,152,645,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="614,106,569,145,566,141,611,102"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="572,372,643,397"/>
+<area shape="poly" id="edge19_Node000002_Node000007" title=" " alt="" coords="636,103,649,125,659,152,659,177,653,252,637,325,622,361,617,359,631,323,648,251,654,177,654,152,644,127,632,106"/>
+<area shape="rect" id="Node000012" href="$ISymbolExporter_8h.html" title=" " alt="" coords="49,152,291,177"/>
+<area shape="poly" id="edge14_Node000002_Node000012" title=" " alt="" coords="557,106,257,153,256,147,556,101"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="315,152,417,177"/>
+<area shape="poly" id="edge18_Node000002_Node000013" title=" " alt="" coords="585,107,422,151,421,146,584,101"/>
+<area shape="poly" id="edge20_Node000002_Node000014" title=" " alt="" coords="651,102,739,144,736,148,649,106"/>
+<area shape="rect" id="Node000004" href="$SymbolIR_8h.html" title="原理图符号的通用中间表示" alt="" coords="202,225,343,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="501,180,330,224,329,219,499,175"/>
+<area shape="poly" id="edge13_Node000003_Node000007" title=" " alt="" coords="562,176,584,196,603,224,614,260,617,296,614,358,609,358,612,296,608,261,598,226,580,200,558,179"/>
+<area shape="rect" id="Node000005" href="$IRTypes_8h.html" title="EDA 无关的通用枚举和类型定义" alt="" coords="135,299,218,324"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="259,253,205,292,202,288,256,249"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="105,372,171,397"/>
+<area shape="poly" id="edge7_Node000004_Node000006" title=" " alt="" coords="203,252,160,270,141,283,126,300,120,314,119,329,128,359,123,360,114,329,115,313,121,297,137,279,157,265,201,247"/>
+<area shape="poly" id="edge12_Node000004_Node000007" title=" " alt="" coords="344,246,424,265,467,279,507,296,553,327,589,360,586,364,550,331,505,301,465,284,423,270,343,251"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="5,299,60,324"/>
+<area shape="poly" id="edge8_Node000004_Node000008" title=" " alt="" coords="235,253,74,301,73,295,233,248"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="243,299,303,324"/>
+<area shape="poly" id="edge9_Node000004_Node000009" title=" " alt="" coords="275,251,275,285,270,285,270,251"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="327,299,400,324"/>
+<area shape="poly" id="edge10_Node000004_Node000010" title=" " alt="" coords="289,249,339,288,336,292,286,253"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="425,299,494,324"/>
+<area shape="poly" id="edge11_Node000004_Node000011" title=" " alt="" coords="304,248,417,291,415,296,302,253"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="173,326,153,361,148,359,168,323"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="219,319,230,321,412,352,559,374,558,379,411,357,230,327,218,324"/>
+<area shape="poly" id="edge15_Node000012_Node000004" title=" " alt="" coords="188,175,246,215,243,219,185,180"/>
+<area shape="poly" id="edge17_Node000012_Node000007" title=" " alt="" coords="239,175,308,191,387,215,469,250,508,272,545,297,575,327,597,359,593,362,571,330,542,301,506,276,467,255,385,220,306,196,238,180"/>
+<area shape="poly" id="edge16_Node000012_Node000008" title=" " alt="" coords="161,180,55,291,51,287,157,176"/>
+<area shape="poly" id="edge22_Node000015_Node000007" title=" " alt="" coords="820,253,703,326,638,367,635,363,701,322,817,249"/>
+</map>

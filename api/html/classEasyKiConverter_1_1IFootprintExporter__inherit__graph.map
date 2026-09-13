@@ -1,0 +1,7 @@
+<map id="EasyKiConverter::IFootprintExporter" name="EasyKiConverter::IFootprintExporter">
+<area shape="rect" id="Node000001" title="封装导出器通用接口" alt="" coords="135,5,327,165"/>
+<area shape="rect" id="Node000002" href="$classEasyKiConverter_1_1ExporterAltiumFootprint.html" title="Altium 封装导出器" alt="" coords="5,213,211,573"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,179,182,214,177,212,191,177"/>
+<area shape="rect" id="Node000003" href="$classEasyKiConverter_1_1ExporterFootprint.html" title="KiCad 封装导出器类" alt="" coords="235,223,472,563"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="270,177,288,222,283,224,265,179"/>
+</map>

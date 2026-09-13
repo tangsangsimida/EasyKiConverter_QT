@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EasyKiConverter: core/kicad/FootprintGraphicsGenerator.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/MathJax.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">EasyKiConverter<span id="projectnumber">&#160;3.0.5</span>
+   </div>
+   <div id="projectbrief">LCSC/EasyEDA 元件转 KiCad 库文件转换器</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('FootprintGraphicsGenerator_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">FootprintGraphicsGenerator.h</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="FootprintGraphicsGenerator_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef FOOTPRINTGRAPHICSGENERATOR_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define FOOTPRINTGRAPHICSGENERATOR_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="FootprintIR_8h.html">core/ir/FootprintIR.h</a>&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="Model3DIR_8h.html">core/ir/Model3DIR.h</a>&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;QString&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceEasyKiConverter.html">EasyKiConverter</a> {</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html">   17</a></span><span class="keyword">class </span><a class="code hl_class" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html">FootprintGraphicsGenerator</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aaf3edf8050bbb82d5f25c03fe42548b3">   19</a></span>    <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aaf3edf8050bbb82d5f25c03fe42548b3">FootprintGraphicsGenerator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="comment">// 图形元素生成函数</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a630867691a829998ae4d3a1d70e5e91d">generatePad</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintPadIR.html">IR::FootprintPadIR</a>&amp; pad, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a1e1915f23fe005c10948923ca5f38d41">generateTrack</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintTrackIR.html">IR::FootprintTrackIR</a>&amp; track, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a89675a874db7662c16e3c72c16cab88c">generateHole</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintHoleIR.html">IR::FootprintHoleIR</a>&amp; hole, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aff95310616603a58f7c15134c972f23d">generateCircle</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintCircleIR.html">IR::FootprintCircleIR</a>&amp; circle, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#ab97bbfef8dc2b63a8e390a962a9a3c6f">generateRectangle</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintRectangleIR.html">IR::FootprintRectangleIR</a>&amp; rectangle, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a3272fc1b811d5ad98873e3aff62ca24a">generateArc</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintArcIR.html">IR::FootprintArcIR</a>&amp; arc, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aed7d61fad910d4bcdf43e003d5891ec0">generateText</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintTextIR.html">IR::FootprintTextIR</a>&amp; text, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#ad9b68534fa3eb93c42d2d832a5165d8a">generateSolidRegion</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintRegionIR.html">IR::FootprintRegionIR</a>&amp; region, <span class="keywordtype">double</span> originX, <span class="keywordtype">double</span> originY) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a18aeb9d185d3dd40553e4e28783a60e2">generateCourtyardFromBBox</a>(<span class="keywordtype">double</span> x1, <span class="keywordtype">double</span> y1, <span class="keywordtype">double</span> x2, <span class="keywordtype">double</span> y2) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="comment">// 3D 模型生成</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a614ca2e4e6993a0213f7435b401596ea">generateModel3D</a>(<span class="keyword">const</span> <a class="code hl_class" href="classEasyKiConverter_1_1IR_1_1Model3DIR.html">IR::Model3DIR</a>&amp; model3D, <span class="keyword">const</span> QString&amp; model3DPath) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="comment">// 层类型映射</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keyword">static</span> QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a17a80fe5bdc51d6e47eed46fd0a05919">layerTypeToKicad</a>(<a class="code hl_enumeration" href="namespaceEasyKiConverter_1_1IR.html#a96a060845a5405e7dea8ffff9451e981">IR::LayerType</a> layerType);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keyword">static</span> QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a3d4aaaa4100f3d99f8934a4f76905bb4">padLayersToKicad</a>(<a class="code hl_enumeration" href="namespaceEasyKiConverter_1_1IR.html#a96a060845a5405e7dea8ffff9451e981">IR::LayerType</a> layer);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keyword">static</span> QString <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a229789fe02c2d1f0154757c9a1dbbc3b">padTypeToKicad</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structEasyKiConverter_1_1IR_1_1FootprintPadIR.html">IR::FootprintPadIR</a>&amp; pad);</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keyword">static</span> <span class="keywordtype">double</span> <a class="code hl_function" href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a1bd5d2a12836e53ac957819c83277f28">roundTo2</a>(<span class="keywordtype">double</span> value);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>};</div>
+</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>}  <span class="comment">// namespace EasyKiConverter</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#endif  </span><span class="comment">// FOOTPRINTGRAPHICSGENERATOR_H</span></div>
+<div class="ttc" id="aFootprintIR_8h_html"><div class="ttname"><a href="FootprintIR_8h.html">FootprintIR.h</a></div><div class="ttdoc">PCB 封装的通用中间表示</div></div>
+<div class="ttc" id="aModel3DIR_8h_html"><div class="ttname"><a href="Model3DIR_8h.html">Model3DIR.h</a></div><div class="ttdoc">通用 3D 模型中间表示</div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html">EasyKiConverter::FootprintGraphicsGenerator</a></div><div class="ttdoc">封装图形生成器</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8h_source.html#l00017">FootprintGraphicsGenerator.h:17</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a17a80fe5bdc51d6e47eed46fd0a05919"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a17a80fe5bdc51d6e47eed46fd0a05919">EasyKiConverter::FootprintGraphicsGenerator::layerTypeToKicad</a></div><div class="ttdeci">static QString layerTypeToKicad(IR::LayerType layerType)</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00454">FootprintGraphicsGenerator.cpp:454</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a18aeb9d185d3dd40553e4e28783a60e2"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a18aeb9d185d3dd40553e4e28783a60e2">EasyKiConverter::FootprintGraphicsGenerator::generateCourtyardFromBBox</a></div><div class="ttdeci">QString generateCourtyardFromBBox(double x1, double y1, double x2, double y2) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00380">FootprintGraphicsGenerator.cpp:380</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a1bd5d2a12836e53ac957819c83277f28"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a1bd5d2a12836e53ac957819c83277f28">EasyKiConverter::FootprintGraphicsGenerator::roundTo2</a></div><div class="ttdeci">static double roundTo2(double value)</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00450">FootprintGraphicsGenerator.cpp:450</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a1e1915f23fe005c10948923ca5f38d41"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a1e1915f23fe005c10948923ca5f38d41">EasyKiConverter::FootprintGraphicsGenerator::generateTrack</a></div><div class="ttdeci">QString generateTrack(const IR::FootprintTrackIR &amp;track, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00106">FootprintGraphicsGenerator.cpp:106</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a229789fe02c2d1f0154757c9a1dbbc3b"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a229789fe02c2d1f0154757c9a1dbbc3b">EasyKiConverter::FootprintGraphicsGenerator::padTypeToKicad</a></div><div class="ttdeci">static QString padTypeToKicad(const IR::FootprintPadIR &amp;pad)</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00534">FootprintGraphicsGenerator.cpp:534</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a3272fc1b811d5ad98873e3aff62ca24a"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a3272fc1b811d5ad98873e3aff62ca24a">EasyKiConverter::FootprintGraphicsGenerator::generateArc</a></div><div class="ttdeci">QString generateArc(const IR::FootprintArcIR &amp;arc, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00207">FootprintGraphicsGenerator.cpp:207</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a3d4aaaa4100f3d99f8934a4f76905bb4"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a3d4aaaa4100f3d99f8934a4f76905bb4">EasyKiConverter::FootprintGraphicsGenerator::padLayersToKicad</a></div><div class="ttdeci">static QString padLayersToKicad(IR::LayerType layer)</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00510">FootprintGraphicsGenerator.cpp:510</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a614ca2e4e6993a0213f7435b401596ea"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a614ca2e4e6993a0213f7435b401596ea">EasyKiConverter::FootprintGraphicsGenerator::generateModel3D</a></div><div class="ttdeci">QString generateModel3D(const IR::Model3DIR &amp;model3D, const QString &amp;model3DPath) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00403">FootprintGraphicsGenerator.cpp:403</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a630867691a829998ae4d3a1d70e5e91d"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a630867691a829998ae4d3a1d70e5e91d">EasyKiConverter::FootprintGraphicsGenerator::generatePad</a></div><div class="ttdeci">QString generatePad(const IR::FootprintPadIR &amp;pad, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00012">FootprintGraphicsGenerator.cpp:12</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_a89675a874db7662c16e3c72c16cab88c"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#a89675a874db7662c16e3c72c16cab88c">EasyKiConverter::FootprintGraphicsGenerator::generateHole</a></div><div class="ttdeci">QString generateHole(const IR::FootprintHoleIR &amp;hole, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00130">FootprintGraphicsGenerator.cpp:130</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_aaf3edf8050bbb82d5f25c03fe42548b3"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aaf3edf8050bbb82d5f25c03fe42548b3">EasyKiConverter::FootprintGraphicsGenerator::FootprintGraphicsGenerator</a></div><div class="ttdeci">FootprintGraphicsGenerator()=default</div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_ab97bbfef8dc2b63a8e390a962a9a3c6f"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#ab97bbfef8dc2b63a8e390a962a9a3c6f">EasyKiConverter::FootprintGraphicsGenerator::generateRectangle</a></div><div class="ttdeci">QString generateRectangle(const IR::FootprintRectangleIR &amp;rectangle, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00165">FootprintGraphicsGenerator.cpp:165</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_ad9b68534fa3eb93c42d2d832a5165d8a"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#ad9b68534fa3eb93c42d2d832a5165d8a">EasyKiConverter::FootprintGraphicsGenerator::generateSolidRegion</a></div><div class="ttdeci">QString generateSolidRegion(const IR::FootprintRegionIR &amp;region, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00335">FootprintGraphicsGenerator.cpp:335</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_aed7d61fad910d4bcdf43e003d5891ec0"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aed7d61fad910d4bcdf43e003d5891ec0">EasyKiConverter::FootprintGraphicsGenerator::generateText</a></div><div class="ttdeci">QString generateText(const IR::FootprintTextIR &amp;text, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00261">FootprintGraphicsGenerator.cpp:261</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1FootprintGraphicsGenerator_html_aff95310616603a58f7c15134c972f23d"><div class="ttname"><a href="classEasyKiConverter_1_1FootprintGraphicsGenerator.html#aff95310616603a58f7c15134c972f23d">EasyKiConverter::FootprintGraphicsGenerator::generateCircle</a></div><div class="ttdeci">QString generateCircle(const IR::FootprintCircleIR &amp;circle, double originX, double originY) const</div><div class="ttdef"><b>Definition</b> <a href="FootprintGraphicsGenerator_8cpp_source.html#l00146">FootprintGraphicsGenerator.cpp:146</a></div></div>
+<div class="ttc" id="aclassEasyKiConverter_1_1IR_1_1Model3DIR_html"><div class="ttname"><a href="classEasyKiConverter_1_1IR_1_1Model3DIR.html">EasyKiConverter::IR::Model3DIR</a></div><div class="ttdoc">通用 3D 模型数据</div><div class="ttdef"><b>Definition</b> <a href="Model3DIR_8h_source.html#l00046">Model3DIR.h:46</a></div></div>
+<div class="ttc" id="anamespaceEasyKiConverter_1_1IR_html_a96a060845a5405e7dea8ffff9451e981"><div class="ttname"><a href="namespaceEasyKiConverter_1_1IR.html#a96a060845a5405e7dea8ffff9451e981">EasyKiConverter::IR::LayerType</a></div><div class="ttdeci">LayerType</div><div class="ttdoc">PCB 层类型枚举（EDA 无关）</div><div class="ttdef"><b>Definition</b> <a href="IRTypes_8h_source.html#l00115">IRTypes.h:115</a></div></div>
+<div class="ttc" id="anamespaceEasyKiConverter_html"><div class="ttname"><a href="namespaceEasyKiConverter.html">EasyKiConverter</a></div><div class="ttdef"><b>Definition</b> <a href="OLECompoundWriter_8cpp_source.html#l00010">OLECompoundWriter.cpp:10</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintArcIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintArcIR.html">EasyKiConverter::IR::FootprintArcIR</a></div><div class="ttdoc">通用圆弧</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00118">FootprintIR.h:118</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintCircleIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintCircleIR.html">EasyKiConverter::IR::FootprintCircleIR</a></div><div class="ttdoc">通用圆</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00092">FootprintIR.h:92</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintHoleIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintHoleIR.html">EasyKiConverter::IR::FootprintHoleIR</a></div><div class="ttdoc">通用安装孔</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00083">FootprintIR.h:83</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintPadIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintPadIR.html">EasyKiConverter::IR::FootprintPadIR</a></div><div class="ttdoc">通用焊盘</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00037">FootprintIR.h:37</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintRectangleIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintRectangleIR.html">EasyKiConverter::IR::FootprintRectangleIR</a></div><div class="ttdoc">通用填充矩形</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00103">FootprintIR.h:103</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintRegionIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintRegionIR.html">EasyKiConverter::IR::FootprintRegionIR</a></div><div class="ttdoc">通用实心区域</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00161">FootprintIR.h:161</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintTextIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintTextIR.html">EasyKiConverter::IR::FootprintTextIR</a></div><div class="ttdoc">通用文本</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00137">FootprintIR.h:137</a></div></div>
+<div class="ttc" id="astructEasyKiConverter_1_1IR_1_1FootprintTrackIR_html"><div class="ttname"><a href="structEasyKiConverter_1_1IR_1_1FootprintTrackIR.html">EasyKiConverter::IR::FootprintTrackIR</a></div><div class="ttdoc">通用走线</div><div class="ttdef"><b>Definition</b> <a href="FootprintIR_8h_source.html#l00072">FootprintIR.h:72</a></div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_4270bfced15e0e73154b13468c7c9ad9.html">core</a></li><li class="navelem"><a class="el" href="dir_ad1ddbc3e0d75829e0afe087a249d2ba.html">kicad</a></li><li class="navelem"><a class="el" href="FootprintGraphicsGenerator_8h.html">FootprintGraphicsGenerator.h</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<map id="core/ir/ComponentIR.h" name="core/ir/ComponentIR.h">
+<area shape="rect" id="Node000001" title="顶层组件聚合结构体" alt="" coords="46,5,213,31"/>
+<area shape="rect" id="Node000002" href="$ComponentDataConverter_8h.html" title="ComponentData &#45;&gt; ComponentIR 转换桥接" alt="" coords="5,79,253,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,44,132,79,127,79,127,44"/>
+</map>

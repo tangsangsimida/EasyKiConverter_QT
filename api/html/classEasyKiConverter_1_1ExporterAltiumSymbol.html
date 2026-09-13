@@ -1,0 +1,763 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EasyKiConverter: EasyKiConverter::ExporterAltiumSymbol类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/MathJax.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectalign">
+   <div id="projectname">EasyKiConverter<span id="projectnumber">&#160;3.0.5</span>
+   </div>
+   <div id="projectbrief">LCSC/EasyEDA 元件转 KiCad 库文件转换器</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classEasyKiConverter_1_1ExporterAltiumSymbol.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classEasyKiConverter_1_1ExporterAltiumSymbol-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">EasyKiConverter::ExporterAltiumSymbol类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Altium 符号导出器  
+ <a href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="ExporterAltiumSymbol_8h_source.html">ExporterAltiumSymbol.h</a>&gt;</code></p>
+<div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> 类 EasyKiConverter::ExporterAltiumSymbol 继承关系图:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classEasyKiConverter_1_1ExporterAltiumSymbol__inherit__graph.svg" width="196" height="539"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+<div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> EasyKiConverter::ExporterAltiumSymbol 的协作图:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classEasyKiConverter_1_1ExporterAltiumSymbol__coll__graph.svg" width="416" height="754"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a11f0761ef8e27b6fd97829c0b8c88d0d" id="r_a11f0761ef8e27b6fd97829c0b8c88d0d"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a11f0761ef8e27b6fd97829c0b8c88d0d">libraryFileExtension</a> () const override</td></tr>
+<tr class="memdesc:a11f0761ef8e27b6fd97829c0b8c88d0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取符号库文件扩展名  <br /></td></tr>
+<tr class="separator:a11f0761ef8e27b6fd97829c0b8c88d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8233cc0c333dc03fad95b96ba3477545" id="r_a8233cc0c333dc03fad95b96ba3477545"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a8233cc0c333dc03fad95b96ba3477545">exportSymbol</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a> &amp;symbol, const QString &amp;filePath) override</td></tr>
+<tr class="memdesc:a8233cc0c333dc03fad95b96ba3477545"><td class="mdescLeft">&#160;</td><td class="mdescRight">导出单个符号到 SchLib 文件  <br /></td></tr>
+<tr class="separator:a8233cc0c333dc03fad95b96ba3477545"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8360863b7361b12bdf332278af16164d" id="r_a8360863b7361b12bdf332278af16164d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a8360863b7361b12bdf332278af16164d">exportSymbolLibrary</a> (const QList&lt; <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a> &gt; &amp;symbols, const QString &amp;libName, const QString &amp;filePath, bool appendMode=true, bool updateMode=false, const QString &amp;libraryDescription=QString()) override</td></tr>
+<tr class="memdesc:a8360863b7361b12bdf332278af16164d"><td class="mdescLeft">&#160;</td><td class="mdescRight">导出符号库（多个符号合并到一个 SchLib 文件）  <br /></td></tr>
+<tr class="separator:a8360863b7361b12bdf332278af16164d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classEasyKiConverter_1_1ISymbolExporter"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classEasyKiConverter_1_1ISymbolExporter')"><img src="closed.png" alt="-"/>&#160;Public 成员函数 继承自 <a class="el" href="classEasyKiConverter_1_1ISymbolExporter.html">EasyKiConverter::ISymbolExporter</a></td></tr>
+<tr class="memitem:aad4f37547ee3cc492d3596f4ac1aa7c7 inherit pub_methods_classEasyKiConverter_1_1ISymbolExporter" id="r_aad4f37547ee3cc492d3596f4ac1aa7c7"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ISymbolExporter.html#aad4f37547ee3cc492d3596f4ac1aa7c7">~ISymbolExporter</a> ()=default</td></tr>
+<tr class="separator:aad4f37547ee3cc492d3596f4ac1aa7c7 inherit pub_methods_classEasyKiConverter_1_1ISymbolExporter"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:a58a60b0f43ffc27971ca0fc550425127" id="r_a58a60b0f43ffc27971ca0fc550425127"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html">AltiumSchComponent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a58a60b0f43ffc27971ca0fc550425127">convertSymbol</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a> &amp;data)</td></tr>
+<tr class="memdesc:a58a60b0f43ffc27971ca0fc550425127"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolComponentIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html" title="Altium 符号元件">AltiumSchComponent</a> 转换  <br /></td></tr>
+<tr class="separator:a58a60b0f43ffc27971ca0fc550425127"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fa6787c5ace825d05838d825a58489c" id="r_a4fa6787c5ace825d05838d825a58489c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchPin.html">AltiumSchPin</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a4fa6787c5ace825d05838d825a58489c">convertPin</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html">IR::SymbolPinIR</a> &amp;pin)</td></tr>
+<tr class="memdesc:a4fa6787c5ace825d05838d825a58489c"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolPinIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPin.html" title="Altium 符号引脚">AltiumSchPin</a> 转换  <br /></td></tr>
+<tr class="separator:a4fa6787c5ace825d05838d825a58489c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1501fce993b5e75a5e8eb22492bf1b42" id="r_a1501fce993b5e75a5e8eb22492bf1b42"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchRectangle.html">AltiumSchRectangle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a1501fce993b5e75a5e8eb22492bf1b42">convertRectangle</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html">IR::SymbolRectangleIR</a> &amp;rect)</td></tr>
+<tr class="memdesc:a1501fce993b5e75a5e8eb22492bf1b42"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolRectangleIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchRectangle.html" title="Altium 符号矩形">AltiumSchRectangle</a> 转换  <br /></td></tr>
+<tr class="separator:a1501fce993b5e75a5e8eb22492bf1b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9b19dcf493527e97f609f2623101e46" id="r_aa9b19dcf493527e97f609f2623101e46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html">AltiumSchEllipse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#aa9b19dcf493527e97f609f2623101e46">convertCircle</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html">IR::SymbolCircleIR</a> &amp;circle)</td></tr>
+<tr class="memdesc:aa9b19dcf493527e97f609f2623101e46"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolCircleIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html" title="Altium 符号椭圆/圆">AltiumSchEllipse</a> 转换  <br /></td></tr>
+<tr class="separator:aa9b19dcf493527e97f609f2623101e46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa695dd91bc542edf354568e38cee52f9" id="r_aa695dd91bc542edf354568e38cee52f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchArc.html">AltiumSchArc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#aa695dd91bc542edf354568e38cee52f9">convertArc</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html">IR::SymbolArcIR</a> &amp;arc)</td></tr>
+<tr class="memdesc:aa695dd91bc542edf354568e38cee52f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolArcIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchArc.html" title="Altium 符号弧线">AltiumSchArc</a> 转换  <br /></td></tr>
+<tr class="separator:aa695dd91bc542edf354568e38cee52f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06ebed0d564ff4c66beaad60b2605270" id="r_a06ebed0d564ff4c66beaad60b2605270"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchPolygon.html">AltiumSchPolygon</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a06ebed0d564ff4c66beaad60b2605270">convertPolygon</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html">IR::SymbolPolygonIR</a> &amp;polygon)</td></tr>
+<tr class="memdesc:a06ebed0d564ff4c66beaad60b2605270"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolPolygonIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPolygon.html" title="Altium 符号多边形">AltiumSchPolygon</a> 转换  <br /></td></tr>
+<tr class="separator:a06ebed0d564ff4c66beaad60b2605270"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c3fd508a2a52d4e894e81f927c40603" id="r_a4c3fd508a2a52d4e894e81f927c40603"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchPolyline.html">AltiumSchPolyline</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a4c3fd508a2a52d4e894e81f927c40603">convertPolyline</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html">IR::SymbolPolylineIR</a> &amp;polyline)</td></tr>
+<tr class="memdesc:a4c3fd508a2a52d4e894e81f927c40603"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolPolylineIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPolyline.html" title="Altium 符号折线">AltiumSchPolyline</a> 转换  <br /></td></tr>
+<tr class="separator:a4c3fd508a2a52d4e894e81f927c40603"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dbb0c3344d5e1ae52083fbbf95c090d" id="r_a2dbb0c3344d5e1ae52083fbbf95c090d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchPath.html">AltiumSchPath</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a2dbb0c3344d5e1ae52083fbbf95c090d">convertPath</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html">IR::SymbolPathIR</a> &amp;path)</td></tr>
+<tr class="memdesc:a2dbb0c3344d5e1ae52083fbbf95c090d"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolPathIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPath.html" title="Altium 符号路径">AltiumSchPath</a> 转换  <br /></td></tr>
+<tr class="separator:a2dbb0c3344d5e1ae52083fbbf95c090d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50f397a451fd30ad6d352155679b32d7" id="r_a50f397a451fd30ad6d352155679b32d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchText.html">AltiumSchText</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a50f397a451fd30ad6d352155679b32d7">convertText</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html">IR::SymbolTextIR</a> &amp;text)</td></tr>
+<tr class="memdesc:a50f397a451fd30ad6d352155679b32d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolTextIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchText.html" title="Altium 符号文本">AltiumSchText</a> 转换  <br /></td></tr>
+<tr class="separator:a50f397a451fd30ad6d352155679b32d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd9d96868cbe2a2ba974f7655a9baa73" id="r_abd9d96868cbe2a2ba974f7655a9baa73"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html">AltiumSchEllipse</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#abd9d96868cbe2a2ba974f7655a9baa73">convertEllipse</a> (const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html">IR::SymbolEllipseIR</a> &amp;ellipse)</td></tr>
+<tr class="memdesc:abd9d96868cbe2a2ba974f7655a9baa73"><td class="mdescLeft">&#160;</td><td class="mdescRight">SymbolEllipseIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html" title="Altium 符号椭圆/圆">AltiumSchEllipse</a> 转换  <br /></td></tr>
+<tr class="separator:abd9d96868cbe2a2ba974f7655a9baa73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d7984c2ccbce3019c66af387368823f" id="r_a9d7984c2ccbce3019c66af387368823f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#a9d7984c2ccbce3019c66af387368823f">centerComponent</a> (<a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html">AltiumSchComponent</a> &amp;component)</td></tr>
+<tr class="memdesc:a9d7984c2ccbce3019c66af387368823f"><td class="mdescLeft">&#160;</td><td class="mdescRight">将符号图元坐标归一化到原点  <br /></td></tr>
+<tr class="separator:a9d7984c2ccbce3019c66af387368823f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:aad5ec10afd0e94b72451f62f5b69a7f2" id="r_aad5ec10afd0e94b72451f62f5b69a7f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classEasyKiConverter_1_1AltiumSchLibWriter.html">AltiumSchLibWriter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html#aad5ec10afd0e94b72451f62f5b69a7f2">m_writer</a></td></tr>
+<tr class="separator:aad5ec10afd0e94b72451f62f5b69a7f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>Altium 符号导出器 </p>
+<p>实现 <a class="el" href="classEasyKiConverter_1_1ISymbolExporter.html" title="符号导出器通用接口">ISymbolExporter</a> 接口，将 SymbolComponentIR 转换为 Altium SchLib 格式 </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8h_source.html">ExporterAltiumSymbol.h</a> 第 <a class="el" href="ExporterAltiumSymbol_8h_source.html#l00014">14</a> 行定义.</p>
+</div><h2 class="groupheader">成员函数说明</h2>
+<a id="a9d7984c2ccbce3019c66af387368823f" name="a9d7984c2ccbce3019c66af387368823f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d7984c2ccbce3019c66af387368823f">&#9670;&#160;</a></span>centerComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void EasyKiConverter::ExporterAltiumSymbol::centerComponent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html">AltiumSchComponent</a> &amp;&#160;</td>
+          <td class="paramname"><em>component</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>将符号图元坐标归一化到原点 </p>
+<p>将符号坐标归一化，以第一个引脚为原点</p>
+<p>使用符号图形包围盒中心作为统一原点，保证主体、引脚和文本在 Altium Designer 中保持相对位置。 </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00497">497</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00144">EasyKiConverter::AltiumSchComponent::arcs</a>, <a class="el" href="namespaceEasyKiConverter_1_1AltiumModels.html#a82c4edf3d360b7d7b44e12c7ace9dc3da08a38277b0309070706f6652eeae9a53">EasyKiConverter::AltiumModels::Down</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00146">EasyKiConverter::AltiumSchComponent::ellipses</a>, <a class="el" href="namespaceEasyKiConverter_1_1AltiumModels.html#a82c4edf3d360b7d7b44e12c7ace9dc3da945d5e233cf7d6240f6b783b36a374ff">EasyKiConverter::AltiumModels::Left</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00148">EasyKiConverter::AltiumSchComponent::paths</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00141">EasyKiConverter::AltiumSchComponent::pins</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00145">EasyKiConverter::AltiumSchComponent::polygons</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00147">EasyKiConverter::AltiumSchComponent::polylines</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00142">EasyKiConverter::AltiumSchComponent::rectangles</a>, <a class="el" href="namespaceEasyKiConverter_1_1AltiumModels.html#a82c4edf3d360b7d7b44e12c7ace9dc3da92b09c7c48c520c3c55e497875da437c">EasyKiConverter::AltiumModels::Right</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00149">EasyKiConverter::AltiumSchComponent::texts</a> , 以及 <a class="el" href="namespaceEasyKiConverter_1_1AltiumModels.html#a82c4edf3d360b7d7b44e12c7ace9dc3da258f49887ef8d14ac268c92b02503aaa">EasyKiConverter::AltiumModels::Up</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="aa695dd91bc542edf354568e38cee52f9" name="aa695dd91bc542edf354568e38cee52f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa695dd91bc542edf354568e38cee52f9">&#9670;&#160;</a></span>convertArc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchArc.html">AltiumSchArc</a> EasyKiConverter::ExporterAltiumSymbol::convertArc </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolArcIR.html">IR::SymbolArcIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>arc</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolArcIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchArc.html" title="Altium 符号弧线">AltiumSchArc</a> 转换 </p>
+<p>SymbolArcIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchArc.html" title="Altium 符号弧线">AltiumSchArc</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00377">377</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00061">EasyKiConverter::AltiumSchArc::centerX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00061">EasyKiConverter::AltiumSchArc::centerY</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00066">EasyKiConverter::AltiumSchArc::color</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00064">EasyKiConverter::AltiumSchArc::endAngle</a>, <a class="el" href="SymbolIR_8h_source.html#l00145">EasyKiConverter::IR::SymbolArcIR::endPoint</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00065">EasyKiConverter::AltiumSchArc::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="GeometryUtils_8cpp_source.html#l00012">M_PI</a>, <a class="el" href="SymbolIR_8h_source.html#l00144">EasyKiConverter::IR::SymbolArcIR::midPoint</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00067">EasyKiConverter::AltiumSchArc::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00150">EasyKiConverter::IR::SymbolArcIR::partIndex</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00062">EasyKiConverter::AltiumSchArc::radius</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00063">EasyKiConverter::AltiumSchArc::startAngle</a>, <a class="el" href="SymbolIR_8h_source.html#l00143">EasyKiConverter::IR::SymbolArcIR::startPoint</a>, <a class="el" href="SymbolIR_8h_source.html#l00146">EasyKiConverter::IR::SymbolArcIR::strokeColor</a> , 以及 <a class="el" href="SymbolIR_8h_source.html#l00147">EasyKiConverter::IR::SymbolArcIR::strokeWidth</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="aa9b19dcf493527e97f609f2623101e46" name="aa9b19dcf493527e97f609f2623101e46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9b19dcf493527e97f609f2623101e46">&#9670;&#160;</a></span>convertCircle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html">AltiumSchEllipse</a> EasyKiConverter::ExporterAltiumSymbol::convertCircle </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolCircleIR.html">IR::SymbolCircleIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>circle</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolCircleIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html" title="Altium 符号椭圆/圆">AltiumSchEllipse</a> 转换 </p>
+<p>SymbolCircleIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html" title="Altium 符号椭圆/圆">AltiumSchEllipse</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00360">360</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00090">EasyKiConverter::AltiumSchEllipse::areaColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00127">EasyKiConverter::IR::SymbolCircleIR::center</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00086">EasyKiConverter::AltiumSchEllipse::centerX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00086">EasyKiConverter::AltiumSchEllipse::centerY</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00089">EasyKiConverter::AltiumSchEllipse::color</a>, <a class="el" href="SymbolIR_8h_source.html#l00131">EasyKiConverter::IR::SymbolCircleIR::fillColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00132">EasyKiConverter::IR::SymbolCircleIR::isFilled</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00091">EasyKiConverter::AltiumSchEllipse::isSolid</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00088">EasyKiConverter::AltiumSchEllipse::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00092">EasyKiConverter::AltiumSchEllipse::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00133">EasyKiConverter::IR::SymbolCircleIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00128">EasyKiConverter::IR::SymbolCircleIR::radius</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00087">EasyKiConverter::AltiumSchEllipse::radiusX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00087">EasyKiConverter::AltiumSchEllipse::radiusY</a>, <a class="el" href="SymbolIR_8h_source.html#l00129">EasyKiConverter::IR::SymbolCircleIR::strokeColor</a> , 以及 <a class="el" href="SymbolIR_8h_source.html#l00130">EasyKiConverter::IR::SymbolCircleIR::strokeWidth</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="abd9d96868cbe2a2ba974f7655a9baa73" name="abd9d96868cbe2a2ba974f7655a9baa73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd9d96868cbe2a2ba974f7655a9baa73">&#9670;&#160;</a></span>convertEllipse()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html">AltiumSchEllipse</a> EasyKiConverter::ExporterAltiumSymbol::convertEllipse </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolEllipseIR.html">IR::SymbolEllipseIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>ellipse</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolEllipseIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html" title="Altium 符号椭圆/圆">AltiumSchEllipse</a> 转换 </p>
+<p>SymbolEllipseIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchEllipse.html" title="Altium 符号椭圆/圆">AltiumSchEllipse</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00478">478</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00090">EasyKiConverter::AltiumSchEllipse::areaColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00157">EasyKiConverter::IR::SymbolEllipseIR::center</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00086">EasyKiConverter::AltiumSchEllipse::centerX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00086">EasyKiConverter::AltiumSchEllipse::centerY</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00089">EasyKiConverter::AltiumSchEllipse::color</a>, <a class="el" href="SymbolIR_8h_source.html#l00162">EasyKiConverter::IR::SymbolEllipseIR::fillColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00163">EasyKiConverter::IR::SymbolEllipseIR::isFilled</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00091">EasyKiConverter::AltiumSchEllipse::isSolid</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00088">EasyKiConverter::AltiumSchEllipse::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00092">EasyKiConverter::AltiumSchEllipse::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00164">EasyKiConverter::IR::SymbolEllipseIR::partIndex</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00087">EasyKiConverter::AltiumSchEllipse::radiusX</a>, <a class="el" href="SymbolIR_8h_source.html#l00158">EasyKiConverter::IR::SymbolEllipseIR::radiusX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00087">EasyKiConverter::AltiumSchEllipse::radiusY</a>, <a class="el" href="SymbolIR_8h_source.html#l00159">EasyKiConverter::IR::SymbolEllipseIR::radiusY</a>, <a class="el" href="SymbolIR_8h_source.html#l00160">EasyKiConverter::IR::SymbolEllipseIR::strokeColor</a> , 以及 <a class="el" href="SymbolIR_8h_source.html#l00161">EasyKiConverter::IR::SymbolEllipseIR::strokeWidth</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a2dbb0c3344d5e1ae52083fbbf95c090d" name="a2dbb0c3344d5e1ae52083fbbf95c090d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dbb0c3344d5e1ae52083fbbf95c090d">&#9670;&#160;</a></span>convertPath()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchPath.html">AltiumSchPath</a> EasyKiConverter::ExporterAltiumSymbol::convertPath </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPathIR.html">IR::SymbolPathIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolPathIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPath.html" title="Altium 符号路径">AltiumSchPath</a> 转换 </p>
+<p>SymbolPathIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPath.html" title="Altium 符号路径">AltiumSchPath</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00446">446</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00111">EasyKiConverter::AltiumSchPath::color</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00110">EasyKiConverter::AltiumSchPath::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="AltiumCoord_8h_source.html#l00101">EasyKiConverter::AltiumCoord::mmToSchematicUnits()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00112">EasyKiConverter::AltiumSchPath::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00203">EasyKiConverter::IR::SymbolPathIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00198">EasyKiConverter::IR::SymbolPathIR::points</a>, <a class="el" href="SymbolIR_8h_source.html#l00199">EasyKiConverter::IR::SymbolPathIR::strokeColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00200">EasyKiConverter::IR::SymbolPathIR::strokeWidth</a> , 以及 <a class="el" href="AltiumSchComponent_8h_source.html#l00109">EasyKiConverter::AltiumSchPath::vertices</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a4fa6787c5ace825d05838d825a58489c" name="a4fa6787c5ace825d05838d825a58489c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fa6787c5ace825d05838d825a58489c">&#9670;&#160;</a></span>convertPin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchPin.html">AltiumSchPin</a> EasyKiConverter::ExporterAltiumSymbol::convertPin </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPinIR.html">IR::SymbolPinIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>pin</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolPinIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPin.html" title="Altium 符号引脚">AltiumSchPin</a> 转换 </p>
+<p>SymbolPinIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPin.html" title="Altium 符号引脚">AltiumSchPin</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00261">261</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="SymbolIR_8h_source.html#l00033">EasyKiConverter::IR::SymbolPinStyle::clock</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00025">EasyKiConverter::AltiumSchPin::color</a>, <a class="el" href="SymbolIR_8h_source.html#l00035">EasyKiConverter::IR::SymbolPinStyle::decoration</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00016">EasyKiConverter::AltiumSchPin::designator</a>, <a class="el" href="SymbolIR_8h_source.html#l00075">EasyKiConverter::IR::SymbolPinIR::designator</a>, <a class="el" href="SymbolIR_8h_source.html#l00088">EasyKiConverter::IR::SymbolPinIR::direction</a>, <a class="el" href="SymbolIR_8h_source.html#l00095">EasyKiConverter::IR::SymbolPinIR::display</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00020">EasyKiConverter::AltiumSchPin::electricalType</a>, <a class="el" href="SymbolIR_8h_source.html#l00091">EasyKiConverter::IR::SymbolPinIR::electricalType</a>, <a class="el" href="SymbolIR_8h_source.html#l00101">EasyKiConverter::IR::SymbolPinIR::hasClock</a>, <a class="el" href="SymbolIR_8h_source.html#l00100">EasyKiConverter::IR::SymbolPinIR::hasDot</a>, <a class="el" href="SymbolIR_8h_source.html#l00081">EasyKiConverter::IR::SymbolPinIR::hasNamePosition</a>, <a class="el" href="SymbolIR_8h_source.html#l00086">EasyKiConverter::IR::SymbolPinIR::hasNumberPosition</a>, <a class="el" href="namespaceEasyKiConverter_1_1IR.html#ae2ebcbc87fff2de2c5b2c6bbb4b52326ab4f85051516c5085ef86dd9ea36ae937">EasyKiConverter::IR::HiZ</a>, <a class="el" href="SymbolIR_8h_source.html#l00032">EasyKiConverter::IR::SymbolPinStyle::inverted</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00024">EasyKiConverter::AltiumSchPin::isHidden</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00019">EasyKiConverter::AltiumSchPin::length</a>, <a class="el" href="SymbolIR_8h_source.html#l00087">EasyKiConverter::IR::SymbolPinIR::length</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00017">EasyKiConverter::AltiumSchPin::locationX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00018">EasyKiConverter::AltiumSchPin::locationY</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00015">EasyKiConverter::AltiumSchPin::name</a>, <a class="el" href="SymbolIR_8h_source.html#l00074">EasyKiConverter::IR::SymbolPinIR::name</a>, <a class="el" href="namespaceEasyKiConverter_1_1IR.html#ae2ebcbc87fff2de2c5b2c6bbb4b52326a66ff3fbc34440398658cf2fa4e7f704c">EasyKiConverter::IR::OpenCollector</a>, <a class="el" href="namespaceEasyKiConverter_1_1IR.html#ae2ebcbc87fff2de2c5b2c6bbb4b52326ae1d9b85cc316bbd2a6447d25ff0edc90">EasyKiConverter::IR::OpenEmitter</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00021">EasyKiConverter::AltiumSchPin::orientation</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00030">EasyKiConverter::AltiumSchPin::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00104">EasyKiConverter::IR::SymbolPinIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00076">EasyKiConverter::IR::SymbolPinIR::position</a>, <a class="el" href="namespaceEasyKiConverter_1_1IR.html#ae2ebcbc87fff2de2c5b2c6bbb4b52326ad60e198096c022a2728e76b5c20c023f">EasyKiConverter::IR::Postponed</a>, <a class="el" href="namespaceEasyKiConverter_1_1AltiumModels.html#a82043bc0b192a8bfd7511136e3b20061add4fe0cc913f704600b97d1f5dd285de">EasyKiConverter::AltiumModels::Power</a>, <a class="el" href="namespaceEasyKiConverter_1_1IR.html#ae2ebcbc87fff2de2c5b2c6bbb4b52326aec8374db32bacb4cd9760199ec42819e">EasyKiConverter::IR::Pulse</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00023">EasyKiConverter::AltiumSchPin::showDesignator</a>, <a class="el" href="SymbolIR_8h_source.html#l00051">EasyKiConverter::IR::SymbolPinDisplay::showDesignator</a>, <a class="el" href="SymbolIR_8h_source.html#l00099">EasyKiConverter::IR::SymbolPinIR::showDesignator</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00022">EasyKiConverter::AltiumSchPin::showName</a>, <a class="el" href="SymbolIR_8h_source.html#l00050">EasyKiConverter::IR::SymbolPinDisplay::showName</a>, <a class="el" href="SymbolIR_8h_source.html#l00098">EasyKiConverter::IR::SymbolPinIR::showName</a>, <a class="el" href="SymbolIR_8h_source.html#l00092">EasyKiConverter::IR::SymbolPinIR::style</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00026">EasyKiConverter::AltiumSchPin::symbolInnerEdge</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00027">EasyKiConverter::AltiumSchPin::symbolOuterEdge</a>, <a class="el" href="AltiumLayerMap_8cpp_source.html#l00083">EasyKiConverter::AltiumLayerMap::toAltiumElectricalType()</a> , 以及 <a class="el" href="AltiumLayerMap_8cpp_source.html#l00098">EasyKiConverter::AltiumLayerMap::toAltiumPinOrientation()</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a06ebed0d564ff4c66beaad60b2605270" name="a06ebed0d564ff4c66beaad60b2605270"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06ebed0d564ff4c66beaad60b2605270">&#9670;&#160;</a></span>convertPolygon()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchPolygon.html">AltiumSchPolygon</a> EasyKiConverter::ExporterAltiumSymbol::convertPolygon </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPolygonIR.html">IR::SymbolPolygonIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>polygon</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolPolygonIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPolygon.html" title="Altium 符号多边形">AltiumSchPolygon</a> 转换 </p>
+<p>SymbolPolygonIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPolygon.html" title="Altium 符号多边形">AltiumSchPolygon</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00412">412</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00077">EasyKiConverter::AltiumSchPolygon::areaColor</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00076">EasyKiConverter::AltiumSchPolygon::color</a>, <a class="el" href="SymbolIR_8h_source.html#l00188">EasyKiConverter::IR::SymbolPolygonIR::fillColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00189">EasyKiConverter::IR::SymbolPolygonIR::isFilled</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00078">EasyKiConverter::AltiumSchPolygon::isSolid</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00075">EasyKiConverter::AltiumSchPolygon::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="AltiumCoord_8h_source.html#l00101">EasyKiConverter::AltiumCoord::mmToSchematicUnits()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00079">EasyKiConverter::AltiumSchPolygon::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00190">EasyKiConverter::IR::SymbolPolygonIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00185">EasyKiConverter::IR::SymbolPolygonIR::points</a>, <a class="el" href="SymbolIR_8h_source.html#l00186">EasyKiConverter::IR::SymbolPolygonIR::strokeColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00187">EasyKiConverter::IR::SymbolPolygonIR::strokeWidth</a> , 以及 <a class="el" href="AltiumSchComponent_8h_source.html#l00074">EasyKiConverter::AltiumSchPolygon::vertices</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a4c3fd508a2a52d4e894e81f927c40603" name="a4c3fd508a2a52d4e894e81f927c40603"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c3fd508a2a52d4e894e81f927c40603">&#9670;&#160;</a></span>convertPolyline()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchPolyline.html">AltiumSchPolyline</a> EasyKiConverter::ExporterAltiumSymbol::convertPolyline </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolPolylineIR.html">IR::SymbolPolylineIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>polyline</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolPolylineIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPolyline.html" title="Altium 符号折线">AltiumSchPolyline</a> 转换 </p>
+<p>SymbolPolylineIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchPolyline.html" title="Altium 符号折线">AltiumSchPolyline</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00430">430</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00101">EasyKiConverter::AltiumSchPolyline::color</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00100">EasyKiConverter::AltiumSchPolyline::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="AltiumCoord_8h_source.html#l00101">EasyKiConverter::AltiumCoord::mmToSchematicUnits()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00102">EasyKiConverter::AltiumSchPolyline::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00177">EasyKiConverter::IR::SymbolPolylineIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00172">EasyKiConverter::IR::SymbolPolylineIR::points</a>, <a class="el" href="SymbolIR_8h_source.html#l00173">EasyKiConverter::IR::SymbolPolylineIR::strokeColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00174">EasyKiConverter::IR::SymbolPolylineIR::strokeWidth</a> , 以及 <a class="el" href="AltiumSchComponent_8h_source.html#l00099">EasyKiConverter::AltiumSchPolyline::vertices</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a1501fce993b5e75a5e8eb22492bf1b42" name="a1501fce993b5e75a5e8eb22492bf1b42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1501fce993b5e75a5e8eb22492bf1b42">&#9670;&#160;</a></span>convertRectangle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchRectangle.html">AltiumSchRectangle</a> EasyKiConverter::ExporterAltiumSymbol::convertRectangle </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolRectangleIR.html">IR::SymbolRectangleIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>rect</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolRectangleIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchRectangle.html" title="Altium 符号矩形">AltiumSchRectangle</a> 转换 </p>
+<p>SymbolRectangleIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchRectangle.html" title="Altium 符号矩形">AltiumSchRectangle</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00343">343</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00041">EasyKiConverter::AltiumSchRectangle::areaColor</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00040">EasyKiConverter::AltiumSchRectangle::color</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00038">EasyKiConverter::AltiumSchRectangle::cornerX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00038">EasyKiConverter::AltiumSchRectangle::cornerY</a>, <a class="el" href="SymbolIR_8h_source.html#l00118">EasyKiConverter::IR::SymbolRectangleIR::fillColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00119">EasyKiConverter::IR::SymbolRectangleIR::isFilled</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00042">EasyKiConverter::AltiumSchRectangle::isSolid</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00039">EasyKiConverter::AltiumSchRectangle::lineWidth</a>, <a class="el" href="AltiumCoord_8h_source.html#l00076">EasyKiConverter::AltiumCoord::lineWidthMmToIndex()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00037">EasyKiConverter::AltiumSchRectangle::locationX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00037">EasyKiConverter::AltiumSchRectangle::locationY</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00043">EasyKiConverter::AltiumSchRectangle::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00120">EasyKiConverter::IR::SymbolRectangleIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00116">EasyKiConverter::IR::SymbolRectangleIR::strokeColor</a>, <a class="el" href="SymbolIR_8h_source.html#l00117">EasyKiConverter::IR::SymbolRectangleIR::strokeWidth</a>, <a class="el" href="SymbolIR_8h_source.html#l00112">EasyKiConverter::IR::SymbolRectangleIR::x0</a>, <a class="el" href="SymbolIR_8h_source.html#l00114">EasyKiConverter::IR::SymbolRectangleIR::x1</a>, <a class="el" href="SymbolIR_8h_source.html#l00113">EasyKiConverter::IR::SymbolRectangleIR::y0</a> , 以及 <a class="el" href="SymbolIR_8h_source.html#l00115">EasyKiConverter::IR::SymbolRectangleIR::y1</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a58a60b0f43ffc27971ca0fc550425127" name="a58a60b0f43ffc27971ca0fc550425127"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58a60b0f43ffc27971ca0fc550425127">&#9670;&#160;</a></span>convertSymbol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html">AltiumSchComponent</a> EasyKiConverter::ExporterAltiumSymbol::convertSymbol </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolComponentIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html" title="Altium 符号元件">AltiumSchComponent</a> 转换 </p>
+<p>SymbolComponentIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchComponent.html" title="Altium 符号元件">AltiumSchComponent</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">190</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00123">EasyKiConverter::AltiumSchText::anchor</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00144">EasyKiConverter::AltiumSchComponent::arcs</a>, <a class="el" href="SymbolIR_8h_source.html#l00241">EasyKiConverter::IR::SymbolComponentIR::arcs</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00497">centerComponent()</a>, <a class="el" href="SymbolIR_8h_source.html#l00240">EasyKiConverter::IR::SymbolComponentIR::circles</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00377">convertArc()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00360">convertCircle()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00478">convertEllipse()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00446">convertPath()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00261">convertPin()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00412">convertPolygon()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00430">convertPolyline()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00343">convertRectangle()</a>, <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00462">convertText()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00137">EasyKiConverter::AltiumSchComponent::description</a>, <a class="el" href="SymbolIR_8h_source.html#l00231">EasyKiConverter::IR::SymbolComponentIR::description</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00138">EasyKiConverter::AltiumSchComponent::designatorPrefix</a>, <a class="el" href="SymbolIR_8h_source.html#l00232">EasyKiConverter::IR::SymbolComponentIR::designatorPrefix</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00146">EasyKiConverter::AltiumSchComponent::ellipses</a>, <a class="el" href="SymbolIR_8h_source.html#l00242">EasyKiConverter::IR::SymbolComponentIR::ellipses</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00122">EasyKiConverter::AltiumSchText::fontSizeMm</a>, <a class="el" href="SymbolIR_8h_source.html#l00249">EasyKiConverter::IR::SymbolComponentIR::footprintName</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00157">EasyKiConverter::AltiumSchComponent::implementations</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00125">EasyKiConverter::AltiumSchText::isDisplayed</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00119">EasyKiConverter::AltiumSchText::locationX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00119">EasyKiConverter::AltiumSchText::locationY</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00153">EasyKiConverter::AltiumSchComponent::Implementation::modelName</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00154">EasyKiConverter::AltiumSchComponent::Implementation::modelType</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00136">EasyKiConverter::AltiumSchComponent::name</a>, <a class="el" href="SymbolIR_8h_source.html#l00230">EasyKiConverter::IR::SymbolComponentIR::name</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00127">EasyKiConverter::AltiumSchText::orientation</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00128">EasyKiConverter::AltiumSchText::ownerPartId</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00139">EasyKiConverter::AltiumSchComponent::partCount</a>, <a class="el" href="SymbolIR_8h_source.html#l00233">EasyKiConverter::IR::SymbolComponentIR::partCount</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00148">EasyKiConverter::AltiumSchComponent::paths</a>, <a class="el" href="SymbolIR_8h_source.html#l00245">EasyKiConverter::IR::SymbolComponentIR::paths</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00141">EasyKiConverter::AltiumSchComponent::pins</a>, <a class="el" href="SymbolIR_8h_source.html#l00238">EasyKiConverter::IR::SymbolComponentIR::pins</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00145">EasyKiConverter::AltiumSchComponent::polygons</a>, <a class="el" href="SymbolIR_8h_source.html#l00244">EasyKiConverter::IR::SymbolComponentIR::polygons</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00147">EasyKiConverter::AltiumSchComponent::polylines</a>, <a class="el" href="SymbolIR_8h_source.html#l00243">EasyKiConverter::IR::SymbolComponentIR::polylines</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00142">EasyKiConverter::AltiumSchComponent::rectangles</a>, <a class="el" href="SymbolIR_8h_source.html#l00239">EasyKiConverter::IR::SymbolComponentIR::rectangles</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00120">EasyKiConverter::AltiumSchText::text</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00149">EasyKiConverter::AltiumSchComponent::texts</a> , 以及 <a class="el" href="SymbolIR_8h_source.html#l00246">EasyKiConverter::IR::SymbolComponentIR::texts</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00157">exportSymbol()</a> , 以及 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00170">exportSymbolLibrary()</a>.</p>
+
+</div>
+</div>
+<a id="a50f397a451fd30ad6d352155679b32d7" name="a50f397a451fd30ad6d352155679b32d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50f397a451fd30ad6d352155679b32d7">&#9670;&#160;</a></span>convertText()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structEasyKiConverter_1_1AltiumSchText.html">AltiumSchText</a> EasyKiConverter::ExporterAltiumSymbol::convertText </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolTextIR.html">IR::SymbolTextIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>text</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>SymbolTextIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchText.html" title="Altium 符号文本">AltiumSchText</a> 转换 </p>
+<p>SymbolTextIR → <a class="el" href="structEasyKiConverter_1_1AltiumSchText.html" title="Altium 符号文本">AltiumSchText</a> </p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00462">462</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="AltiumSchComponent_8h_source.html#l00124">EasyKiConverter::AltiumSchText::color</a>, <a class="el" href="SymbolIR_8h_source.html#l00214">EasyKiConverter::IR::SymbolTextIR::color</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00121">EasyKiConverter::AltiumSchText::fontId</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00126">EasyKiConverter::AltiumSchText::isHidden</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00119">EasyKiConverter::AltiumSchText::locationX</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00119">EasyKiConverter::AltiumSchText::locationY</a>, <a class="el" href="AltiumCoord_8h_source.html#l00092">EasyKiConverter::AltiumCoord::mmToRaw()</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00127">EasyKiConverter::AltiumSchText::orientation</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00128">EasyKiConverter::AltiumSchText::ownerPartId</a>, <a class="el" href="SymbolIR_8h_source.html#l00220">EasyKiConverter::IR::SymbolTextIR::partIndex</a>, <a class="el" href="SymbolIR_8h_source.html#l00212">EasyKiConverter::IR::SymbolTextIR::position</a>, <a class="el" href="SymbolIR_8h_source.html#l00213">EasyKiConverter::IR::SymbolTextIR::rotation</a>, <a class="el" href="AltiumSchComponent_8h_source.html#l00120">EasyKiConverter::AltiumSchText::text</a>, <a class="el" href="SymbolIR_8h_source.html#l00211">EasyKiConverter::IR::SymbolTextIR::text</a> , 以及 <a class="el" href="SymbolIR_8h_source.html#l00219">EasyKiConverter::IR::SymbolTextIR::visible</a>.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>.</p>
+
+</div>
+</div>
+<a id="a8233cc0c333dc03fad95b96ba3477545" name="a8233cc0c333dc03fad95b96ba3477545"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8233cc0c333dc03fad95b96ba3477545">&#9670;&#160;</a></span>exportSymbol()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool EasyKiConverter::ExporterAltiumSymbol::exportSymbol </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a> &amp;&#160;</td>
+          <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>filePath</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>导出单个符号到 SchLib 文件 </p>
+<p>导出单个符号 </p>
+
+<p>实现了 <a class="el" href="classEasyKiConverter_1_1ISymbolExporter.html#ab86be9ed1c09069f5618d1b78c6355c1">EasyKiConverter::ISymbolExporter</a>.</p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00157">157</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>, <a class="el" href="ExporterAltiumSymbol_8h_source.html#l00095">m_writer</a> , 以及 <a class="el" href="AltiumSchLibWriter_8cpp_source.html#l00073">EasyKiConverter::AltiumSchLibWriter::write()</a>.</p>
+
+</div>
+</div>
+<a id="a8360863b7361b12bdf332278af16164d" name="a8360863b7361b12bdf332278af16164d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8360863b7361b12bdf332278af16164d">&#9670;&#160;</a></span>exportSymbolLibrary()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool EasyKiConverter::ExporterAltiumSymbol::exportSymbolLibrary </td>
+          <td>(</td>
+          <td class="paramtype">const QList&lt; <a class="el" href="structEasyKiConverter_1_1IR_1_1SymbolComponentIR.html">IR::SymbolComponentIR</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>symbols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>libName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>filePath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>appendMode</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>updateMode</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>libraryDescription</em> = <code>QString()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>导出符号库（多个符号合并到一个 SchLib 文件） </p>
+<p>导出符号库 </p>
+
+<p>实现了 <a class="el" href="classEasyKiConverter_1_1ISymbolExporter.html#ae3e7e965184c23ef02f7bfeae201d1de">EasyKiConverter::ISymbolExporter</a>.</p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a> 第 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00170">170</a> 行定义.</p>
+
+<p class="reference">引用了 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00190">convertSymbol()</a>, <a class="el" href="ExporterAltiumSymbol_8h_source.html#l00095">m_writer</a> , 以及 <a class="el" href="AltiumSchLibWriter_8cpp_source.html#l00073">EasyKiConverter::AltiumSchLibWriter::write()</a>.</p>
+
+</div>
+</div>
+<a id="a11f0761ef8e27b6fd97829c0b8c88d0d" name="a11f0761ef8e27b6fd97829c0b8c88d0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11f0761ef8e27b6fd97829c0b8c88d0d">&#9670;&#160;</a></span>libraryFileExtension()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString EasyKiConverter::ExporterAltiumSymbol::libraryFileExtension </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取符号库文件扩展名 </p>
+<dl class="section return"><dt>返回</dt><dd>".SchLib" </dd></dl>
+
+<p>实现了 <a class="el" href="classEasyKiConverter_1_1ISymbolExporter.html#a237736caad0b82fbf8ddcec29de2ef75">EasyKiConverter::ISymbolExporter</a>.</p>
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8h_source.html">ExporterAltiumSymbol.h</a> 第 <a class="el" href="ExporterAltiumSymbol_8h_source.html#l00020">20</a> 行定义.</p>
+
+</div>
+</div>
+<h2 class="groupheader">类成员变量说明</h2>
+<a id="aad5ec10afd0e94b72451f62f5b69a7f2" name="aad5ec10afd0e94b72451f62f5b69a7f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad5ec10afd0e94b72451f62f5b69a7f2">&#9670;&#160;</a></span>m_writer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classEasyKiConverter_1_1AltiumSchLibWriter.html">AltiumSchLibWriter</a> EasyKiConverter::ExporterAltiumSymbol::m_writer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">在文件 <a class="el" href="ExporterAltiumSymbol_8h_source.html">ExporterAltiumSymbol.h</a> 第 <a class="el" href="ExporterAltiumSymbol_8h_source.html#l00095">95</a> 行定义.</p>
+
+<p class="reference">被这些函数引用 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00157">exportSymbol()</a> , 以及 <a class="el" href="ExporterAltiumSymbol_8cpp_source.html#l00170">exportSymbolLibrary()</a>.</p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>core/altium/<a class="el" href="ExporterAltiumSymbol_8h_source.html">ExporterAltiumSymbol.h</a></li>
+<li>core/altium/<a class="el" href="ExporterAltiumSymbol_8cpp_source.html">ExporterAltiumSymbol.cpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceEasyKiConverter.html">EasyKiConverter</a></li><li class="navelem"><a class="el" href="classEasyKiConverter_1_1ExporterAltiumSymbol.html">ExporterAltiumSymbol</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

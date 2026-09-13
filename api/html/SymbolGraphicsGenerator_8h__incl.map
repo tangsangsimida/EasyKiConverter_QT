@@ -1,0 +1,22 @@
+<map id="core/kicad/SymbolGraphicsGenerator.h" name="core/kicad/SymbolGraphicsGenerator.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="301,5,499,45"/>
+<area shape="rect" id="Node000002" href="$SymbolIR_8h.html" title="原理图符号的通用中间表示" alt="" coords="200,93,341,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="370,48,303,88,300,84,367,43"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="129,240,199,265"/>
+<area shape="poly" id="edge11_Node000001_Node000005" title=" " alt="" coords="439,43,486,72,531,108,548,129,557,150,557,172,546,194,523,211,488,224,398,242,298,251,213,254,213,249,298,246,397,237,487,219,520,206,542,190,552,171,552,151,543,132,527,112,483,76,436,48"/>
+<area shape="rect" id="Node000003" href="$IRTypes_8h.html" title="EDA 无关的通用枚举和类型定义" alt="" coords="44,167,127,192"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="242,121,129,164,127,159,240,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,240,72,265"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="200,118,101,137,59,151,34,168,28,181,26,196,31,226,26,227,20,196,23,180,30,165,57,146,99,132,199,113"/>
+<area shape="poly" id="edge10_Node000002_Node000005" title=" " alt="" coords="250,121,220,141,193,168,178,198,170,227,165,226,173,196,188,165,217,137,247,117"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="202,167,257,192"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="266,120,245,156,241,153,262,118"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="281,167,341,192"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="280,118,300,153,295,156,275,120"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="365,167,438,192"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="293,116,369,158,367,162,290,121"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="463,167,532,192"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="308,116,450,161,449,166,306,121"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="80,194,56,230,52,227,75,191"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="100,190,143,229,139,233,96,194"/>
+</map>

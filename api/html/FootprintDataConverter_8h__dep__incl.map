@@ -1,0 +1,9 @@
+<map id="core/ir/FootprintDataConverter.h" name="core/ir/FootprintDataConverter.h">
+<area shape="rect" id="Node000001" title="FootprintData &#45;&gt; FootprintComponentIR 转换桥接" alt="" coords="254,5,485,31"/>
+<area shape="rect" id="Node000002" href="$ComponentDataConverter_8h.html" title="ComponentData &#45;&gt; ComponentIR 转换桥接" alt="" coords="5,86,253,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="322,37,165,89,163,83,321,32"/>
+<area shape="rect" id="Node000003" href="$FootprintExportStage_8cpp.html" title=" " alt="" coords="277,79,461,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="372,44,372,79,367,79,367,44"/>
+<area shape="rect" id="Node000004" href="$WriteWorker_8cpp.html" title=" " alt="" coords="486,86,669,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="413,33,548,83,546,88,411,38"/>
+</map>

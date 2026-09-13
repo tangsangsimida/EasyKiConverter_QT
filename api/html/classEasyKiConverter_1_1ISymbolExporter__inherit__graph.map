@@ -1,0 +1,7 @@
+<map id="EasyKiConverter::ISymbolExporter" name="EasyKiConverter::ISymbolExporter">
+<area shape="rect" id="Node000001" title="符号导出器通用接口" alt="" coords="115,5,297,145"/>
+<area shape="rect" id="Node000002" href="$classEasyKiConverter_1_1ExporterAltiumSymbol.html" title="Altium 符号导出器" alt="" coords="5,193,191,533"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,159,165,194,160,192,173,157"/>
+<area shape="rect" id="Node000003" href="$classEasyKiConverter_1_1ExporterSymbol.html" title="KiCad 符号导出器类" alt="" coords="215,243,413,483"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="239,157,272,242,267,244,234,159"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="core/interfaces/ISymbolExporter.h" name="core/interfaces/ISymbolExporter.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="384,5,627,31"/>
+<area shape="rect" id="Node000002" href="$SymbolIR_8h.html" title="原理图符号的通用中间表示" alt="" coords="207,79,348,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="469,33,328,77,327,72,468,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="129,225,199,251"/>
+<area shape="poly" id="edge12_Node000001_Node000005" title=" " alt="" coords="516,29,536,58,554,97,560,119,562,140,558,161,547,179,524,196,490,210,399,228,299,236,214,239,213,234,299,231,398,222,488,205,522,192,543,176,553,159,557,140,555,120,549,99,531,61,512,32"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="478,152,533,177"/>
+<area shape="poly" id="edge11_Node000001_Node000006" title=" " alt="" coords="508,31,508,138,503,138,503,31"/>
+<area shape="rect" id="Node000003" href="$IRTypes_8h.html" title="EDA 无关的通用枚举和类型定义" alt="" coords="44,152,127,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="247,107,131,149,129,144,246,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,225,72,251"/>
+<area shape="poly" id="edge5_Node000002_Node000004" title=" " alt="" coords="207,103,104,122,60,136,34,154,28,167,26,181,31,212,26,213,20,182,23,165,30,150,58,131,102,116,206,98"/>
+<area shape="poly" id="edge10_Node000002_Node000005" title=" " alt="" coords="253,106,221,126,191,154,177,183,169,212,164,211,172,181,187,150,217,122,250,102"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="315,101,466,148,464,153,313,107"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="202,152,262,177"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="272,106,249,142,244,139,268,103"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="286,152,359,177"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="287,103,310,139,306,142,283,106"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="384,152,453,177"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="301,102,385,143,382,148,299,106"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="80,179,56,215,52,212,75,176"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="100,175,143,214,139,218,96,179"/>
+</map>
