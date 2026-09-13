@@ -347,6 +347,24 @@ jobs:
             echo "ERROR: QML directory not found in any location!"
             exit 1
           fi
+
+          # artifact 传输不会可靠保留 Qt 库的符号链接。Quick Controls 2 主库
+          # 会被 QML 运行时动态加载，因此将其从 Qt 安装目录复制为真实文件。
+          REQUIRED_QT_LIBRARY="libQt6QuickControls2.so.6"
+          QT_LIBS="${QT_LIBS:-$(qmake -query QT_INSTALL_LIBS 2>/dev/null || echo "")}"
+          if [ ! -d "$QT_LIBS" ]; then
+            echo "ERROR: Qt library directory not found: $QT_LIBS"
+            exit 1
+          fi
+          QT_CONTROLS_LIBRARY=$(find "$QT_LIBS" -maxdepth 1 -type f \
+            \( -name "$REQUIRED_QT_LIBRARY" -o -name "$REQUIRED_QT_LIBRARY.*" \) -print -quit)
+          if [ -z "$QT_CONTROLS_LIBRARY" ]; then
+            echo "ERROR: Qt Quick Controls 2 library not found in $QT_LIBS"
+            exit 1
+          fi
+          mkdir -p "${APPIMAGE_DST_PATH}/usr/lib"
+          cp -L "$QT_CONTROLS_LIBRARY" "${APPIMAGE_DST_PATH}/usr/lib/$REQUIRED_QT_LIBRARY"
+          echo "✓ Copied $REQUIRED_QT_LIBRARY as a regular file"
           
           # 严格验证关键 QML 模块
           QML_CONTROLS_FOUND=false
@@ -649,8 +667,8 @@ jobs:
 
           # 验证关键 Qt 库
           for lib in libQt6Quick.so.6 libQt6Qml.so.6 libQt6QuickControls2.so.6; do
-            if [ ! -f "${APPIMAGE_DST_PATH}/usr/lib/$lib" ]; then
-              echo "ERROR: Required library not found: $lib"
+            if [ ! -f "${APPIMAGE_DST_PATH}/usr/lib/$lib" ] || [ -L "${APPIMAGE_DST_PATH}/usr/lib/$lib" ]; then
+              echo "ERROR: Required library is missing or not a regular file: $lib"
               exit 1
             fi
           done
