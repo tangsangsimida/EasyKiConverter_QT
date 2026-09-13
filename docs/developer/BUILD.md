@@ -116,6 +116,12 @@ Windows 发布构建同时支持以下架构：
 
 ARM64 发布包由 GitHub Actions 的 `windows-11-arm` runner 构建，生成 ARM64 便携版、安装程序和 MSIX 包。
 
+### LoongArch64（龙架构）
+
+LoongArch64 暂未提供可执行的 GitHub Actions 构建工作流或正式发布包。GitHub 官方 runner 不支持 LoongArch64，项目也尚未配置可用的第三方原生 CI 或 x86_64/ARM64 交叉编译工具链，因此暂不保留不可执行的 workflow 配置。
+
+后续具备可运行的构建基础设施后，再增加独立的 Qt、工具链、测试和 `loongarch64` 发布包流程。
+
 ### macOS
 
 #### 使用 Homebrew 安装

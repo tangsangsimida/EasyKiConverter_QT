@@ -112,6 +112,12 @@ Windows release builds support both architectures:
 
 The ARM64 release packages are built on the GitHub Actions `windows-11-arm` runner and include portable, installer, and MSIX packages.
 
+### LoongArch64
+
+LoongArch64 does not currently have an executable GitHub Actions workflow or official release package. GitHub-hosted runners do not support LoongArch64, and the project does not yet have a usable third-party native CI or x86_64/ARM64 cross-compilation toolchain, so no non-runnable workflow configuration is kept in the repository.
+
+Once usable build infrastructure is available, add an independent Qt, toolchain, test, and `loongarch64` packaging workflow.
+
 ### macOS
 
 #### 1. Install Qt
