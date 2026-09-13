@@ -214,7 +214,7 @@ jobs:
             (cd release_assets && sha256sum -c "$(basename "$checksum")")
             asset_name="${checksum%.sha256sum}"
             [[ -f "$asset_name" ]] || { echo "Checksum has no matching asset: $checksum"; exit 1; }
-            referenced_asset="$(awk '{print $2}' "$checksum" | sed 's/^\*//')"
+            referenced_asset="$(awk '{print $2}' "$checksum" | sed 's/^\*//' | tr -d '\r' | xargs -r basename)"
             [[ "$referenced_asset" == "$(basename "$asset_name")" ]] || {
               echo "Checksum file references an unexpected asset: $checksum"
               exit 1
