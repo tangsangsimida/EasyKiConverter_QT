@@ -63,6 +63,45 @@ fix_permissions() {
     chmod 755 "$appdir/AppRun.wrapped" 2>/dev/null || true
 }
 
+ensure_qt_quick_controls_library() {
+    local appdir="$1"
+    local required_library="$appdir/usr/lib/libQt6QuickControls2.so.6"
+
+    if [ -f "$required_library" ] && [ ! -L "$required_library" ]; then
+        return
+    fi
+
+    local qt_libs="${QT_LIBS:-}"
+    if [ -z "$qt_libs" ] && command -v qmake >/dev/null 2>&1; then
+        qt_libs="$(qmake -query QT_INSTALL_LIBS 2>/dev/null || true)"
+    fi
+
+    local source_library=""
+    if [ -d "$qt_libs" ]; then
+        source_library="$(find "$qt_libs" -maxdepth 1 -type f \
+            \( -name "libQt6QuickControls2.so.6" -o -name "libQt6QuickControls2.so.6.*" \) \
+            -print -quit)"
+    fi
+    if [ -z "$source_library" ] && [ -d /opt/qt ]; then
+        source_library="$(find /opt/qt -type f \
+            \( -name "libQt6QuickControls2.so.6" -o -name "libQt6QuickControls2.so.6.*" \) \
+            -print -quit 2>/dev/null)"
+    fi
+    if [ -z "$source_library" ]; then
+        echo "ERROR: Qt Quick Controls 2 library is missing from AppDir and Qt installation" >&2
+        exit 1
+    fi
+
+    mkdir -p "$(dirname "$required_library")"
+    rm -f "$required_library"
+    cp -L "$source_library" "$required_library"
+    if [ ! -f "$required_library" ] || [ -L "$required_library" ]; then
+        echo "ERROR: Qt Quick Controls 2 library was not restored as a regular file" >&2
+        exit 1
+    fi
+    echo "✓ Restored libQt6QuickControls2.so.6 from $source_library"
+}
+
 render_nfpm_config() {
     local appdir="$1"
     local version="$2"
@@ -102,6 +141,10 @@ package_appimage() {
 
     sed -i "s|^Exec=.*easykiconverter|Exec=AppRun|" "$appdir/io.github.tangsangsimida.easykiconverter.desktop"
     sed -i "s|^Exec=.*easykiconverter|Exec=AppRun|" "$appdir/usr/share/applications/io.github.tangsangsimida.easykiconverter.desktop"
+
+    # artifact 传输或 linuxdeploy 处理可能丢失 Qt 主库的符号链接目标。
+    # 在 appimagetool 读取 AppDir 前强制恢复为真实文件，避免运行时退出 127。
+    ensure_qt_quick_controls_library "$appdir"
 
     # linuxdeploy 可能在准备阶段新建或覆盖包装启动脚本，必须在 appimagetool
     # 读取 AppDir 前再次修复两个启动文件的执行权限。
