@@ -370,8 +370,15 @@ jobs:
           if (Test-Path $manifestPath) {
             [xml]$xml = Get-Content $manifestPath
             $xml.Package.Identity.Version = $msixVersion
+            $expectedArchitecture = "${{ matrix.config.package_arch }}"
+            if ($expectedArchitecture -notin @('x64', 'arm64')) {
+              Write-Error "Unsupported MSIX architecture: $expectedArchitecture"
+              exit 1
+            }
+            $xml.Package.Identity.ProcessorArchitecture = $expectedArchitecture
             $xml.Save($manifestPath)
             Write-Host "Manifest version updated to: $msixVersion"
+            Write-Host "Manifest architecture updated to: $expectedArchitecture"
           } else {
             Write-Error "AppxManifest.xml not found at $manifestPath"
             exit 1
@@ -413,6 +420,21 @@ jobs:
                 $manifestInStaging = "$stagingDir\AppxManifest.xml"
                 if (-not (Test-Path $manifestInStaging)) {
                   Write-Error "AppxManifest.xml not found in staging directory at $manifestInStaging"
+                  exit 1
+                }
+
+                [xml]$stagingManifest = Get-Content $manifestInStaging
+                $expectedArchitecture = "${{ matrix.config.package_arch }}"
+                $actualArchitecture = $stagingManifest.Package.Identity.ProcessorArchitecture
+                if ($actualArchitecture -ne $expectedArchitecture) {
+                  Write-Error "MSIX architecture mismatch: expected '$expectedArchitecture', got '$actualArchitecture'"
+                  exit 1
+                }
+                Write-Host "MSIX manifest architecture verified: $actualArchitecture"
+
+                $packagedExecutable = Join-Path $stagingDir 'easykiconverter.exe'
+                if (-not (Test-Path $packagedExecutable)) {
+                  Write-Error "MSIX executable not found in staging directory: $packagedExecutable"
                   exit 1
                 }
       
