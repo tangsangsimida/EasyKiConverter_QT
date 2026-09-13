@@ -124,7 +124,9 @@ LoongArch64 使用独立的原生构建流程，不复用 x86_64 或 ARM64 的 Q
 self-hosted, linux, loongarch64
 ```
 
-Runner 必须预装 Qt 6、CMake、Ninja 以及项目运行所需的 Linux 开发库，并确保 `qmake6`/`qmake` 能查询到 Qt 6。发布流程会生成：
+Runner 必须预装 Qt 6、CMake、Ninja 以及项目运行所需的 Linux 开发库，并确保 `qmake6`/`qmake` 能查询到 Qt 6。该工作流目前仅支持手动触发，不在正式发布流程的强制依赖链中；这是因为 GitHub 官方托管 runner 不提供 LoongArch64，项目也尚未配置可用的 LoongArch64 或交叉编译基础设施。
+
+配置好可用 runner 后，工作流会生成：
 
 ```text
 EasyKiConverter-<version>-g<commit>-loongarch64.tar.gz

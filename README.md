@@ -38,7 +38,7 @@
 请前往 [Releases](https://github.com/tangsangsimida/EasyKiConverter/releases) 页面下载适用于您平台的版本：
 
 *   **Windows**: 提供 x64 和 ARM64 版本；请按设备架构下载对应的 `.exe` 安装程序或 `.zip` 便携版。
-*   **Linux**: x86_64/ARM64 推荐下载 `.AppImage`；LoongArch64 下载对应的 `loongarch64.tar.gz` 原生归档。
+*   **Linux**: 推荐下载 x86_64/ARM64 `.AppImage`；LoongArch64 构建目前需要单独配置构建基础设施，暂未纳入正式发布包。
 *   **macOS**: 下载 `.dmg` 镜像文件。
 *   **Arch Linux**: `yay -S easykiconverter`
 

@@ -120,7 +120,9 @@ LoongArch64 uses an independent native build workflow and does not reuse the x86
 self-hosted, linux, loongarch64
 ```
 
-The runner must provide Qt 6, CMake, Ninja, and the Linux development libraries required by the project. `qmake6` or `qmake` must resolve to Qt 6. The release workflow produces:
+The runner must provide Qt 6, CMake, Ninja, and the Linux development libraries required by the project. `qmake6` or `qmake` must resolve to Qt 6. This workflow is currently manual-only and is not a mandatory dependency of the official release workflow because GitHub-hosted runners do not provide LoongArch64 and the project has not yet configured a usable LoongArch64 or cross-compilation infrastructure.
+
+Once a usable runner is configured, the workflow produces:
 
 ```text
 EasyKiConverter-<version>-g<commit>-loongarch64.tar.gz

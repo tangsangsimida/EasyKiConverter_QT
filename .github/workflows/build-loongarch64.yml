@@ -7,16 +7,6 @@ on:
         description: 'Release tag to build'
         required: false
         type: string
-  workflow_call:
-    inputs:
-      tag_name:
-        description: 'Release tag to build'
-        required: true
-        type: string
-      target_sha:
-        description: 'Fixed release commit SHA'
-        required: false
-        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -38,7 +28,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
+          ref: ${{ inputs.tag_name || github.ref }}
 
       - name: Record Start Time
         run: echo "BUILD_START_TIME=$(date +%s)" >> "$GITHUB_ENV"
