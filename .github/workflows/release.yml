@@ -171,7 +171,9 @@ jobs:
           }
 
           require_asset '*-win64.zip'
+          require_asset '*-win64-arm64.zip'
           require_asset '*-x64-setup.exe'
+          require_asset '*-arm64-setup.exe'
           require_asset '*.x86_64.AppImage'
           require_asset '*.aarch64.AppImage'
           require_asset '*_amd64.deb'
@@ -182,7 +184,8 @@ jobs:
           require_asset '*_aarch64.pkg.tar.zst'
           require_asset '*-intel.dmg'
           require_asset '*-arm64.dmg'
-          require_asset '*.msix'
+          require_asset '*-x64.msix'
+          require_asset '*-arm64.msix'
 
           target_short_sha="${TARGET_SHA:0:7}"
           while IFS= read -r asset; do

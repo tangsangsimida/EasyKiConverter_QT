@@ -36,7 +36,7 @@
 ### Installation
 Please visit the [Releases](https://github.com/tangsangsimida/EasyKiConverter/releases) page to download the version for your platform:
 
-*   **Windows**: Recommended to download `.exe` installer (includes complete runtime), or download `.zip` portable version.
+*   **Windows**: x64 and ARM64 builds are available; download the matching `.exe` installer or `.zip` portable package for your device.
 *   **Linux**: Recommended to download `.AppImage` (no installation required, just grant execute permission and run), or `.tar.gz` archive.
 *   **macOS**: Download `.dmg` image file.
 *   **Arch Linux**: `yay -S easykiconverter`
