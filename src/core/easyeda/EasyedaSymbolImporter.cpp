@@ -1,3 +1,7 @@
+/**
+ * @file EasyedaSymbolImporter.cpp
+ * @brief EasyedaSymbolImporter 的实现。
+ */
 #include "EasyedaSymbolImporter.h"
 
 #include "EasyedaUtils.h"
@@ -80,13 +84,19 @@ QSharedPointer<SymbolData> EasyedaSymbolImporter::importSymbolData(const QJsonOb
             symbolBbox.y = bbox["y"].toDouble();
             symbolBbox.width = bbox["width"].toDouble();
             symbolBbox.height = bbox["height"].toDouble();
-        } else if (dataStr.contains("head")) {
+        }
+        if (dataStr.contains("head")) {
             QJsonObject head = dataStr["head"].toObject();
-            symbolBbox.x = head["x"].toDouble();
-            symbolBbox.y = head["y"].toDouble();
-            symbolBbox.width = 0;
-            symbolBbox.height = 0;
-            qWarning() << "Symbol BBox not found in dataStr, using head.x/y as center point";
+            if (head.contains("x") && head.contains("y")) {
+                symbolBbox.headX = head["x"].toDouble();
+                symbolBbox.headY = head["y"].toDouble();
+                symbolBbox.hasHeadCenter = true;
+            }
+            if (symbolBbox.width <= 0.0 || symbolBbox.height <= 0.0) {
+                symbolBbox.x = symbolBbox.headX;
+                symbolBbox.y = symbolBbox.headY;
+                qWarning() << "Symbol BBox not found in dataStr, using head.x/y as center point";
+            }
         }
         symbolData->setBbox(symbolBbox);
     }
@@ -310,12 +320,21 @@ SymbolPin EasyedaSymbolImporter::importPinData(const QString& pinData) {
 
             pin.dot.circleX = segments[4][1].toDouble();
             pin.dot.circleY = segments[4][2].toDouble();
+            // Segment 4 的首字段描述 Pin Dot 状态，不直接等同于 Pin Number 显示状态。
+            // 只有存在编号文本时才建立可导出的编号文本元数据。
+            pin.number.isDisplayed = false;
+            pin.number.posX = pin.dot.circleX;
+            pin.number.posY = pin.dot.circleY;
+            pin.number.rotation = pin.settings.rotation;
+            pin.number.textAnchor = QStringLiteral("middle");
 
             qDebug() << "  dot.isDisplayed set to: false (always hide)";
 
             QString pinNumberDisplayText = segments[4][4];
             if (!pinNumberDisplayText.isEmpty()) {
                 pin.settings.spicePinNumber = pinNumberDisplayText;
+                pin.number.text = pinNumberDisplayText;
+                pin.number.isDisplayed = true;
                 qDebug() << "Pin Number Display Text extracted from Segment 4:" << pinNumberDisplayText << "for pin"
                          << pin.name.text << "(replaced spicePinNumber)";
             }
@@ -474,7 +493,10 @@ SymbolText EasyedaSymbolImporter::importTextData(const QString& textData) {
     SymbolText text;
     QStringList fields = EasyedaUtils::parseDataString(textData);
 
-    if (fields.size() >= 15) {
+    // EasyEDA T 记录布局：字段 10 为基线，字段 11 为文本类型，
+    // 字段 12 才是实际显示文本；旧实现将字段 11 误写入 text，
+    // 导致所有符号文本在 Altium 中显示为 "comment"。
+    if (fields.size() >= 16) {
         text.mark = fields[0];
         text.posX = fields[1].toDouble();
         text.posY = fields[2].toDouble();
@@ -484,13 +506,13 @@ SymbolText EasyedaSymbolImporter::importTextData(const QString& textData) {
         text.textSize = fields[6].toDouble();
         text.bold = EasyedaUtils::stringToBool(fields[7]);
         text.italic = fields[8];
-        text.baseline = fields[9];
-        text.type = fields[10];
-        text.text = fields[11];
-        text.visible = EasyedaUtils::stringToBool(fields[12]);
-        text.anchor = fields[13];
-        text.id = fields[14];
-        text.isLocked = fields.size() > 15 ? EasyedaUtils::stringToBool(fields[15]) : false;
+        text.baseline = fields[10];
+        text.type = fields[11];
+        text.text = fields[12];
+        text.visible = EasyedaUtils::stringToBool(fields[13]);
+        text.anchor = fields[14];
+        text.id = fields[15];
+        text.isLocked = fields.size() > 16 ? EasyedaUtils::stringToBool(fields[16]) : false;
     }
 
     return text;

@@ -19,15 +19,15 @@ permissions:
 jobs:
   clang-format:
     name: 'Check clang-format'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
       - name: 'Run clang-format check'
-        uses: DoozyX/clang-format-lint-action@v0.18
+        uses: DoozyX/clang-format-lint-action@c71d0bf4e21876ebec3e5647491186f8797fde31 # v0.18
         with:
           source: './src'
           extensions: 'h,cpp'

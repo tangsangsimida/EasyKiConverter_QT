@@ -9,6 +9,7 @@ Rectangle {
     // 外部属性
     property int windowRadius: 0
     property var windowController
+    property string appVersion: ""
     width: parent.width
     height: 38
     color: AppStyle.colors.surface
@@ -62,8 +63,20 @@ Rectangle {
             font.pixelSize: AppStyle.titleBar.fontSize
             font.bold: true
             Layout.leftMargin: 12
-            Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
+        }
+
+        // 在顶部左侧常驻显示构建时注入的当前版本。
+        Text {
+            text: appVersion.length > 0 ? qsTr("v%1").arg(appVersion) : ""
+            color: AppStyle.colors.textSecondary
+            font.pixelSize: AppStyle.fontSizes.xs
+            Layout.leftMargin: 8
+            Layout.alignment: Qt.AlignVCenter
+        }
+
+        Item {
+            Layout.fillWidth: true
         }
 
         // 窗口控制按钮

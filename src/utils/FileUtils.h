@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QProcess>
 #include <QString>
+#include <QUrl>
 
 namespace EasyKiConverter {
 
@@ -37,6 +38,20 @@ public:
      * @return 绝对路径
      */
     Q_INVOKABLE QString toAbsolutePath(const QString& path);
+
+    /**
+     * @brief 将本地路径转换为完整编码的 file URL
+     * @param path 本地文件或文件夹路径，支持 Windows UNC 路径
+     * @return 可供 Qt Quick 对话框使用的 file URL
+     */
+    Q_INVOKABLE QUrl localPathToFileUrl(const QString& path) const;
+
+    /**
+     * @brief 将 file URL 转换为本地路径
+     * @param url 文件 URL
+     * @return 本地文件或文件夹路径，支持 Windows UNC 路径
+     */
+    Q_INVOKABLE QString urlToLocalPath(const QUrl& url) const;
 
     /**
      * @brief 检查路径是否存在

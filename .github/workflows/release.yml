@@ -8,200 +8,336 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag to publish, required when running from a branch'
-        required: false
+        description: '已有的语义版本标签，例如 v3.1.12'
+        required: true
         type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: release-${{ inputs.tag_name || github.ref_name }}
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  actions: read
+  contents: read
 
 jobs:
-  release:
-    name: 'Collect Artifacts and Publish'
-    runs-on: ubuntu-latest
-    timeout-minutes: 180
-
+  resolve-target:
+    name: Validate release target
+    runs-on: ubuntu-24.04
+    outputs:
+      tag_name: ${{ steps.target.outputs.tag_name }}
+      version: ${{ steps.target.outputs.version }}
+      target_sha: ${{ steps.target.outputs.target_sha }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
-      - name: Resolve Release Target
+      - name: Validate tag and version
         id: target
         shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.tag_name || github.ref_name }}
         run: |
           set -euo pipefail
-
-          TAG_NAME="${{ inputs.tag_name }}"
-          if [ -z "$TAG_NAME" ]; then
-            if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-              TAG_NAME="${GITHUB_REF#refs/tags/}"
-            else
-              echo "tag_name is required when this workflow is not running on a tag"
-              exit 1
-            fi
+          tag_name="$RELEASE_TAG"
+          if [[ ! "$tag_name" =~ ^[vV][0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid release tag: $tag_name"
+            echo "Expected vMAJOR.MINOR.PATCH"
+            exit 1
           fi
-
-          if ! git rev-parse -q --verify "refs/tags/${TAG_NAME}" >/dev/null; then
-            echo "Tag not found: ${TAG_NAME}"
+          if ! git rev-parse -q --verify "refs/tags/$tag_name" >/dev/null; then
+            echo "Tag not found: $tag_name"
+            exit 1
+          fi
+          if [[ "$(git cat-file -t "refs/tags/$tag_name")" != "tag" ]]; then
+            echo "Release tag must be an annotated tag: $tag_name"
             exit 1
           fi
 
-          TARGET_SHA="$(git rev-list -n 1 "${TAG_NAME}")"
-          VERSION="${TAG_NAME#[vV]}"
-          GIT_HASH="$(git rev-parse --short "${TARGET_SHA}")"
+          target_sha="$(git rev-parse "refs/tags/$tag_name^{commit}")"
+          version="${tag_name#[vV]}"
+          if ! grep -Eq "set\(VERSION_FROM_CI \"$version\"\)" CMakeLists.txt; then
+            echo "CMakeLists.txt default version does not match $version"
+            exit 1
+          fi
+
+          release_branch_found=false
+          while read -r branch; do
+            if [[ "$branch" =~ origin/(master|v[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              release_branch_found=true
+              break
+            fi
+          done < <(git branch -r --contains "$target_sha")
+          if [[ "$release_branch_found" != true ]]; then
+            echo "Tag target is not contained in an allowed release branch"
+            git branch -r --contains "$target_sha" || true
+            exit 1
+          fi
 
           {
-            echo "TAG_NAME=${TAG_NAME}"
-            echo "TARGET_SHA=${TARGET_SHA}"
-            echo "VERSION=${VERSION}"
-            echo "GIT_HASH=${GIT_HASH}"
+            echo "tag_name=$tag_name"
+            echo "version=$version"
+            echo "target_sha=$target_sha"
           } >> "$GITHUB_OUTPUT"
 
-          echo "Release tag: ${TAG_NAME}"
-          echo "Target SHA:  ${TARGET_SHA}"
+  package-linux:
+    name: Package Linux
+    needs: resolve-target
+    uses: ./.github/workflows/pack-linux.yml
+    with:
+      tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
+    permissions:
+      contents: read
+      packages: read
 
-      - name: Generate Changelog
+  package-windows:
+    name: Package Windows
+    needs: resolve-target
+    uses: ./.github/workflows/pack-windows.yml
+    with:
+      tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
+    permissions:
+      contents: read
+
+  package-macos:
+    name: Package macOS
+    needs: resolve-target
+    uses: ./.github/workflows/pack-macos.yml
+    with:
+      tag_name: ${{ needs.resolve-target.outputs.tag_name }}
+      target_sha: ${{ needs.resolve-target.outputs.target_sha }}
+    permissions:
+      contents: read
+
+  publish:
+    name: Validate and publish release
+    needs: [resolve-target, package-linux, package-windows, package-macos]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.resolve-target.outputs.target_sha }}
+
+      - name: Download packaging artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: artifact_downloads
+
+      - name: Flatten artifacts and reject collisions
         shell: bash
         run: |
           set -euo pipefail
-
-          TAG_NAME="${{ steps.target.outputs.TAG_NAME }}"
-          PREV_TAG="$(git describe --tags --abbrev=0 "${TAG_NAME}^" 2>/dev/null || true)"
-
-          {
-            echo "### 变更内容 / Changes"
-            echo
-            if [ -z "$PREV_TAG" ]; then
-              echo "首次发布 / Initial release"
-            else
-              echo "对比版本: ${PREV_TAG} -> ${TAG_NAME}"
-              echo
-              git log "${PREV_TAG}..${TAG_NAME}" --oneline --pretty=format:"* %s (%h)"
-              echo
-            fi
-          } > changelog.md
-
-      - name: Wait for Packaging Artifacts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_SHA: ${{ steps.target.outputs.TARGET_SHA }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
           mkdir -p release_assets
-          workflows=(
-            "pack-linux.yml"
-            "pack-windows.yml"
-            "pack-macos.yml"
-          )
-
-          for workflow in "${workflows[@]}"; do
-            echo "Waiting for ${workflow} on ${TARGET_SHA}..."
-            run_id=""
-            run_ready=false
-
-            for attempt in $(seq 1 90); do
-              runs_json="$(gh run list \
-                --workflow "$workflow" \
-                --limit 50 \
-                --json databaseId,headSha,status,conclusion,createdAt,url)"
-
-              run_id="$(jq -r --arg sha "$TARGET_SHA" \
-                '[.[] | select(.headSha == $sha)] | sort_by(.createdAt) | reverse | .[0].databaseId // empty' \
-                <<< "$runs_json")"
-
-              if [ -z "$run_id" ]; then
-                echo "No run found for ${workflow} yet (${attempt}/90)"
-                sleep 30
-                continue
-              fi
-
-              run_status="$(jq -r --argjson id "$run_id" '.[] | select(.databaseId == $id) | .status' <<< "$runs_json")"
-              run_conclusion="$(jq -r --argjson id "$run_id" '.[] | select(.databaseId == $id) | .conclusion // ""' <<< "$runs_json")"
-              run_url="$(jq -r --argjson id "$run_id" '.[] | select(.databaseId == $id) | .url' <<< "$runs_json")"
-
-              echo "${workflow} run ${run_id}: status=${run_status} conclusion=${run_conclusion}"
-              echo "${run_url}"
-
-              if [ "$run_status" = "completed" ]; then
-                if [ "$run_conclusion" = "success" ]; then
-                  run_ready=true
-                  break
-                fi
-                echo "${workflow} failed with conclusion: ${run_conclusion}"
-                exit 1
-              fi
-
-              sleep 30
-            done
-
-            if [ "$run_ready" != "true" ]; then
-              echo "Timed out waiting for ${workflow}"
+          declare -A seen
+          while IFS= read -r -d '' file; do
+            artifact_path="${file#artifact_downloads/}"
+            artifact_name="${artifact_path%%/*}"
+            [[ "$artifact_name" == built-appdir-* ]] && continue
+            filename="$(basename "$file")"
+            if [[ -n "${seen[$filename]+x}" ]]; then
+              echo "Artifact filename collision: $filename"
               exit 1
             fi
+            seen["$filename"]="$file"
+            cp "$file" "release_assets/$filename"
+          done < <(find artifact_downloads -type f -print0)
 
-            # 下载到临时目录，然后移动文件（排除中间构建产物）
-            tmp_dir=$(mktemp -d)
-            gh run download "$run_id" --dir "$tmp_dir"
-            # 删除 built-appdir 等中间产物目录（使用 find 确保匹配）
-            find "$tmp_dir" -maxdepth 1 -type d -name "built-appdir*" -exec rm -rf {} + 2>/dev/null || true
-            # 移动剩余的最终发布文件
-            find "$tmp_dir" -type f -exec mv -f {} release_assets/ \;
-            rm -rf "$tmp_dir"
-          done
-
-          echo "Collected release assets:"
-          find release_assets -maxdepth 1 -type f -printf '%f\n' | sort
-
-      - name: Publish Draft Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ steps.target.outputs.TAG_NAME }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if ! find release_assets -maxdepth 1 -type f | grep -q .; then
-            echo "No release assets found"
+          if [[ -z "$(find release_assets -type f -print -quit)" ]]; then
+            echo "No release assets were downloaded"
             exit 1
           fi
 
-          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            gh release edit "$TAG_NAME" \
-              --notes-file changelog.md
+      - name: Validate expected assets and SHA256 files
+        shell: bash
+        env:
+          VERSION: ${{ needs.resolve-target.outputs.version }}
+          TARGET_SHA: ${{ needs.resolve-target.outputs.target_sha }}
+        run: |
+          set -euo pipefail
+          require_asset() {
+            local pattern="$1"
+            if ! compgen -G "release_assets/$pattern" >/dev/null; then
+              echo "Missing release asset: $pattern"
+              exit 1
+            fi
+          }
+
+          require_asset '*-win64.zip'
+          require_asset '*-win64-arm64.zip'
+          require_asset '*-x64-setup.exe'
+          require_asset '*-arm64-setup.exe'
+          require_asset '*.x86_64.AppImage'
+          require_asset '*.aarch64.AppImage'
+          require_asset '*_amd64.deb'
+          require_asset '*_arm64.deb'
+          require_asset '*_x86_64.rpm'
+          require_asset '*_aarch64.rpm'
+          require_asset '*_x86_64.pkg.tar.zst'
+          require_asset '*_aarch64.pkg.tar.zst'
+          require_asset '*-intel.dmg'
+          require_asset '*-arm64.dmg'
+          require_asset '*-x64.msix'
+          require_asset '*-arm64.msix'
+
+          target_short_sha="${TARGET_SHA:0:7}"
+          while IFS= read -r asset; do
+            filename="$(basename "$asset")"
+            [[ "$filename" == EasyKiConverter-${VERSION}-g${target_short_sha}-* ]] || {
+              echo "Asset version or commit mismatch: $filename"
+              exit 1
+            }
+          done < <(find release_assets -maxdepth 1 -type f ! -name '*.sha256sum' -print)
+
+          while IFS= read -r checksum; do
+            [[ -s "$checksum" ]] || { echo "Empty checksum file: $checksum"; exit 1; }
+            (cd release_assets && sha256sum -c "$(basename "$checksum")")
+            asset_name="${checksum%.sha256sum}"
+            [[ -f "$asset_name" ]] || { echo "Checksum has no matching asset: $checksum"; exit 1; }
+            referenced_asset="$(awk '{print $2}' "$checksum" | sed 's/^\*//')"
+            [[ "$referenced_asset" == "$(basename "$asset_name")" ]] || {
+              echo "Checksum file references an unexpected asset: $checksum"
+              exit 1
+            }
+          done < <(find release_assets -maxdepth 1 -type f -name '*.sha256sum' -print)
+
+          checksum_count="$(find release_assets -maxdepth 1 -type f -name '*.sha256sum' | wc -l)"
+          asset_count="$(find release_assets -maxdepth 1 -type f \! -name '*.sha256sum' | wc -l)"
+          [[ "$checksum_count" -eq "$asset_count" ]] || {
+            echo "Every release asset must have exactly one .sha256sum file"
+            exit 1
+          }
+
+      - name: Generate structured release notes
+        env:
+          TAG_NAME: ${{ needs.resolve-target.outputs.tag_name }}
+          VERSION: ${{ needs.resolve-target.outputs.version }}
+          TARGET_SHA: ${{ needs.resolve-target.outputs.target_sha }}
+          LINUX_RESULT: ${{ needs.package-linux.result }}
+          WINDOWS_RESULT: ${{ needs.package-windows.result }}
+          MACOS_RESULT: ${{ needs.package-macos.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          previous_tag="$(git describe --tags --abbrev=0 "$TAG_NAME^" 2>/dev/null || true)"
+          range="$TAG_NAME"
+          [[ -n "$previous_tag" ]] && range="$previous_tag..$TAG_NAME"
+
+          {
+            echo "# EasyKiConverter $VERSION"
+            echo
+            echo "EasyKiConverter $VERSION 改善了 EasyEDA 到 KiCad/Altium 的库转换质量，并完善了跨平台发布流程。"
+            echo
+            echo "## 下载"
+            echo
+            echo "| 平台 | 架构/格式 | 文件 |"
+            echo "| --- | --- | --- |"
+            while IFS= read -r asset; do
+              filename="$(basename "$asset")"
+              [[ "$filename" == *.sha256sum ]] && continue
+              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+[._-]//; s/\.(AppImage|deb|rpm|pkg\.tar\.zst|zip|exe|msix|dmg)$//')"
+              case "$filename" in
+                *win64*|*-setup.exe|*.msix) platform="Windows" ;;
+                *.AppImage|*.deb|*.rpm|*.pkg.tar.zst) platform="Linux" ;;
+                *.dmg) platform="macOS" ;;
+                *) platform="其他" ;;
+              esac
+              echo "| $platform | $descriptor | [$filename](https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${filename}) |"
+            done < <(find release_assets -maxdepth 1 -type f -print | sort)
+            echo
+            echo "## 重要变化"
+            echo
+            echo "- 改进符号原点归一化、Pin Name/Pin Number 原始坐标及网格对齐。"
+            echo "- 改进 EasyEDA SVG 圆弧、曲线和连续参数解析。"
+            echo "- 修复 KiCad 封装弧线格式兼容性问题。"
+            echo
+            echo "## 变更分类"
+            echo
+            for category in '新功能|feat' '问题修复|fix' '重构与性能|refactor' '测试|test' '构建与 CI|ci' '文档|docs'; do
+              title="${category%%|*}"
+              prefix="${category##*|}"
+              echo "### $title"
+              found=false
+              while IFS=$'\t' read -r subject hash; do
+                if [[ "$subject" == "$prefix:"* || "$subject" == "$prefix("* ]]; then
+                  echo "- $subject ([${hash}](https://github.com/${GITHUB_REPOSITORY}/commit/${hash}))"
+                  found=true
+                fi
+              done < <(git log "$range" --no-merges --format='%s%x09%h')
+              [[ "$found" == true ]] || echo "- 无"
+              echo
+            done
+            echo "## 转换格式"
+            echo
+            echo "- KiCad 符号库和封装库"
+            echo "- Altium SchLib 和 PcbLib"
+            echo "- STEP 三维模型"
+            echo
+            echo "## 构建与验证"
+            echo
+            for platform_status in \
+              "Linux:${LINUX_RESULT}" \
+              "Windows:${WINDOWS_RESULT}" \
+              "macOS:${MACOS_RESULT}"; do
+              platform="${platform_status%%:*}"
+              result="${platform_status##*:}"
+              echo "- $platform 构建任务：$result。"
+            done
+            echo "- 发布前已验证全部制品及 SHA256 校验和。"
+            echo
+            echo "## 校验和"
+            echo
+            echo "请下载对应的 .sha256sum 文件验证制品完整性。"
+            echo
+            echo "## 已知问题"
+            echo
+            echo "- 部分 EasyEDA 非标准 SVG 路径仍可能需要人工复核。"
+            echo "- Altium 对极少数特殊引脚装饰的表达能力有限。"
+            echo
+            echo "## 贡献者"
+            echo
+            git shortlog -sne "$range" | sed -E 's/^ *[0-9]+[[:space:]]+/- /' || echo "- 无"
+            echo
+            echo "构建提交：$TARGET_SHA"
+          } > release_notes.md
+
+      - name: Create or update draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.resolve-target.outputs.tag_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG_NAME" --json isDraft --jq '.isDraft' >/tmp/release_is_draft 2>/dev/null; then
+            if [[ "$(cat /tmp/release_is_draft)" != true ]]; then
+              echo "A published release already exists for $TAG_NAME"
+              exit 1
+            fi
+            gh release edit "$TAG_NAME" --title "EasyKiConverter ${TAG_NAME#[vV]}" --notes-file release_notes.md
           else
-            gh release create "$TAG_NAME" \
-              --draft \
-              --title "$TAG_NAME" \
-              --notes-file changelog.md
+            gh release create "$TAG_NAME" --draft --title "EasyKiConverter ${TAG_NAME#[vV]}" --notes-file release_notes.md
           fi
 
-          # 逐个上传文件，带重试逻辑以应对速率限制
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.resolve-target.outputs.tag_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
           for asset in release_assets/*; do
-            filename=$(basename "$asset")
-            echo "Uploading: $filename"
-            for attempt in 1 2 3; do
-              if gh release upload "$TAG_NAME" "$asset" --clobber 2>/dev/null; then
-                echo "  ✓ Uploaded: $filename"
-                break
-              fi
-              if [ "$attempt" -lt 3 ]; then
-                wait_time=$((attempt * 30))
-                echo "  ⚠ Rate limited, waiting ${wait_time}s before retry..."
-                sleep "$wait_time"
-              else
-                echo "  ✗ Failed to upload: $filename after 3 attempts"
-                exit 1
-              fi
-            done
-            # 每次上传后等待 5 秒，避免触发速率限制
-            sleep 5
+            gh release upload "$TAG_NAME" "$asset" --clobber
           done
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.resolve-target.outputs.tag_name }}
+        run: gh release edit "$TAG_NAME" --draft=false

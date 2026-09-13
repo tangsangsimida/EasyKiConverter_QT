@@ -1,4 +1,6 @@
 
+#include "utils/FileUtils.h"
+
 #include <QObject>
 #include <QQmlContext>
 #include <QQmlEngine>
@@ -46,6 +48,7 @@ public slots:
     void qmlEngineAvailable(QQmlEngine* engine) {
         engine->addImportPath("qrc:/qt/qml");
         engine->rootContext()->setContextProperty("LanguageManager", new FakeLanguageManager(engine));
+        engine->rootContext()->setContextProperty("fileUtils", new EasyKiConverter::FileUtils(engine));
 
         // 注册 AppStyle 单例类型 (必须手动注册以匹配 ModernButton.qml 中的导入 URI)
         qmlRegisterSingletonType(QUrl("qrc:/qt/qml/EasyKiconverter_Cpp_Version/src/ui/qml/styles/AppStyle.qml"),

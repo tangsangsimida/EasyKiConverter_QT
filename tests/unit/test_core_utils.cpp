@@ -2,9 +2,12 @@
 #include "core/utils/KiCadTableUtils.h"
 #include "core/utils/LayerMapper.h"
 #include "core/utils/UrlUtils.h"
+#include "utils/FileUtils.h"
 
 #include <QByteArray>
+#include <QDir>
 #include <QTest>
+#include <QUrl>
 
 #include <cmath>
 
@@ -28,6 +31,29 @@ private slots:
                  QStringLiteral("https://image.lceda.cn/relative/a.png"));
         QCOMPARE(UrlUtils::normalizePreviewImageUrl(QStringLiteral("alimg.szlcsc.com/upload/a.png")),
                  QStringLiteral("https://alimg.szlcsc.com/upload/a.png"));
+    }
+
+    void fileUtilsRoundTripsSpecialCharacters() {
+        const FileUtils fileUtils;
+#ifdef Q_OS_WIN
+        const QString path = QStringLiteral("C:/tmp/work#1/folder?2");
+        const QString expectedUrl = QStringLiteral("file:///C:/tmp/work%231/folder%3F2");
+#else
+        const QString path = QStringLiteral("/tmp/work#1/folder?2");
+        const QString expectedUrl = QStringLiteral("file:///tmp/work%231/folder%3F2");
+#endif
+        const QUrl url = fileUtils.localPathToFileUrl(path);
+
+        QCOMPARE(url.toString(QUrl::FullyEncoded), expectedUrl);
+        QCOMPARE(fileUtils.urlToLocalPath(url), path);
+    }
+
+    void fileUtilsParsesUncFileUrl() {
+        const FileUtils fileUtils;
+        const QUrl url(QStringLiteral("file://server/share/folder%231"));
+        const QString localPath = fileUtils.urlToLocalPath(url);
+
+        QCOMPARE(QDir::fromNativeSeparators(localPath), QStringLiteral("//server/share/folder#1"));
     }
 
     void deduplicateAndNormalizeUrlsKeepsFirstOccurrenceOrder() {

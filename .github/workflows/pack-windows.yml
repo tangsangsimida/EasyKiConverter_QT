@@ -1,11 +1,22 @@
 name: Packaging(Windows)
 
 on:
-  push:
-    tags:
-      - 'v*'
-      - 'V*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: true
+        type: string
+      target_sha:
+        description: '固定的发布提交 SHA'
+        required: false
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,28 +32,43 @@ env:
 
 jobs:
   windows-pack:
-    name: 'VS 2022 ${{ matrix.config.arch }}-${{ matrix.type }}'
-    runs-on: windows-2022
+    name: 'Windows ${{ matrix.config.package_arch }}-${{ matrix.type }}'
+    runs-on: ${{ matrix.config.runner }}
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.config.vcpkg_triplet }}
+      VCPKG_TARGET_TRIPLET: ${{ matrix.config.vcpkg_triplet }}
     strategy:
       fail-fast: false
       matrix:
         qt_target: [desktop]
         config:
-          - {
-              arch: 'x64',
-              generator: 'Ninja',
-              gen_arch: '',
-              vcpkg_triplet: 'x64-windows',
-              qt_arch: 'win64_msvc2022_64',
-              qt_arch_install: 'msvc2022_64',
-              pak_arch: 'win64'
-            }
+          - runner: 'windows-2022'
+            arch: 'x64'
+            generator: 'Ninja'
+            gen_arch: ''
+            vcpkg_triplet: 'x64-windows'
+            qt_host: 'windows'
+            qt_arch: 'win64_msvc2022_64'
+            setup_cmake: true
+            package_arch: 'x64'
+            pak_arch: 'win64'
+          - runner: 'windows-11-arm'
+            arch: 'arm64'
+            generator: 'Ninja'
+            gen_arch: ''
+            vcpkg_triplet: 'arm64-windows'
+            qt_host: 'windows_arm64'
+            qt_arch: 'win64_msvc2022_arm64'
+            setup_cmake: false
+            package_arch: 'arm64'
+            pak_arch: 'win64-arm64'
         type: [portable, installer]
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
 
       - name: 'Record Start Time'
         shell: pwsh
@@ -56,6 +82,8 @@ jobs:
       - name: 'Get Version Info'
         id: version
         uses: ./.github/actions/get-version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: 'Export Version to Env'
         shell: bash
@@ -67,13 +95,12 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: 'Setup MSVC'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: ${{ matrix.config.arch }}
-          vsversion: '2022'
 
       - name: 'Setup vcpkg'
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
@@ -83,21 +110,55 @@ jobs:
         with:
           cmake-version: ${{ env.CMAKE_VERSION }}
           qt-version: ${{ env.QT_VERSION }}
-          qt-host: 'windows'
+          qt-host: ${{ matrix.config.qt_host }}
           qt-target: ${{ matrix.qt_target }}
           qt-arch: ${{ matrix.config.qt_arch }}
+          setup-cmake: ${{ matrix.config.setup_cmake }}
           enable-ccache: 'false'
           enable-sccache: 'false'
 
       - name: 'Install Ninja'
-        run: choco install ninja -y --no-progress
+        shell: pwsh
+        run: |
+          $ninja = Get-Command ninja -ErrorAction SilentlyContinue
+          if ($ninja) {
+            Write-Host "Ninja is already available:"
+            ninja --version
+          } else {
+            choco install ninja --version=1.12.1 -y --no-progress
+          }
 
       - name: 'Setup Inno Setup'
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          # 安装 Inno Setup (最新版本)
-          choco install innosetup --no-progress
+          # 优先使用 runner 已安装的 Inno Setup，避免 Chocolatey 因版本更高而失败。
+          $innoCandidates = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          )
+          $innoCommand = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+          if ($innoCommand) {
+            $innoCandidates += $innoCommand.Source
+          }
+
+          $innoPath = $innoCandidates |
+            Where-Object { $_ -and (Test-Path $_) } |
+            Select-Object -First 1
+          if ($innoPath) {
+            Write-Host "Inno Setup is already available: $innoPath"
+          } else {
+            choco install innosetup -y --no-progress
+            $innoPath = $innoCandidates |
+              Where-Object { $_ -and (Test-Path $_) } |
+              Select-Object -First 1
+          }
+          if (-not $innoPath) {
+            Write-Error "Inno Setup compiler (ISCC.exe) was not found after installation."
+            exit 1
+          }
+          "INNO_SETUP_PATH=$innoPath" >> $env:GITHUB_ENV
+
           # 下载并安装简体中文语言文件（可选，失败不影响构建）
           $langDir = "${env:ProgramFiles(x86)}\Inno Setup 6\Languages"
           $langUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl"
@@ -205,6 +266,21 @@ jobs:
           Copy-Item -Path $env:GITHUB_WORKSPACE\LICENSE -Destination $env:GITHUB_WORKSPACE\build\Package\portable\
           Compress-Archive -Path $env:GITHUB_WORKSPACE\build\Package\portable\* -DestinationPath $env:GITHUB_WORKSPACE\build\Package\portable\${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.pak_arch }}.zip
 
+      - name: 'Smoke test portable executable'
+        if: matrix.type == 'portable'
+        shell: pwsh
+        run: |
+          $executable = "$env:GITHUB_WORKSPACE\build\Package\portable\easykiconverter.exe"
+          if (-not (Test-Path $executable)) {
+            Write-Error "Portable executable not found: $executable"
+            exit 1
+          }
+          $process = Start-Process -FilePath $executable -ArgumentList @('--version') -Wait -NoNewWindow -PassThru
+          if ($process.ExitCode -ne 0) {
+            Write-Error "Portable executable smoke test failed with exit code: $($process.ExitCode)"
+            exit 1
+          }
+
       - name: 'Create installer package'
         if: matrix.type == 'installer'
         shell: pwsh
@@ -239,7 +315,7 @@ jobs:
             exit 1
           }
           
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ env.VERSION }}" "/DSourceDir=$stagingDir" "/DAppIconPath=$iconPath" "/DLicensePath=$licensePath" "/O$outputDir" "$issFile"
+          & "$env:INNO_SETUP_PATH" "/DMyAppVersion=${{ env.VERSION }}" "/DSourceDir=$stagingDir" "/DAppIconPath=$iconPath" "/DLicensePath=$licensePath" "/O$outputDir" "$issFile"
 
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Inno Setup Compiler failed with exit code: $LASTEXITCODE"
@@ -248,7 +324,7 @@ jobs:
 
           # Rename output to standard format
           $setupExe = Get-ChildItem -Path $outputDir -Filter "EasyKiConverter_*_Setup.exe" | Select-Object -First 1
-          $newContentName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-setup.exe"
+          $newContentName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}-setup.exe"
           Rename-Item -Path $setupExe.FullName -NewName $newContentName
 
           Write-Host "Installer created at: $outputDir\$newContentName"
@@ -268,7 +344,7 @@ jobs:
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-setup.exe"
+          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}-setup.exe"
           $filePath = "$env:GITHUB_WORKSPACE\build\Package\installer\$fileName"
           $hash = Get-FileHash -Path $filePath -Algorithm SHA256
           $hashString = $hash.Hash.ToLower() + " *" + $fileName
@@ -294,8 +370,15 @@ jobs:
           if (Test-Path $manifestPath) {
             [xml]$xml = Get-Content $manifestPath
             $xml.Package.Identity.Version = $msixVersion
+            $expectedArchitecture = "${{ matrix.config.package_arch }}"
+            if ($expectedArchitecture -notin @('x64', 'arm64')) {
+              Write-Error "Unsupported MSIX architecture: $expectedArchitecture"
+              exit 1
+            }
+            $xml.Package.Identity.ProcessorArchitecture = $expectedArchitecture
             $xml.Save($manifestPath)
             Write-Host "Manifest version updated to: $msixVersion"
+            Write-Host "Manifest architecture updated to: $expectedArchitecture"
           } else {
             Write-Error "AppxManifest.xml not found at $manifestPath"
             exit 1
@@ -329,7 +412,7 @@ jobs:
                 # 注意：AppxManifest.xml 必须在 staging 目录中，文件名必须为 AppxManifest.xml
                 $stagingDir = "$env:GITHUB_WORKSPACE\build\Staging"
                 $outputDir = "$env:GITHUB_WORKSPACE\build\Package\msix"
-                $msixPath = "$outputDir\${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}.msix"
+                $msixPath = "$outputDir\${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}.msix"
       
                 mkdir -p $outputDir
       
@@ -337,6 +420,21 @@ jobs:
                 $manifestInStaging = "$stagingDir\AppxManifest.xml"
                 if (-not (Test-Path $manifestInStaging)) {
                   Write-Error "AppxManifest.xml not found in staging directory at $manifestInStaging"
+                  exit 1
+                }
+
+                [xml]$stagingManifest = Get-Content $manifestInStaging
+                $expectedArchitecture = "${{ matrix.config.package_arch }}"
+                $actualArchitecture = $stagingManifest.Package.Identity.ProcessorArchitecture
+                if ($actualArchitecture -ne $expectedArchitecture) {
+                  Write-Error "MSIX architecture mismatch: expected '$expectedArchitecture', got '$actualArchitecture'"
+                  exit 1
+                }
+                Write-Host "MSIX manifest architecture verified: $actualArchitecture"
+
+                $packagedExecutable = Join-Path $stagingDir 'easykiconverter.exe'
+                if (-not (Test-Path $packagedExecutable)) {
+                  Write-Error "MSIX executable not found in staging directory: $packagedExecutable"
                   exit 1
                 }
       
@@ -360,7 +458,7 @@ jobs:
         if: matrix.type == 'installer'
         shell: pwsh
         run: |
-          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}.msix"
+          $fileName = "${env:PRODUCT}-${env:VERSION}-g${env:GIT_HASH}-${{ matrix.config.package_arch }}.msix"
           $filePath = "$env:GITHUB_WORKSPACE\build\Package\msix\$fileName"
           $hash = Get-FileHash -Path $filePath -Algorithm SHA256
           $hashString = $hash.Hash.ToLower() + " *" + $fileName
@@ -369,9 +467,9 @@ jobs:
 
       - name: 'Artifact Upload (portable)'
         if: matrix.type == 'portable'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-portable
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-portable
           path: |
             ${{ github.workspace }}/build/Package/portable/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.pak_arch }}.zip
             ${{ github.workspace }}/build/Package/portable/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.pak_arch }}.zip.sha256sum
@@ -379,21 +477,21 @@ jobs:
 
       - name: 'Artifact Upload (installer)'
         if: matrix.type == 'installer'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-setup
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-setup
           path: |
-            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-setup.exe
-            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-setup.exe.sha256sum
+            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-setup.exe
+            ${{ github.workspace }}/build/Package/installer/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-setup.exe.sha256sum
           overwrite: true
 
       - name: 'Artifact Upload (MSIX)'
         if: matrix.type == 'installer'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-x64-msix
+          name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}-msix
           path: |
-            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}.msix
-            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}.msix.sha256sum
+            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}.msix
+            ${{ github.workspace }}/build/Package/msix/${{ env.PRODUCT }}-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.config.package_arch }}.msix.sha256sum
           overwrite: true
-          if-no-files-found: warn
+          if-no-files-found: error

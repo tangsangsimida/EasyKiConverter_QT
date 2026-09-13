@@ -16,6 +16,7 @@ Item {
     property var componentListController: componentListViewModel
     property var exportSettingsController: exportSettingsViewModel
     property var exportProgressController: exportProgressViewModel
+    property var exportTargetController: exportTargetModel
     property var themeController: themeSettingsViewModel
     property var updateChecker: updateCheckerService
     // 对话框引用（供 SidebarPanel 等子组件访问）
@@ -153,19 +154,18 @@ Item {
         property: "windowHeight"
         value: window.height
     }
-    // 从 FolderDialog URL 中提取本地路径（跨平台处理）
+    // 从 FolderDialog URL 中提取本地路径（由后端 QUrl 处理编码和 UNC 主机）
     function urlToLocalPath(url) {
-        if (!url)
+        if (!url || !fileUtils)
             return "";
-        var s = url.toString();
-        // file:///C:/Users/... → Windows 需要去掉第三个 /
-        // file:///home/...     → Linux 第三个 / 是路径的一部分
-        if (Qt.platform.os === "windows") {
-            s = s.replace(/^file:\/\/\//, "");
-        } else {
-            s = s.replace(/^file:\/\//, "");
-        }
-        return decodeURIComponent(s);
+        return fileUtils.urlToLocalPath(url);
+    }
+
+    // 将本地路径转换为 FolderDialog 所需的 file URL（由后端完整编码）。
+    function localPathToFileUrl(path) {
+        if (!path || !fileUtils)
+            return "";
+        return fileUtils.localPathToFileUrl(path);
     }
 
     // BOM 文件选择对话框
@@ -183,7 +183,7 @@ Item {
         title: qsTr("选择输出目录")
         currentFolder: {
             var p = exportSettingsController ? exportSettingsController.outputPath : "";
-            return p ? "file://" + p : "";
+            return localPathToFileUrl(p);
         }
         onAccepted: {
             var localPath = urlToLocalPath(selectedFolder);
@@ -199,7 +199,7 @@ Item {
         title: qsTr("选择缓存目录")
         currentFolder: {
             var p = exportSettingsController ? exportSettingsController.cacheDir : "";
-            return p ? "file://" + p : "";
+            return localPathToFileUrl(p);
         }
         onAccepted: {
             var localPath = urlToLocalPath(selectedFolder);
@@ -292,6 +292,7 @@ Item {
             id: titleBar
             windowRadius: window.windowRadius
             windowController: Window.window ? Window.window.windowController : null
+            appVersion: window.updateChecker ? window.updateChecker.currentVersion : ""
         }
 
         // 主布局：侧边栏 + 工作区
@@ -690,8 +691,9 @@ Item {
                             id: compactSettingsLoader
                             Layout.fillWidth: true
                             active: !window.isSidebarMode
-                            sourceComponent: ExportSettingsCard {
+                            sourceComponent: ExportSettingsBaseCard {
                                 exportSettingsController: window.exportSettingsController
+                                exportTargetModel: window.exportTargetController
                             }
                         }
 
@@ -713,6 +715,7 @@ Item {
                             sourceComponent: ExportButtonsSection {
                                 exportProgressController: window.exportProgressController
                                 exportSettingsController: window.exportSettingsController
+                                exportTargetModel: window.exportTargetController
                                 componentListController: window.componentListController
                             }
                         }

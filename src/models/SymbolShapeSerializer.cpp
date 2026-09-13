@@ -12,6 +12,9 @@ QJsonObject SymbolShapeSerializer::toJson(const SymbolBBox& bbox) {
     json["y"] = bbox.y;
     json["width"] = bbox.width;
     json["height"] = bbox.height;
+    json["head_x"] = bbox.headX;
+    json["head_y"] = bbox.headY;
+    json["has_head_center"] = bbox.hasHeadCenter;
     return json;
 }
 
@@ -20,6 +23,9 @@ bool SymbolShapeSerializer::fromJson(SymbolBBox& bbox, const QJsonObject& json) 
     bbox.y = json["y"].toDouble(0.0);
     bbox.width = json["width"].toDouble(0.0);
     bbox.height = json["height"].toDouble(0.0);
+    bbox.headX = json["head_x"].toDouble(0.0);
+    bbox.headY = json["head_y"].toDouble(0.0);
+    bbox.hasHeadCenter = json["has_head_center"].toBool(false);
     return true;
 }
 

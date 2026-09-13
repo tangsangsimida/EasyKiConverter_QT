@@ -2,6 +2,8 @@
 
 本文档介绍如何在本地编译 EasyKiConverter 项目。
 
+发布说明样例请参阅 [RELEASE_NOTES_TEMPLATE.md](RELEASE_NOTES_TEMPLATE.md)。
+
 ## 环境要求
 
 ### 操作系统
@@ -49,6 +51,32 @@
 
 ## 安装依赖
 
+### 项目本地开发环境（Linux）
+
+本项目不使用系统 Qt，也不向系统 Python 安装项目依赖。Python 工具统一使用仓库根目录的 `.venv`，Qt 使用独立安装的 6.10.2。
+
+```bash
+# 创建并启用项目虚拟环境
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 安装 Python 构建辅助工具
+python -m pip install aqtinstall==3.2.1
+
+# 使用项目专用 Qt（不要使用 /usr/lib 下的系统 Qt）
+export Qt6_DIR=/home/dennis/software/QT/6.10.2/gcc_64/lib/cmake/Qt6
+export CMAKE_PREFIX_PATH=/home/dennis/software/QT/6.10.2/gcc_64
+export PATH=/home/dennis/software/QT/6.10.2/gcc_64/bin:$PATH
+```
+
+`format_code.py` 会自动从 `tools/config/build_config.json` 查找项目 Qt 的 `qmlformat`；上述 `PATH` 设置仍推荐用于直接调用 Qt 工具。
+
+验证 Qt 版本：
+
+```bash
+qmake -query QT_VERSION       # 必须为 6.10.2
+```
+
 ### Windows
 
 #### 安装 Qt
@@ -83,6 +111,19 @@
 1. 安装 Visual Studio 2019 或更高版本
 2. 在安装时选择 "使用 C++ 的桌面开发" 工作负载
 
+Windows 发布构建同时支持以下架构：
+
+- x64：Qt `win64_msvc2022_64`，vcpkg triplet `x64-windows`
+- ARM64：Windows 11 on ARM、Qt `win64_msvc2022_arm64`，vcpkg triplet `arm64-windows`
+
+ARM64 发布包由 GitHub Actions 的 `windows-11-arm` runner 构建，生成 ARM64 便携版、安装程序和 MSIX 包。
+
+### LoongArch64（龙架构）
+
+LoongArch64 暂未提供可执行的 GitHub Actions 构建工作流或正式发布包。GitHub 官方 runner 不支持 LoongArch64，项目也尚未配置可用的第三方原生 CI 或 x86_64/ARM64 交叉编译工具链，因此暂不保留不可执行的 workflow 配置。
+
+后续具备可运行的构建基础设施后，再增加独立的 Qt、工具链、测试和 `loongarch64` 发布包流程。
+
 ### macOS
 
 #### 使用 Homebrew 安装
@@ -116,10 +157,6 @@ xcode-select --install
 # 更新包管理器
 sudo apt-get update
 
-# 安装 Qt 6 基础和必需模块
-# 注意：Network 模块已包含在 qt6-base-dev 中，无需单独安装 qt6-network-dev
-sudo apt-get install qt6-base-dev qt6-declarative-dev qt6-tools-dev qt6-websockets-dev
-
 # 安装 CMake
 sudo apt-get install cmake
 
@@ -129,8 +166,10 @@ sudo apt-get install build-essential g++
 # 安装 zlib
 sudo apt-get install zlib1g-dev
 
-# 安装 XKB 支持（Qt 6 GuiPrivate 模块需要）
-sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev qt6-base-private-dev
+# 安装 XKB 支持和其他 Qt 运行时依赖
+sudo apt-get install libxkbcommon-dev libxkbcommon-x11-dev
+
+# Qt 请按照上面的“项目本地开发环境”安装到独立目录，禁止使用系统 Qt
 ```
 
 **Fedora**
@@ -198,9 +237,9 @@ tools\windows\build_project.bat -v             # 详细日志模式
 
 ```bash
 # 直接调用 Python 构建脚本
-python tools/python/build_project.py -t Release --parallel
-python tools/python/build_project.py --check
-python tools/python/build_project.py -c -y
+.venv/bin/python tools/python/build_project.py -t Release --parallel
+.venv/bin/python tools/python/build_project.py --check
+.venv/bin/python tools/python/build_project.py -c -y
 ```
 
 **Python 构建脚本参数**:

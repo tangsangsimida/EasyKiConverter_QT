@@ -120,14 +120,14 @@ EasyKiConverter uses **Inno Setup** to create Windows installers (.exe format).
 
 - **Name**: EasyKiConverter Setup
 - **Version**: 3.1.4
-- **Architecture**: x64
+- **Architecture**: x64 or ARM64 (select according to the package filename)
 - **Type**: Inno Setup (.exe)
 - **Size**: Approximately 100-150 MB
 - **Signature**: Includes digital signature
 
 ## System Requirements
 
-- **Operating System**: Windows 10/11 (64-bit)
+- **Operating System**: Windows 10/11 (64-bit); ARM64 packages require Windows on Arm
 - **Permissions**: Administrator privileges required
 - **Disk Space**: Minimum 200MB
 - **Network**: Not required (unless downloading from network)

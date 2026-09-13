@@ -39,7 +39,7 @@ jobs:
       matrix:
         dist:
           - name: amd64
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             qt_host: linux
             qt_arch: linux_gcc_64
             qt_dir: gcc_64
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
 
@@ -91,7 +91,7 @@ jobs:
             ninja-build
 
       - name: 'Setup CCache'
-        uses: hendrikmuhs/ccache-action@v1.2.23
+        uses: hendrikmuhs/ccache-action@d62db5f07c26379fc4b4e0916f098a92573c3b03 # v1.2.23
         with:
           key: ${{ runner.os }}-${{ matrix.dist.name }}-linux-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
@@ -100,7 +100,7 @@ jobs:
 
       - name: 'Install Qt 6.10.2'
         run: |
-          pip3 install --no-cache-dir --break-system-packages aqtinstall
+          pip3 install --no-cache-dir --break-system-packages aqtinstall==3.2.1
           aqt install-qt ${{ matrix.dist.qt_host }} desktop 6.10.2 ${{ matrix.dist.qt_arch }} --outputdir /opt/qt --modules qtshadertools qtimageformats
           echo "/opt/qt/6.10.2/${{ matrix.dist.qt_dir }}/bin" >> "$GITHUB_PATH"
           echo "Qt6_DIR=/opt/qt/6.10.2/${{ matrix.dist.qt_dir }}/lib/cmake/Qt6" >> "$GITHUB_ENV"
@@ -158,22 +158,39 @@ jobs:
 
 
   windows-build:
-    name: 'Build Windows'
-    runs-on: windows-2022
+    name: 'Build Windows (${{ matrix.name }})'
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 90
     env:
-      WindowsSDKVersion: '10.0.22621.0'
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.vcpkg_triplet }}
+      VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: 'Windows MSVC'
-            platform: 'msvc2019_64'
+            runner: 'windows-2022'
+            platform: 'msvc2022_64'
             generator: 'Ninja'
             arch: 'x64'
+            qt_host: 'windows'
+            qt_arch: 'win64_msvc2022_64'
+            vcpkg_triplet: 'x64-windows'
+            setup_cmake: true
+            enable_ccache: true
+          - name: 'Windows ARM64'
+            runner: 'windows-11-arm'
+            platform: 'msvc2022_arm64'
+            generator: 'Ninja'
+            arch: 'arm64'
+            qt_host: 'windows_arm64'
+            qt_arch: 'win64_msvc2022_arm64'
+            vcpkg_triplet: 'arm64-windows'
+            setup_cmake: false
+            enable_ccache: false
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
 
@@ -182,13 +199,12 @@ jobs:
         run: echo "BUILD_START_TIME=$(Get-Date -Format o)" >> $env:GITHUB_ENV
 
       - name: 'Setup MSVC'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         with:
           arch: ${{ matrix.arch }}
-          vsversion: '2022'
 
       - name: 'Setup vcpkg'
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
         with:
           vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
@@ -198,19 +214,29 @@ jobs:
         with:
           cmake-version: ${{ env.CMAKE_VERSION }}
           qt-version: ${{ env.QT_VERSION }}
-          qt-host: 'windows'
+          qt-host: ${{ matrix.qt_host }}
           qt-target: 'desktop'
-          qt-arch: 'win64_msvc2022_64'
+          qt-arch: ${{ matrix.qt_arch }}
+          setup-cmake: ${{ matrix.setup_cmake }}
           enable-ccache: 'false'
           enable-sccache: 'false'
 
       - name: 'Install Ninja'
-        run: choco install ninja -y --no-progress
-
-      - name: 'Install ccache'
         shell: pwsh
         run: |
-          choco install ccache -y --no-progress
+          $ninja = Get-Command ninja -ErrorAction SilentlyContinue
+          if ($ninja) {
+            Write-Host "Ninja is already available:"
+            ninja --version
+          } else {
+            choco install ninja --version=1.12.1 -y --no-progress
+          }
+
+      - name: 'Install ccache'
+        if: matrix.enable_ccache
+        shell: pwsh
+        run: |
+          choco install ccache --version=4.11.1 -y --no-progress
           echo "CCACHE_DIR=${{ runner.temp }}\ccache" >> $env:GITHUB_ENV
           echo "CCACHE_MAXSIZE=2G" >> $env:GITHUB_ENV
           echo "CCACHE_BASEDIR=${{ github.workspace }}" >> $env:GITHUB_ENV
@@ -218,8 +244,9 @@ jobs:
           echo "CCACHE_COMPILERCHECK=content" >> $env:GITHUB_ENV
 
       - name: 'Restore CCache'
+        if: matrix.enable_ccache
         id: cache-ccache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ runner.temp }}\ccache
           key: win-ccache-${{ matrix.platform }}-${{ env.BUILD_TYPE }}-${{ env.QT_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -229,26 +256,35 @@ jobs:
             win-ccache-${{ matrix.platform }}-
 
       - name: 'Configure CMake (Ninja + ccache) with vcpkg'
+        shell: pwsh
         run: |
-          cmake -B build -G "Ninja" `
-            -DCMAKE_PREFIX_PATH="$env:Qt6_DIR" `
-            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
-            -DCMAKE_C_FLAGS_RELWITHDEBINFO="/MD /O2 /Ob1 /DNDEBUG /Z7" `
-            -DCMAKE_CXX_FLAGS_RELWITHDEBINFO="/MD /O2 /Ob1 /DNDEBUG /Z7" `
-            -DCMAKE_C_COMPILER=cl `
-            -DCMAKE_CXX_COMPILER=cl `
-            -DCMAKE_C_COMPILER_LAUNCHER=ccache `
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache `
-            -DENABLE_SYMBOL_FOOTPRINT_DEBUG_EXPORT=OFF `
-            -DEASYKICONVERTER_BUILD_TESTS=ON `
-            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
-            -DCI=ON
+          $cmakeArgs = @(
+            '-B', 'build',
+            '-G', 'Ninja',
+            "-DCMAKE_PREFIX_PATH=$env:Qt6_DIR",
+            "-DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}",
+            '-DCMAKE_C_FLAGS_RELWITHDEBINFO=/MD /O2 /Ob1 /DNDEBUG /Z7',
+            '-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=/MD /O2 /Ob1 /DNDEBUG /Z7',
+            '-DCMAKE_C_COMPILER=cl',
+            '-DCMAKE_CXX_COMPILER=cl',
+            '-DENABLE_SYMBOL_FOOTPRINT_DEBUG_EXPORT=OFF',
+            '-DEASYKICONVERTER_BUILD_TESTS=ON',
+            "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake",
+            '-DCI=ON'
+          )
+          if ("${{ matrix.enable_ccache }}" -eq "true") {
+            $cmakeArgs += '-DCMAKE_C_COMPILER_LAUNCHER=ccache'
+            $cmakeArgs += '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          }
+          cmake @cmakeArgs
 
       - name: 'Build'
         run: |
           cmake --build build --config ${{ env.BUILD_TYPE }} --parallel 16
 
       - name: 'CCache Stats'
+        if: matrix.enable_ccache
+        shell: pwsh
         run: |
           ccache -sv
           echo "## CCache Statistics" >> $GITHUB_STEP_SUMMARY
@@ -257,8 +293,8 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: 'Save CCache'
-        if: always() && steps.cache-ccache.outputs.cache-primary-key != ''
-        uses: actions/cache/save@v4
+        if: always() && matrix.enable_ccache && steps.cache-ccache.outputs.cache-primary-key != ''
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ runner.temp }}\ccache
           key: ${{ steps.cache-ccache.outputs.cache-primary-key }}
@@ -284,6 +320,7 @@ jobs:
           "| Free disk | ${freeDisk} GB |" >> $env:GITHUB_STEP_SUMMARY
 
       - name: 'Run Tests'
+        shell: pwsh
         run: |
           $env:QT_QPA_PLATFORM = "offscreen"
           ctest --test-dir build -C ${{ env.BUILD_TYPE }} --output-on-failure --no-tests=error
@@ -301,7 +338,7 @@ jobs:
             os: macos-15
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
 

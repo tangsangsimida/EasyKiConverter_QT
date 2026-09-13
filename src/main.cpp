@@ -17,8 +17,10 @@
 #include "ui/viewmodels/ComponentListViewModel.h"
 #include "ui/viewmodels/ExportProgressViewModel.h"
 #include "ui/viewmodels/ExportSettingsViewModel.h"
+#include "ui/viewmodels/ExportTargetModel.h"
 #include "ui/viewmodels/ThemeSettingsViewModel.h"
 #include "utils/CommandLineParser.h"
+#include "utils/FileUtils.h"
 #include "utils/cli/CliConverter.h"
 #include "utils/cli/CompletionGenerator.h"
 #include "utils/logging/Log.h"
@@ -677,6 +679,9 @@ int main(int argc, char* argv[]) {
         new EasyKiConverter::ExportProgressViewModel(exportService, componentService, componentListViewModel);
     EasyKiConverter::ThemeSettingsViewModel* themeSettingsViewModel = new EasyKiConverter::ThemeSettingsViewModel();
     EasyKiConverter::UpdateCheckerService* updateCheckerService = new EasyKiConverter::UpdateCheckerService();
+    EasyKiConverter::ExportTargetModel* exportTargetModel = new EasyKiConverter::ExportTargetModel();
+    exportTargetModel->loadPlugins(":/qt/qml/EasyKiconverter_Cpp_Version/src/resources/export_plugins.json");
+    exportSettingsViewModel->setTargetModel(exportTargetModel);
 
     // 创建 QML 引擎
     auto* engine = new QQmlApplicationEngine();
@@ -701,9 +706,11 @@ int main(int argc, char* argv[]) {
     engine->rootContext()->setContextProperty("exportProgressViewModel", exportProgressViewModel);
     engine->rootContext()->setContextProperty("themeSettingsViewModel", themeSettingsViewModel);
     engine->rootContext()->setContextProperty("updateCheckerService", updateCheckerService);
+    engine->rootContext()->setContextProperty("exportTargetModel", exportTargetModel);
     engine->rootContext()->setContextProperty("configService", EasyKiConverter::ConfigService::instance());
     engine->rootContext()->setContextProperty("componentCacheService",
                                               EasyKiConverter::ComponentCacheService::instance());
+    engine->rootContext()->setContextProperty("fileUtils", new EasyKiConverter::FileUtils(engine));
 
     // 连接对象创建失败信号
     QObject::connect(
@@ -801,6 +808,7 @@ int main(int argc, char* argv[]) {
     engine->rootContext()->setContextProperty("exportProgressViewModel", nullptr);
     engine->rootContext()->setContextProperty("themeSettingsViewModel", nullptr);
     engine->rootContext()->setContextProperty("updateCheckerService", nullptr);
+    engine->rootContext()->setContextProperty("exportTargetModel", nullptr);
     engine->rootContext()->setContextProperty("componentCacheService", nullptr);
 
     // 2. 先销毁 QML 引擎，阻止事件继续投递到 QML/QObject 图树
@@ -820,6 +828,8 @@ int main(int argc, char* argv[]) {
     themeSettingsViewModel = nullptr;
     delete exportProgressViewModel;
     exportProgressViewModel = nullptr;
+    delete exportTargetModel;
+    exportTargetModel = nullptr;
     delete exportSettingsViewModel;
     exportSettingsViewModel = nullptr;
     delete componentListViewModel;

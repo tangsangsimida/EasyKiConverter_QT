@@ -1,11 +1,22 @@
 name: Packaging(MacOS)
 
 on:
-  push:
-    tags:
-      - 'v*'
-      - 'V*'
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Release tag to package'
+        required: true
+        type: string
+      target_sha:
+        description: '固定的发布提交 SHA'
+        required: false
+        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,9 +52,10 @@ jobs:
       DIR_BUILD: build
     steps:
       - name: 'Checkout Source code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.target_sha || inputs.tag_name || github.ref }}
 
       - name: 'Record Start Time'
         run: echo "BUILD_START_TIME=$(date +%s)" >> "$GITHUB_ENV"
@@ -51,6 +63,8 @@ jobs:
       - name: 'Get Version Info'
         id: version
         uses: ./.github/actions/get-version
+        with:
+          tag_name: ${{ inputs.tag_name }}
 
       - name: 'Export Version to Env'
         shell: bash
@@ -222,7 +236,7 @@ jobs:
           shasum -a 256 "${PRODUCT}-${VERSION}-g${{ env.GIT_HASH }}-${{ matrix.dist.arch }}.dmg" | tee "${PRODUCT}-${VERSION}-g${{ env.GIT_HASH }}-${{ matrix.dist.arch }}.dmg.sha256sum"
 
       - name: 'Artifact Upload'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: EasyKiConverter-${{ env.VERSION }}-g${{ env.GIT_HASH }}-${{ matrix.dist.arch }}.dmg
           path: |

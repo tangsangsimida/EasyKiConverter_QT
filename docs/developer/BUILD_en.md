@@ -14,7 +14,7 @@ This document provides detailed instructions for building the EasyKiConverter pr
 
 #### Qt Framework
 
-- **Version**: Qt 6.8 or higher (Recommended Qt 6.10.2)
+- **Version**: Qt 6.6 or higher (Recommended Qt 6.10.2)
 - **Required Modules**:
   - Qt Quick
   - Qt Network
@@ -52,6 +52,32 @@ This document provides detailed instructions for building the EasyKiConverter pr
 
 ## Installation Instructions
 
+### Project-local development environment (Linux)
+
+This project does not use the system Qt installation and does not install project Python packages into system Python. Use the repository-local `.venv` and the standalone Qt 6.10.2 installation.
+
+```bash
+# Create and activate the project virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install Python build helpers into the project environment
+python -m pip install aqtinstall==3.2.1
+
+# Use the project-specific Qt (not /usr/lib system Qt)
+export Qt6_DIR=/home/dennis/software/QT/6.10.2/gcc_64/lib/cmake/Qt6
+export CMAKE_PREFIX_PATH=/home/dennis/software/QT/6.10.2/gcc_64
+export PATH=/home/dennis/software/QT/6.10.2/gcc_64/bin:$PATH
+```
+
+`format_code.py` automatically locates the project Qt `qmlformat` from `tools/config/build_config.json`; the `PATH` export is still recommended when invoking Qt tools directly.
+
+Verify the Qt version:
+
+```bash
+qmake -query QT_VERSION       # must be 6.10.2
+```
+
 ### Windows
 
 #### 1. Install Qt
@@ -78,6 +104,19 @@ This document provides detailed instructions for building the EasyKiConverter pr
 1. Download MinGW-w64 from https://www.mingw-w64.org/
 2. Extract to a directory (e.g., C:\mingw64)
 3. Add bin directory to system PATH
+
+Windows release builds support both architectures:
+
+- x64: Qt `win64_msvc2022_64`, vcpkg triplet `x64-windows`
+- ARM64: Windows 11 on Arm, Qt `win64_msvc2022_arm64`, vcpkg triplet `arm64-windows`
+
+The ARM64 release packages are built on the GitHub Actions `windows-11-arm` runner and include portable, installer, and MSIX packages.
+
+### LoongArch64
+
+LoongArch64 does not currently have an executable GitHub Actions workflow or official release package. GitHub-hosted runners do not support LoongArch64, and the project does not yet have a usable third-party native CI or x86_64/ARM64 cross-compilation toolchain, so no non-runnable workflow configuration is kept in the repository.
+
+Once usable build infrastructure is available, add an independent Qt, toolchain, test, and `loongarch64` packaging workflow.
 
 ### macOS
 
@@ -107,7 +146,10 @@ xcode-select --install
 
 ```bash
 sudo apt-get update
-sudo apt-get install qt6-base-dev qt6-declarative-dev qt6-network-dev
+sudo apt-get install cmake ninja-build build-essential zlib1g-dev libxkbcommon-dev libxkbcommon-x11-dev
+
+# Install project-specific Qt 6.10.2 using the project-local Qt instructions above.
+# Do not use the system Qt under /usr/lib.
 ```
 
 #### 2. Install CMake
@@ -192,7 +234,7 @@ mkdir build
 cd build
 
 # Configure project
-cmake .. -DCMAKE_PREFIX_PATH="/opt/Qt/6.10.2/gcc_64"
+cmake .. -DCMAKE_PREFIX_PATH="/home/dennis/software/QT/6.10.2/gcc_64"
 
 # Build project (Debug version)
 cmake --build . --config Debug

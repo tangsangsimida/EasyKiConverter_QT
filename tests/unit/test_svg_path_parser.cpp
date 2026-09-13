@@ -1,3 +1,4 @@
+#include "core/ir/GeometryNormalizer.h"
 #include "core/utils/SvgPathParser.h"
 
 #include <QTest>
@@ -30,6 +31,31 @@ private slots:
         QCOMPARE(points.at(3), QPointF(20, 15));
     }
 
+    void parsesRepeatedParameterGroups() {
+        const QList<QPointF> linePoints = SvgPathParser::parsePath(QStringLiteral("M 0 0 L 10 0 10 10 0 10 Z"));
+        QCOMPARE(linePoints.size(), 5);
+        QCOMPARE(linePoints.last(), QPointF(0, 0));
+
+        const QList<QPointF> curvePoints = SvgPathParser::parsePath(QStringLiteral("M 0 0 Q 10 20 20 0 30 -20 40 0"));
+        QVERIFY(curvePoints.size() > 25);
+        QCOMPARE(curvePoints.at(8), QPointF(10, 10));
+        QCOMPARE(curvePoints.last(), QPointF(40, 0));
+
+        const QList<QPointF> arcPoints =
+            SvgPathParser::parsePath(QStringLiteral("M 0 0 A 10 10 0 0 1 10 10 10 10 0 0 1 20 0"));
+        QVERIFY(arcPoints.size() > 60);
+        QCOMPARE(arcPoints.last(), QPointF(20, 0));
+    }
+
+    void smoothCurvesPreserveReflectedControlPoints() {
+        const QList<QPointF> cubicPoints =
+            SvgPathParser::parsePath(QStringLiteral("M 0 0 C 0 10 10 10 10 0 S 20 -10 20 0"));
+        QCOMPARE(cubicPoints.at(24), QPointF(15, -7.5));
+
+        const QList<QPointF> quadraticPoints = SvgPathParser::parsePath(QStringLiteral("M 0 0 Q 10 20 20 0 T 40 0"));
+        QCOMPARE(quadraticPoints.at(24), QPointF(30, -10));
+    }
+
     void cubicBezierProducesPolylineIncludingEndpoint() {
         const QList<QPointF> points = SvgPathParser::parsePath(QStringLiteral("M 0 0 C 0 10 10 10 10 0"));
 
@@ -44,6 +70,36 @@ private slots:
         QVERIFY(points.size() > 3);
         QCOMPARE(points.first(), QPointF(0, 0));
         QCOMPARE(points.last(), QPointF(10, 10));
+    }
+
+    void normalizedArcUsesOnlyGeometryCoordinates() {
+        const QList<QPointF> points = IR::GeometryNormalizer::parseSimpleSvgPath(
+            QStringLiteral("M 0 0 A 10 10 0 0 1 10 10 A 10 10 0 0 1 20 0 Z"));
+
+        QVERIFY(points.size() > 10);
+        for (const QPointF& point : points) {
+            QVERIFY2(qAbs(point.x()) < 10.0, "arc parser produced an implausibly large X coordinate");
+            QVERIFY2(qAbs(point.y()) < 10.0, "arc parser produced an implausibly large Y coordinate");
+        }
+        QCOMPARE(points.first(), points.last());
+    }
+
+    void normalizedQuadraticProducesEndpoint() {
+        const QList<QPointF> points = IR::GeometryNormalizer::parseSimpleSvgPath(QStringLiteral("M 0 0 Q 10 20 20 0"));
+
+        QVERIFY(points.size() > 3);
+        QCOMPARE(points.first(), QPointF(0, 0));
+        QCOMPARE(points.last(), QPointF(5.08, 0));
+        QVERIFY(points.at(points.size() / 2).y() > 2.0);
+    }
+
+    void smoothCurvesProduceValidEndpoints() {
+        const QList<QPointF> points =
+            SvgPathParser::parsePath(QStringLiteral("M 0 0 C 0 10 10 10 10 0 S 20 -10 20 0 Q 30 10 40 0 T 60 0"));
+
+        QVERIFY(points.size() > 20);
+        QCOMPARE(points.first(), QPointF(0, 0));
+        QCOMPARE(points.last(), QPointF(60, 0));
     }
 
     void invalidOrEmptyPathsReturnNoPoints() {

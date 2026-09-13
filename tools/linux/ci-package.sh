@@ -5,6 +5,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
+# 固定外部打包工具版本，避免 continuous 构建结果随上游变化。
+LINUXDEPLOY_VERSION="1-alpha-20240109-1"
+LINUXDEPLOY_PLUGIN_QT_VERSION="1-alpha-20240109-1"
+NFPM_VERSION="2.36.0"
+
 usage() {
     cat <<'EOF'
 Usage:
@@ -21,7 +26,7 @@ install_linuxdeploy() {
     sudo mkdir -p /opt/linuxdeploy /opt/linuxdeploy-plugin-qt
 
     wget -q -O /tmp/linuxdeploy \
-        "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${linuxdeploy_arch}.AppImage"
+        "https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-${linuxdeploy_arch}.AppImage"
     chmod +x /tmp/linuxdeploy
     /tmp/linuxdeploy --appimage-extract
     sudo cp -r squashfs-root/* /opt/linuxdeploy/
@@ -29,7 +34,7 @@ install_linuxdeploy() {
     sudo ln -sf /opt/linuxdeploy/AppRun /usr/local/bin/linuxdeploy
 
     wget -q -O /tmp/linuxdeploy-plugin-qt \
-        "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${linuxdeploy_arch}.AppImage"
+        "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${LINUXDEPLOY_PLUGIN_QT_VERSION}/linuxdeploy-plugin-qt-${linuxdeploy_arch}.AppImage"
     chmod +x /tmp/linuxdeploy-plugin-qt
     /tmp/linuxdeploy-plugin-qt --appimage-extract
     sudo cp -r squashfs-root/* /opt/linuxdeploy-plugin-qt/
