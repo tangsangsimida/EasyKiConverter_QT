@@ -122,7 +122,12 @@ TestCase {
         progressController.filteredPendingCount = 1
         progressController.successCount = 1
         progressController.failureCount = 1
-        wait(100)
+        // GridView/DelegateModel 异步创建委托，macOS 上固定等待时间可能不足。
+        // 等待失败项实际出现在对象树中，避免测试依赖平台调度时序。
+        tryVerify(function() {
+            return resultsCard.item !== null
+                    && findByObjectName(resultsCard.item, "exportResultItem_C200") !== null
+        }, 1000)
     }
 
     function cardItem() {
