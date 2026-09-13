@@ -134,20 +134,17 @@ package_appimage() {
 
     fix_permissions "$appdir"
 
-    # 先只准备 AppDir，避免 linuxdeploy 内置 output 插件在权限修复前生成 AppImage。
-    /opt/linuxdeploy/AppRun --appdir "$appdir" \
-        --executable "$appdir/usr/bin/easykiconverter" \
-        --desktop-file "$appdir/io.github.tangsangsimida.easykiconverter.desktop"
-
+    # build-core 阶段已经完成依赖部署。这里不能再次运行 linuxdeploy，
+    # 否则它会重写自定义 AppRun 并生成 AppRun.wrapped，导致 AppImage
+    # 启动时绕过 AppRun 中的 LD_LIBRARY_PATH 配置。
     sed -i "s|^Exec=.*easykiconverter|Exec=AppRun|" "$appdir/io.github.tangsangsimida.easykiconverter.desktop"
     sed -i "s|^Exec=.*easykiconverter|Exec=AppRun|" "$appdir/usr/share/applications/io.github.tangsangsimida.easykiconverter.desktop"
 
-    # artifact 传输或 linuxdeploy 处理可能丢失 Qt 主库的符号链接目标。
+    # artifact 传输可能丢失 Qt 主库的符号链接目标。
     # 在 appimagetool 读取 AppDir 前强制恢复为真实文件，避免运行时退出 127。
     ensure_qt_quick_controls_library "$appdir"
 
-    # linuxdeploy 可能在准备阶段新建或覆盖包装启动脚本，必须在 appimagetool
-    # 读取 AppDir 前再次修复两个启动文件的执行权限。
+    # appimagetool 读取 AppDir 前再次修复启动文件的执行权限。
     fix_permissions "$appdir"
 
     local appimagetool="/opt/linuxdeploy/plugins/linuxdeploy-plugin-appimage/usr/bin/appimagetool"
