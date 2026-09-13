@@ -253,6 +253,7 @@ jobs:
             win-ccache-${{ matrix.platform }}-
 
       - name: 'Configure CMake (Ninja + ccache) with vcpkg'
+        shell: pwsh
         run: |
           $cmakeArgs = @(
             '-B', 'build',

@@ -42,28 +42,24 @@ jobs:
       matrix:
         qt_target: [desktop]
         config:
-          - {
-              runner: 'windows-2022',
-              arch: 'x64',
-              generator: 'Ninja',
-              gen_arch: '',
-              vcpkg_triplet: 'x64-windows',
-              qt_host: 'windows',
-              qt_arch: 'win64_msvc2022_64',
-              package_arch: 'x64',
-              pak_arch: 'win64'
-            },
-          - {
-              runner: 'windows-11-arm',
-              arch: 'arm64',
-              generator: 'Ninja',
-              gen_arch: '',
-              vcpkg_triplet: 'arm64-windows',
-              qt_host: 'windows_arm64',
-              qt_arch: 'win64_msvc2022_arm64',
-              package_arch: 'arm64',
-              pak_arch: 'win64-arm64'
-            }
+          - runner: 'windows-2022'
+            arch: 'x64'
+            generator: 'Ninja'
+            gen_arch: ''
+            vcpkg_triplet: 'x64-windows'
+            qt_host: 'windows'
+            qt_arch: 'win64_msvc2022_64'
+            package_arch: 'x64'
+            pak_arch: 'win64'
+          - runner: 'windows-11-arm'
+            arch: 'arm64'
+            generator: 'Ninja'
+            gen_arch: ''
+            vcpkg_triplet: 'arm64-windows'
+            qt_host: 'windows_arm64'
+            qt_arch: 'win64_msvc2022_arm64'
+            package_arch: 'arm64'
+            pak_arch: 'win64-arm64'
         type: [portable, installer]
     steps:
       - name: 'Checkout Source code'
