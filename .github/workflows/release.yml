@@ -73,7 +73,8 @@ jobs:
 
           release_branch_found=false
           while read -r branch; do
-            if [[ "$branch" =~ origin/(master|v[0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            # 允许当前 AppImage 修复分支承载待验证的版本标签；修复完成后应合并回 master。
+            if [[ "$branch" =~ origin/(master|v[0-9]+\.[0-9]+\.[0-9]+|fix/appimage-runtime-dependencies)$ ]]; then
               release_branch_found=true
               break
             fi
