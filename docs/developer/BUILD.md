@@ -118,21 +118,9 @@ ARM64 发布包由 GitHub Actions 的 `windows-11-arm` runner 构建，生成 AR
 
 ### LoongArch64（龙架构）
 
-LoongArch64 使用独立的原生构建流程，不复用 x86_64 或 ARM64 的 Qt 二进制包。GitHub Actions 需要配置带有以下标签的自托管 runner：
+LoongArch64 暂未提供可执行的 GitHub Actions 构建工作流或正式发布包。GitHub 官方 runner 不支持 LoongArch64，项目也尚未配置可用的第三方原生 CI 或 x86_64/ARM64 交叉编译工具链，因此暂不保留不可执行的 workflow 配置。
 
-```text
-self-hosted, linux, loongarch64
-```
-
-Runner 必须预装 Qt 6、CMake、Ninja 以及项目运行所需的 Linux 开发库，并确保 `qmake6`/`qmake` 能查询到 Qt 6。该工作流目前仅支持手动触发，不在正式发布流程的强制依赖链中；这是因为 GitHub 官方托管 runner 不提供 LoongArch64，项目也尚未配置可用的 LoongArch64 或交叉编译基础设施。
-
-配置好可用 runner 后，工作流会生成：
-
-```text
-EasyKiConverter-<version>-g<commit>-loongarch64.tar.gz
-```
-
-该归档是面向 LoongArch64 国产 Linux 系统的原生包，使用系统 Qt/运行库；发布前必须在目标国产操作系统上验证启动和基本转换流程。
+后续具备可运行的构建基础设施后，再增加独立的 Qt、工具链、测试和 `loongarch64` 发布包流程。
 
 ### macOS
 

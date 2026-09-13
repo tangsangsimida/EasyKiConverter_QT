@@ -114,21 +114,9 @@ The ARM64 release packages are built on the GitHub Actions `windows-11-arm` runn
 
 ### LoongArch64
 
-LoongArch64 uses an independent native build workflow and does not reuse the x86_64 or ARM64 Qt binaries. GitHub Actions requires a self-hosted runner with these labels:
+LoongArch64 does not currently have an executable GitHub Actions workflow or official release package. GitHub-hosted runners do not support LoongArch64, and the project does not yet have a usable third-party native CI or x86_64/ARM64 cross-compilation toolchain, so no non-runnable workflow configuration is kept in the repository.
 
-```text
-self-hosted, linux, loongarch64
-```
-
-The runner must provide Qt 6, CMake, Ninja, and the Linux development libraries required by the project. `qmake6` or `qmake` must resolve to Qt 6. This workflow is currently manual-only and is not a mandatory dependency of the official release workflow because GitHub-hosted runners do not provide LoongArch64 and the project has not yet configured a usable LoongArch64 or cross-compilation infrastructure.
-
-Once a usable runner is configured, the workflow produces:
-
-```text
-EasyKiConverter-<version>-g<commit>-loongarch64.tar.gz
-```
-
-This is a native package for LoongArch64 Linux distributions and uses the system Qt/runtime libraries. Validate startup and a basic conversion flow on the target Chinese Linux distribution before release.
+Once usable build infrastructure is available, add an independent Qt, toolchain, test, and `loongarch64` packaging workflow.
 
 ### macOS
 

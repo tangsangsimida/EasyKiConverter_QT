@@ -242,10 +242,10 @@ jobs:
             while IFS= read -r asset; do
               filename="$(basename "$asset")"
               [[ "$filename" == *.sha256sum ]] && continue
-              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+[._-]//; s/\.(AppImage|deb|rpm|pkg\.tar\.zst|tar\.gz|zip|exe|msix|dmg)$//')"
+              descriptor="$(echo "$filename" | sed -E 's/^EasyKiConverter-[^-]+-g[0-9a-f]+[._-]//; s/\.(AppImage|deb|rpm|pkg\.tar\.zst|zip|exe|msix|dmg)$//')"
               case "$filename" in
                 *win64*|*-setup.exe|*.msix) platform="Windows" ;;
-                *.AppImage|*.deb|*.rpm|*.pkg.tar.zst|*.tar.gz) platform="Linux" ;;
+                *.AppImage|*.deb|*.rpm|*.pkg.tar.zst) platform="Linux" ;;
                 *.dmg) platform="macOS" ;;
                 *) platform="其他" ;;
               esac
